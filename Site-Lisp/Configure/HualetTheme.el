@@ -1,9 +1,9 @@
 (custom-set-faces
  ;; Flymake.
  '(flymake-errline                      ;错误行
-   ((t (:background "black" :underline "red"))))
+   ((t (:background "white" :underline "red"))))
  '(flymake-infoline                     ;信息行
-   ((t (:background "black" :underline "yellow" :slant italic))))
+   ((t (:background "white" :underline "yellow" :slant italic))))
  '(flymake-warnline                     ;警告行
    ((((class color)) (:background "Gold3" :foreground "Black"))))
  ;; Dired

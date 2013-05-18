@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 扩展设置 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;(require 'init-misc)              ;各种各样的设置
+(require 'init-misc)              ;各种各样的设置
 (require 'init-linum)             ;显示行号
 (require 'init-time)              ;时间设置
 (require 'init-backup)            ;备份设置

@@ -40,7 +40,7 @@
 
 (require 'HualetFont)                  ;字体
 (require 'HualetDepend)                ;依赖
-;(require 'HualetTheme)                 ;主题
+(require 'HualetTheme)                 ;主题
 (require 'HualetCustomize)             ;自定义
 ;(require 'HualetRedefine)              ;重定义
 (require 'HualetSetup)                 ;设置

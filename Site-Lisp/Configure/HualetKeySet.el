@@ -63,6 +63,20 @@
  ac-complete-mode-map
  )
 
+;;; ### Tabbar ###
+;;; --- 多标签浏览
+(lazy-set-key
+ '(
+   ("M-7" . tabbar-backward-tab)              ;移动到后一个标签
+   ("M-8" . tabbar-forward-tab)               ;移动到前一个标签
+   ("M-9" . tabbar-backward-group)            ;移动到后一个标签组
+   ("M-0" . tabbar-forward-group)             ;移动到前一个标签组
+   ("M-&" . tabbar-backward-tab-other-window) ;向前移动其他窗口的标签
+   ("M-*" . tabbar-forward-tab-other-window)  ;向后移动其他窗口的标签
+   ("M-s-7" . tabbar-select-beg-tab)          ;移动到最左边的标签
+   ("M-s-8" . tabbar-select-end-tab)          ;移动到最右边的标签
+   ))
+
 ;;; ### Window Operation ###
 ;;; --- 窗口操作
 (lazy-set-key

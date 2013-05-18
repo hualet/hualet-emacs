@@ -75,7 +75,7 @@
 ;;; (require 'chart)                       ;Emacs的内存使用
 ;(require 'ibuffer)                     ;ibuffer模式
 ;(require 'ido)                         ;ido模式
-;(require 'tabbar)                      ;标签管理
+(require 'tabbar)                      ;标签管理
 ;(require 'browse-kill-ring)            ;超强恢复
 ;(require 'recentf)                     ;打开最近的文件
 ;;; (require 'xcscope)                     ;cscope

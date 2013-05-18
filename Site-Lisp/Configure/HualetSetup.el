@@ -6,6 +6,7 @@
 (require 'init-backup)            ;备份设置
 (require 'init-auto-save)         ;自动保存
 (require 'init-ido)               ;交互式打开文件
+(require 'init-tabbar)
 ;;(require 'init-ide)               ;IDE相关的设置
 ;;;; (require 'init-mldonkey)                ;Mldonkey
 ;;(require 'init-ispell)            ;拼写检查

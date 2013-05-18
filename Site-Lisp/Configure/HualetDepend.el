@@ -36,7 +36,7 @@
 ;(require 'moccur-edit)                  ;搜索编辑
 ;(require 'apt-utils)                    ;APT搜索管理工具
 ;;; (require 'g)                  ;Google Client, 包括Google日历, 博客, 阅读器
-;(require 'cycle-buffer)       ;buffer循环切换
+(require 'cycle-buffer)       ;buffer循环切换
 ;;; (require 'tramp)            ;很强大远程文件访问工具
 ;;; (require 'rcirc)                        ;Emacs里面一个轻量IRC客户端
 ;;; (require 'rcirc-color)                  ;rcirc高亮, 随机颜色妮称
@@ -247,7 +247,8 @@
 (require 'basic-edit-toolkit)           ;基础编辑包
 (require 'fullscreen)                   ;全屏
 ;(require 'shell-command-extension)      ;shell command 扩展
-;(require 'lazycat-toolkit)              ;工具包
+(require 'hualet-toolkit)
+;; (require 'lazycat-toolkit)              ;工具包
 ;(require 'wget-extension)               ;wget 扩展
 ;(require 'find-func-extension)          ;`find-func' 的扩展
 (require 'window-extension)             ;窗口增强函数

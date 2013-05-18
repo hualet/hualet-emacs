@@ -7,6 +7,7 @@
  '(flymake-warnline                     ;警告行
    ((((class color)) (:background "Gold3" :foreground "Black"))))
  ;; Dired
+ 
  '(dired-directory                      ;目录
    ((t (:inherit font-lock-function-name-face
                  :foreground "DodgerBlue"))))
@@ -53,75 +54,35 @@
    ((t (:background "Black" :foreground "IndianRed"))))
  '(diredp-write-priv                    ;写入掩码
    ((t (:background "Black" :foreground "Gold3"))))
- 
- ;; Tabbar标签颜色
- '(tabbar-default                       ;默认
-   ((((class color grayscale)
-      (background dark))
-     (
-      :inherit variable-pitch
-               :height 1.1
-               :family "DejaVu Sans Mono"
-               ))))
- '(tabbar-separator                     ;分隔线
-   ((t (
-        :inherit tabbar-default
-                 :background "black"
-                 :foreground "brown" :height 0.1
-                 ))))
- '(tabbar-button-highlight              ;按钮
-   ((t (
-        :inherit tabbar-default
-                 :background "black"
-                 :foreground "green"
-                 :box (:color "red")
-                 ))))
- '(tabbar-button
-   ((t (
-        :inherit tabbar-default
-                 :background "black"
-                 :foreground "red"
-                 :box (
-                       :line-width 1
-                                   :color "black"
-                                   :style released-button)))))
- '(tabbar-selected                      ;当前正在使用的标签
-   ((t (
-        :inherit tabbar-default
-                 :background "black"
-                 :foreground "LawnGreen"
-                 :box (
-                       :line-width 1
-                                   :color "#014500"
-                                   :style released-button)))))
- '(tabbar-selected-face
-   ((t (
-        :inherit tabbar-default-face
-                 :background "black"
-                 :foreground "grey"
-                 :box (
-                       :line-width -1
-                                   :color "grey"
-                                   :style released-button)))))
- '(tabbar-unselected                    ;未使用的标签
-   ((t (
-        :inherit tabbar-default
-                 :background "black"
-                 :foreground "#10650F"
-                 :box (
-                       :line-width 1
-                                   :color "Grey10"
-                                   :style pressed-button)))))
- '(tabbar-unselected-face
-   ((t (
-        :inherit tabbar-default-face
-                 :background "black"
-                 :foreground "white"
-                 :box (
-                       :line-width -1
-                                   :color "black"
-                                   :style pressed-button)))))
 
+;;;; 设置tabbar外观
+ ;; 设置默认主题: 字体, 背景和前景颜色，大小
+ (set-face-attribute 'tabbar-default nil
+                     :family "Vera Sans YuanTi Mono"
+                     :background "gray80"
+                     :foreground "gray30"
+                     :height 1.0
+                     )
+ ;; 设置左边按钮外观：外框框边大小和颜色
+ (set-face-attribute 'tabbar-button nil
+                     :inherit 'tabbar-default
+                     :box '(:line-width 1 :color "gray30")
+                     )
+ ;; 设置当前tab外观：颜色，字体，外框大小和颜色
+ (set-face-attribute 'tabbar-selected nil
+                     :inherit 'tabbar-default
+                     :foreground "DarkGreen"
+                     :background "LightGoldenrod"
+                     :box '(:line-width 2 :color "DarkGoldenrod")
+                     ;; :overline "black"
+                     ;; :underline "black"
+                     :weight 'bold
+                     )
+ ;; 设置非当前tab外观：外框大小和颜色
+ (set-face-attribute 'tabbar-unselected nil
+                     :inherit 'tabbar-default
+                     :box '(:line-width 2 :color "gray70")
+                     )
 
  )
 

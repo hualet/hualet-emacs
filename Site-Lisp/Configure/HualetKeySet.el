@@ -278,7 +278,7 @@ ac-complete-mode-map
    ;; ("C-c ns" . notes-search)                ;便签搜索
    ;; ("C-c nn" . notes-new)                   ;新建便签
    ("s-c o" . one-key-menu-directory)       ;目录打开菜单
-   ;; ("M-C" . one-key-menu-cycle-buffer)      ;特定模式切换
+   ("M-C" . one-key-menu-cycle-buffer)      ;特定模式切换
    ;; ("s-*" . one-key-menu-backup-file)       ;备份资料
    ;; ("s-," . bury-buffer)                    ;隐藏当前buffer
    ;; ("s-." . unbury-buffer)                  ;反隐藏当前buffer

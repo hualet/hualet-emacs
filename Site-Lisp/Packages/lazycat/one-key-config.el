@@ -345,35 +345,35 @@
   (one-key-menu "DIRECTORY" one-key-menu-directory-alist t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Cycle Buffer ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (defvar one-key-menu-cycle-buffer-alist nil
-;;   "The `one-key' menu alist for CYCLE-BUFFER.")
+(defvar one-key-menu-cycle-buffer-alist nil
+  "The `one-key' menu alist for CYCLE-BUFFER.")
 
-;; (setq one-key-menu-cycle-buffer-alist
-;;       '(
-;;         (("l" . "Elisp") . (lambda () (interactive) (cycle-buffer-in-special-mode 'emacs-lisp-mode)))
-;;         (("i" . "IRC") . (lambda () (interactive) (cycle-buffer-in-special-mode 'erc-mode)))
-;;         (("d" . "Dired") . (lambda () (interactive) (cycle-buffer-in-special-mode 'dired-mode)))
-;;         (("o" . "Org") . (lambda () (interactive) (cycle-buffer-in-special-mode 'org-mode)))
-;;         (("H" . "Haskell") . (lambda () (interactive) (cycle-buffer-in-special-mode 'haskell-mode)))
-;;         (("w" . "W3m") . (lambda () (interactive) (cycle-buffer-in-special-mode 'w3m-mode)))
-;;         (("t" . "Term") . (lambda () (interactive) (cycle-buffer-in-special-mode 'term-mode)))
-;;         (("y" . "Yaoddmuse") . (lambda () (interactive) (cycle-buffer-in-special-mode 'yaoddmuse-mode)))
-;;         (("r" . "RFC") . (lambda () (interactive) (cycle-buffer-in-special-mode 'irfc-mode)))
-;;         (("v" . "DocView") . (lambda () (interactive) (cycle-buffer-in-special-mode 'doc-view-mode)))
-;;         (("c" . "C-Mode") . (lambda () (interactive) (cycle-buffer-in-special-mode 'c-mode)))
-;;         (("C" . "C++-Mode") . (lambda () (interactive) (cycle-buffer-in-special-mode 'c++-mode)))
-;;         (("j" . "JS") . (lambda () (interactive) (cycle-buffer-in-special-mode 'js-mode)))
-;;         (("x" . "XML") . (lambda () (interactive) (cycle-buffer-in-special-mode 'nxml-mode)))
-;;         (("p" . "Python") . (lambda () (interactive) (cycle-buffer-in-special-mode 'python-mode)))
-;;         (("s" . "CSS") . (lambda () (interactive) (cycle-buffer-in-special-mode 'css-mode)))
-;;         (("h" . "html") . (lambda () (interactive) (cycle-buffer-in-special-mode 'html-helper-mode)))
-;;         (("m" . "OCaml") . (lambda () (interactive) (cycle-buffer-in-special-mode 'tuareg-mode)))
-;;         ))
+(setq one-key-menu-cycle-buffer-alist
+      '(
+        (("l" . "Elisp") . (lambda () (interactive) (cycle-buffer-in-special-mode 'emacs-lisp-mode)))
+        (("i" . "IRC") . (lambda () (interactive) (cycle-buffer-in-special-mode 'erc-mode)))
+        (("d" . "Dired") . (lambda () (interactive) (cycle-buffer-in-special-mode 'dired-mode)))
+        (("o" . "Org") . (lambda () (interactive) (cycle-buffer-in-special-mode 'org-mode)))
+        (("H" . "Haskell") . (lambda () (interactive) (cycle-buffer-in-special-mode 'haskell-mode)))
+        (("w" . "W3m") . (lambda () (interactive) (cycle-buffer-in-special-mode 'w3m-mode)))
+        (("t" . "Term") . (lambda () (interactive) (cycle-buffer-in-special-mode 'term-mode)))
+        (("y" . "Yaoddmuse") . (lambda () (interactive) (cycle-buffer-in-special-mode 'yaoddmuse-mode)))
+        (("r" . "RFC") . (lambda () (interactive) (cycle-buffer-in-special-mode 'irfc-mode)))
+        (("v" . "DocView") . (lambda () (interactive) (cycle-buffer-in-special-mode 'doc-view-mode)))
+        (("c" . "C-Mode") . (lambda () (interactive) (cycle-buffer-in-special-mode 'c-mode)))
+        (("C" . "C++-Mode") . (lambda () (interactive) (cycle-buffer-in-special-mode 'c++-mode)))
+        (("j" . "JS") . (lambda () (interactive) (cycle-buffer-in-special-mode 'js-mode)))
+        (("x" . "XML") . (lambda () (interactive) (cycle-buffer-in-special-mode 'nxml-mode)))
+        (("p" . "Python") . (lambda () (interactive) (cycle-buffer-in-special-mode 'python-mode)))
+        (("s" . "CSS") . (lambda () (interactive) (cycle-buffer-in-special-mode 'css-mode)))
+        (("h" . "html") . (lambda () (interactive) (cycle-buffer-in-special-mode 'html-helper-mode)))
+        (("m" . "OCaml") . (lambda () (interactive) (cycle-buffer-in-special-mode 'tuareg-mode)))
+        ))
 
-;; (defun one-key-menu-cycle-buffer ()
-;;   "The `one-key' menu for CYCLE-BUFFER."
-;;   (interactive)
-;;   (one-key-menu "CYCLE-BUFFER" one-key-menu-cycle-buffer-alist t))
+(defun one-key-menu-cycle-buffer ()
+  "The `one-key' menu for CYCLE-BUFFER."
+  (interactive)
+  (one-key-menu "CYCLE-BUFFER" one-key-menu-cycle-buffer-alist t))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Backup File ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (defvar one-key-menu-backup-file-alist nil

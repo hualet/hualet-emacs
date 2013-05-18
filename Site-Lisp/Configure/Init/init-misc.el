@@ -201,10 +201,6 @@
 ;  "Convert a region from simple chinese to tradition chinese or
 ;from tradition chinese to simple chinese" t)
 ;
-;;;; ### Tabbar ###
-;;;; --- 多标签浏览
-;(tabbar-mode t)
-;
 ;;;; ### Files ###
 ;;;; --- 文件设置
 ;(setq require-final-newline nil)        ;不自动添加换行符到末尾, 有些情况会出现错误

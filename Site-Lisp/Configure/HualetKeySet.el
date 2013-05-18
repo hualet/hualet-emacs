@@ -118,6 +118,62 @@ ac-complete-mode-map
    ("s-P" . execute-command-with-region-kill)    ;在选择的区域中执行命令并删除
    ("s-\"" . copy-rectangle-to-register)         ;拷贝矩形到寄存器
    ))
+;;; ### Dired ###
+;;; --- 文件浏览器
+(lazy-set-key
+ '(
+ ;;   ("h" . dired-next-subdir)                   ;下一个子目录
+;;    ("l" . dired-prev-subdir)                   ;上一个子目录
+;;    ("j" . dired-next-file-line)                ;下一行
+;;    ("k" . dired-previous-file-line)            ;上一行
+;;    ("n" . dired-next-dirline)                  ;下一个目录
+;;    ("p" . dired-prev-dirline)                  ;上一个目录
+;;    ("f" . dired-find-file+)                    ;打开当前文件或目录
+;;    ("C-m" . dired-find-file+)                  ;打开当前文件或目录
+;;    ("P" . dired-do-kill-lines)                 ;删除标记的行
+;;    ("4" . dired-serial-rename)                 ;批量重命名
+;;    ("5" . dired-translate-to-html)             ;转换到HTML格式
+;;    ("7" . dired-move-to-last-file)             ;移动到最后一个文件
+;;    ("8" . dired-move-to-first-file)            ;移动到第一个文件
+;;    ("9" . auto-install-from-dired)             ;自动从EmacsWiki安装标记的文件
+   ("E" . dired-touch-now)                     ;Touch命令
+;;    ("z" . dired-do-moccur)                     ;搜索dired
+;;    ("I" . image-dired)                         ;打开浏览模式
+   ("w" . wdired-change-to-wdired-mode)        ;切换到dired编辑模式
+;;    ("W" . dired-x-find-file)                   ;查找文件
+;;    ("\"" . find-lisp-find-dired-pwd)           ;查找特定的lisp文件
+;;    ("J" . dired-goto-file)                     ;跳到某个文件
+;;    ("K" . dired-open-file)                     ;用W3M打开各种文件
+;;    ("X" . traverse-cp-or-mv-extfiles-in-dir)   ;拷贝或移动目录下指定扩展名的文件
+;;    ("V" . traverse-dired-browse-archive)       ;浏览压缩文件
+;;    (";" . dired-view-minor-mode-toggle)        ;字母输入导航模式
+;;    ("," . dired-diff)                          ;比较文件
+;;    ("'" . dired-up-directory-single)           ;返回上一级目录
+;;    ("C-s" . dired-isearch-forward)             ;向后搜索
+;;    ("C-r" . dired-isearch-backward)            ;向前搜索
+;;    ("ESC C-s" . dired-isearch-forward-regexp)  ;向前正则表达式搜索
+;;    ("ESC C-r" . dired-isearch-backward-regexp) ;向后正则表达式搜索
+;;    ("SPC" . scroll-up)                         ;向下翻页
+;;    ("e" . scroll-down)                         ;向上翻页
+;;    ("c" . kill-this-buffer)                    ;关闭当前标签
+;;    ("/" . copy-buffer-file-name-as-kill)       ;显示路径或名称
+;;    ("[" . dired-rename-with-copy)              ;重命名函数
+;;    ("]" . dired-nautilus)                      ;用 Nautils 加载当前目录
+;;    ("{" . dired-gnome-open-file)               ;用GNOME方式打开文件
+;;    ("s" . one-key-menu-dired-sort)             ;排序
+;;    ("?" . dired-get-size)                      ;得到文件的大小
+;;    ("M-o" . dired-toggle-omit)                 ;切换忽略状态
+   )
+ dired-mode-map
+ )
+;; ;;; ### Wdired ###
+;; ;;; --- Dired 的编辑模式
+;; (lazy-set-key
+;;  '(
+;;    ("C-c C-e" . wdired-format-filename) ;格式化文件名
+;;    )
+;;  wdired-mode-map
+;;  )
 
 
 ;;; ### Buffer Edit ###
@@ -188,6 +244,14 @@ ac-complete-mode-map
    ;; ("s-{" . current-line-move-to-top)      ;移动当前行到最上面一行
    ))
 
+;; ### Helm ###
+;; 
+(lazy-set-key
+ '(
+   ("s-y" . helm-mini)
+   )
+ )
+
 ;;; ### Python ###
 ;;; --- Python mode
 (require 'python)
@@ -205,5 +269,39 @@ ac-complete-mode-map
    ("C-c i" . erc)
    )
  )
+
+;;; ### Toolkit ###
+;;; --- 工具函数
+(lazy-set-key
+ '(
+   ;; ("C-x C-c" . checkdoc)                   ;检查文档
+   ;; ("C-c ns" . notes-search)                ;便签搜索
+   ;; ("C-c nn" . notes-new)                   ;新建便签
+   ("s-c o" . one-key-menu-directory)       ;目录打开菜单
+   ;; ("M-C" . one-key-menu-cycle-buffer)      ;特定模式切换
+   ;; ("s-*" . one-key-menu-backup-file)       ;备份资料
+   ;; ("s-," . bury-buffer)                    ;隐藏当前buffer
+   ;; ("s-." . unbury-buffer)                  ;反隐藏当前buffer
+   ;; ("s-&" . killall)                        ;杀掉进程
+   ;; ("C-x w" . count-words)                  ;计算单词的数量
+   ;; ("C-z l" . linum-mode)                   ;行号模式切换
+   ;; ("s-Z" . dot-emacs)                      ;打开dot-emacs文件
+   ;; ("C-x f" . find-file-at-point)           ;文件跳转
+   ;; ("s-f" . find-file-root)                 ;用root打开文件
+   ;; ("s-r" . find-file-smb)                  ;访问samba
+   ;; ("<print>" . save-screenshots)           ;截屏
+   ;; ("<M-s-return>" . toggle-debug-on-error) ;切换调试模式
+   ;; ("s-R" . re-builder)                     ;可视化构建正则表达式
+   ;; ;; ("s-1" . elisp-depend-insert-require)    ;插入 (require '...) 语句
+   ;; ("s-1" . sort-lines)                  ;排序
+   ;; ("s-2" . elisp-depend-insert-comment) ;插入 `...' 注释代码
+   ;; ("s-3" . hanconvert-region)           ;转换简体或繁体中文
+   ;; ("s-4" . uniquify-all-lines-buffer)   ;删除重复的行
+   ;; ("s-[" . eval-expression)             ;执行表达式
+   ;; ("s-\\" . artist-mode)                ;绘制模式
+   ;; ("M-s-u" . ediff-buffers)             ;ediff
+   ;; ("C-s-q" . quoted-insert)             ;读取系一个输入字符并插入
+   ))
+
 
 (provide 'HualetKeySet)

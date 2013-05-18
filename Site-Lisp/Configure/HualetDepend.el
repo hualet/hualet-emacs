@@ -306,8 +306,8 @@
 ;(require 'anything-irfc)                ;irfc 和 anything 集成
 ;(require 'newsticker-notify)            ;newsticker提醒
 ;(require 'isearch-extension)            ;isearch扩展
-;(require 'one-key)                      ;one-key
-;(require 'one-key-config)               ;one-key 扩展
+(require 'one-key)                      ;one-key
+(require 'one-key-config)               ;one-key 扩展
 ;(require 'lazy-search)                  ;懒惰搜索
 ;(require 'lazy-search-extension)        ;lazy-seach 扩展
 ;(require 'gnus-extension)               ;gnus扩展

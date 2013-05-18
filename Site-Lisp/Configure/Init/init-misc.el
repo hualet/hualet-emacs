@@ -151,6 +151,7 @@
 (setq-default indent-tabs-mode t)       ;默认不用空格替代TAB
 (setq default-tab-width 4)              ;设置TAB默认的宽度
 (dolist (hook (list                     ;设置用空格替代TAB的模式
+               'python-mode-hook
                'emacs-lisp-mode-hook
                'lisp-mode-hook
                'lisp-interaction-mode-hook

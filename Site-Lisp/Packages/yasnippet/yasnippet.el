@@ -1,7 +1,7 @@
 ;;; yasnippet.el --- Yet another snippet extension for Emacs.
 
 ;; Copyright (C) 2008-2012 Free Software Foundation, Inc.
-;; Authors: pluskid <pluskid@gmail.com>
+;; Authors: pluskid <pluskid@gmail.com>,  João Távora <joaotavora@gmail.com>
 ;; Version: 0.8.0
 ;; Package-version: 0.8.0
 ;; X-URL: http://github.com/capitaomorte/yasnippet

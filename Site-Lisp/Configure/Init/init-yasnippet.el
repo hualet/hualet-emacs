@@ -50,6 +50,7 @@
 (require 'yasnippet)
 (yas--initialize)
 (yas/load-directory "~/.emacs.d/HualetEmacs/Site-Lisp/Packages/yasnippet/snippets/")
+(yas/global-mode 1)
 
 (provide 'init-yasnippet)
 

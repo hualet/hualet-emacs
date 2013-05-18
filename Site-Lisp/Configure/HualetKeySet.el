@@ -50,18 +50,18 @@
 ;;; ### Auto-complete ###
 ;;; --- 自动补全
 (lazy-unset-key
- '("RET" "TAB")
- ac-complete-mode-map)
+'("RET" "TAB")
+ac-complete-mode-map)
 (lazy-set-key
- '(
-   ("M-h" . ac-complete)                ;补全当前选中的
-   ("M-H" . ac-expand-common)           ;补全公共部分
-   ("M-U" . ac-stop)                    ;停止
-   ("M-," . ac-next)                    ;下一个
-   ("M-." . ac-previous)                ;上一个
-   )
- ac-complete-mode-map
- )
+'(
+  ("M-h" . ac-complete)                ;补全当前选中的
+  ("M-H" . ac-expand-common)           ;补全公共部分
+  ("M-U" . ac-stop)                    ;停止
+  ("M-," . ac-next)                    ;下一个
+  ("M-." . ac-previous)                ;上一个
+  )
+ac-complete-mode-map
+)
 
 ;;; ### Tabbar ###
 ;;; --- 多标签浏览
@@ -176,5 +176,13 @@
    )
  python-mode-map)
 
+
+;; ###ERC###
+;; 
+(lazy-set-key
+ '(
+   ("C-c i" . erc)
+   )
+ )
 
 (provide 'HualetKeySet)

@@ -27,8 +27,8 @@
 ;(require 'info)                         ;Info
 ;(require 'info+)                        ;Info 增强
 ;(require 'apt-sources)                  ;Apt源编辑
-;(require 'rect)                         ;矩形编辑
-;(require 'rect-mark)                    ;矩形操作
+(require 'rect)                         ;矩形编辑
+(require 'rect-mark)                    ;矩形操作
 ;(require 'term)                         ;终端模拟器
 ;(require 'uniquify)                     ;如果有两个重名buffer, 则再前面加上路径区别
 ;(require 'org)                          ;个人信息管理
@@ -202,7 +202,7 @@
 ;(require 'auto-complete-emacs-lisp)     ;集成 auto-complete 和 emacs-lisp
 ;(require 'auto-complete-gtags)          ;集成 auto-complete 和 gtags
 ;;; (require 'auto-complete-semantic)      ;集成 auto-complete 和 semantic
-;(require 'auto-complete-yasnippet)      ;集成 auto-complete 和 yasnippet
+(require 'auto-complete-yasnippet)      ;集成 auto-complete 和 yasnippet
 ;;;(require 'auto-complete-css)           ;集成 auto-complete 和 css
 ;(require 'ac-dabbrev)                  ;auto-complete 的 `dabbrev' 支持
 ;;; (require 'boxquote)                    ;文本引用工具

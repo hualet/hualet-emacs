@@ -99,6 +99,27 @@ ac-complete-mode-map
    ("M-s-o" . toggle-one-window)                      ;切换一个窗口
    ))
 
+;;; ### Rect ###
+;;; --- 矩形操作
+(lazy-set-key
+ '(
+   ("s-M" . rm-set-mark)                         ;矩形标记
+   ("s-X" . rm-exchange-point-and-mark)          ;矩形对角交换
+   ("s-D" . rm-kill-region)                      ;矩形删除
+   ("s-S" . rm-kill-ring-save)                   ;矩形保存
+   ("s-Y" . yank-rectangle)                      ;粘帖矩形
+   ("s-O" . open-rectangle)                      ;用空白填充矩形, 并向右移动文本
+   ("s-C" . clear-rectangle)                     ;清空矩形
+   ("s-T" . string-rectangle)                    ;用字符串替代矩形的每一行
+   ("s-I" . string-insert-rectangle)             ;插入字符串在矩形的每一行
+   ("s-F" . delete-whitespace-rectangle)         ;删除矩形中空格
+   ("s-:" . mark-rectangle-to-end)               ;标记矩形到行末
+   ("s-H" . execute-command-with-region-replace) ;在选择的区域中执行命令并替换
+   ("s-P" . execute-command-with-region-kill)    ;在选择的区域中执行命令并删除
+   ("s-\"" . copy-rectangle-to-register)         ;拷贝矩形到寄存器
+   ))
+
+
 ;;; ### Buffer Edit ###
 ;;; --- 缓存编辑
 (lazy-set-key

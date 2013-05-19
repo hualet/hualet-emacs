@@ -330,12 +330,11 @@
         (("d" . "Downloads") . (lambda () (interactive) (dired-x-find-file my-default-download-directory)))
         (("b" . "Book") . (lambda () (interactive) (dired-x-find-file my-book-directory)))
         (("i" . "Image") . (lambda () (interactive) (dired-x-find-file my-picture-directory)))
-        (("P" . "Emacs Package") . (lambda () (interactive) (dired-x-find-file my-emacs-lisp-package-directory)))
         (("s" . "Screenshots") . (lambda () (interactive) (dired-x-find-file my-screenshots-storage-directory)))
         (("r" . "Backup") . (lambda () (interactive) (dired-x-find-file my-resource-backup-directory)))
         (("n" . "Notes") . (lambda () (interactive) (dired-x-find-file my-notes-directory)))
         (("x" . "Reading") . (lambda () (interactive) (dired-x-find-file my-reading-directory)))
-        (("z" . "Elisp") . (lambda () (interactive) (dired-x-find-file my-elisp-directory)))
+        (("e" . "Elisp") . (lambda () (interactive) (dired-x-find-file my-elisp-directory)))
         (("p" . "Project") . (lambda () (interactive) (dired-x-find-file my-project-directory)))
         ))
 

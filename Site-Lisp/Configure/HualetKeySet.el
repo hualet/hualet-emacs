@@ -12,7 +12,7 @@
    ("<f8>" . dired-jump)                         ;文件管理起
    ;; ("<f9>" . list-load-path-shadows)             ;显示重复加载的库
    ;; ("<f10>" . open-current-log-keyboard-command) ;打开命令日志
-   ;; ("<f11>" . fullscreen-toggle)                 ;全屏切换
+   ("<f11>" . fullscreen-toggle)                 ;全屏切换
    ;; ("<f12>" . hibernate-disk)                    ;休眠
    ;; ("M-1" . strip-blank-lines)                   ;删除选中区域的所有空行
    ;; ("M-2" . indent-buffer)                       ;自动格式化当前Buffer
@@ -27,8 +27,6 @@
    ;; ("C-8" . find-function-or-variable-at-point)  ;查找符号的定义
    ;; ("M-I" . backward-indent)                     ;向后移动4个字符
    ))
-
-
 
 ;;; ### Unset key ###
 ;;; --- 卸载按键
@@ -261,6 +259,15 @@ ac-complete-mode-map
    )
  python-mode-map)
 
+;; ### Multi-Scratch ###
+;; 
+(lazy-set-key
+ '(
+   ("C-1" . multi-scratch-prev)
+   ("C-2" . multi-scratch-next)
+   ("C-3" . multi-scratch-new)
+   )
+ )
 
 ;; ###ERC###
 ;; 

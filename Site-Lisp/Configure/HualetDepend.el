@@ -277,7 +277,7 @@
 ;(require 'c-mode-extension)             ;C 模式的扩展
 ;(require 'newsticker-extension)         ;newsticker扩展
 ;(require 'scim-bridge-extension)        ;scim-brige 的一些扩展
-;(require 'dired-extension)              ;dired 的一些扩展
+(require 'dired-extension)              ;dired 的一些扩展
 ;(require 'wdired-extension)             ;wdired 的扩展
 ;(require 'dired-sort)                   ;排序 dired 文件
 ;(require 'dired-open)                   ;在 dired 中打开不同文件
@@ -320,7 +320,7 @@
 ;(require 'irfc)                         ;RFC 文档阅读
 ;;; (require 'oicq)                         ;QQ
 ;(require 'elisp-format)                 ;elisp 代码格式化
-;(require 'multi-scratch)                ;多重草稿
+(require 'multi-scratch)                ;多重草稿
 ;(require 'chm-view)                     ;CHM 文件阅读
 ;(require 'org-oddmuse)                  ;转换 Org-mode 到 Oddmuse 模式
 ;(require 'gtk2hs)                       ;gtk2hs绑定工具

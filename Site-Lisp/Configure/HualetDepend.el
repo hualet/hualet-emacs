@@ -8,7 +8,7 @@
 ;(require 'flymake-shell)           ;对shell模式的实时语法检查
 (require 'flymake-cursor)          ;把flymake的错误信息显示在minibuf
 ;(require 'kill-ring-search)        ;Kill ring 搜索
-;(require 'highlight-parentheses)   ;智能括号
+(require 'highlight-parentheses)   ;智能括号
 ;(require 'top-mode)                ;top
 ;(require 'pick-backup)             ;备份浏览
 ;(require 'autoload)                ;用于'autoload'的处理
@@ -126,7 +126,7 @@
 ;;; (require 'bbdb)                         ;数据库
 ;;; (require 'bbdb-autoloads)               ;bbdb 自动加载
 ;(require 'shell-history)               ;Shell历史
-;(require 'paredit)                     ;括号编辑模式
+(require 'paredit)                     ;括号编辑模式
 ;;; (require 'mwe-log-commands)       ;命令日志
 ;(require 'predictive)                  ;英文助手
 ;(require 'contentswitch)               ;按内容切换缓存或文件
@@ -325,6 +325,7 @@
 ;(require 'org-oddmuse)                  ;转换 Org-mode 到 Oddmuse 模式
 ;(require 'gtk2hs)                       ;gtk2hs绑定工具
 ;(require 'python-mode-utils)            ;Python 工具
+;; (require 'pymacs)
 ;(require 'qml-mode)                     ;QML mode
 
 (provide 'HualetDepend)

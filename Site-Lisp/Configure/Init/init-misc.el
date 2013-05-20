@@ -303,11 +303,16 @@
 ;;;; --- Same Frame Speedbar
 ;(setq sr-speedbar-skip-other-window-p t)
 ;(setq sr-speedbar-right-side nil)
-;
-;;;; ### Highlight-parentheses ###
-;;;; --- 增强的括号高亮
-;(add-hook 'find-file-hook 'highlight-parentheses-mode t)
-;
+
+;; ### Highlight-parentheses ###
+;;--- 增强的括号高亮
+;; (highlight-parentheses-mode t)
+(define-globalized-minor-mode global-highlight-parentheses-mode
+  highlight-parentheses-mode
+  (lambda ()
+    (highlight-parentheses-mode t)))
+(global-highlight-parentheses-mode t)
+
 ;;;; ### Kill ring search ###
 ;;;; --- 删除环搜索
 ;(autoload 'kill-ring-search "kill-ring-search"
@@ -341,11 +346,11 @@
 ;;;; ### find-func ###
 ;;;; --- 查找函数
 ;(setq find-function-C-source-directory "/usr/share/deepin-emacs/Src") ;设置Emacs的C语言代码目录
-;
-;;;; ### hl-line ###
-;;;; --- 高亮当前行
-;(global-hl-line-mode 1)
-;
+
+;; ### hl-line ###
+;; --- 高亮当前行
+(global-hl-line-mode 1)
+
 ;;;; ### timid ###
 ;;;; --- timid补全
 ;(timid-mode 1)

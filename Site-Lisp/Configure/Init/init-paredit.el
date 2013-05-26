@@ -77,6 +77,7 @@
 ;;; Code:
 
 (dolist (hook (list
+               'python-mode-hook
                'c-mode-hook
                'c++-mode-hook
                'java-mode-hook
@@ -88,7 +89,6 @@
                'ielm-mode-hook
                'sh-mode-hook
                'makefile-gmake-mode-hook
-               'python-mode-hook
                'js-mode-hook
                'go-mode-hook
                'qml-mode-hook

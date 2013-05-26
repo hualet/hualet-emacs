@@ -1,6 +1,5 @@
 (custom-set-faces
- 
- ;; highlight-parenthese
+ ;; highlight parenthese
  '(hl-paren-colors (quote ("Cyan" "Gold" "Red")))
  
  ;; Flymake.

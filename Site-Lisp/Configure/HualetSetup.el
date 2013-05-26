@@ -9,14 +9,14 @@
 (require 'init-tabbar)
 ;;(require 'init-ide)               ;IDE相关的设置
 ;;;; (require 'init-mldonkey)                ;Mldonkey
-;;(require 'init-ispell)            ;拼写检查
+(require 'init-ispell)            ;拼写检查
 ;;;; (require 'init-rcirc)                   ;IRC客户端
 ;;;; (require 'init-maxima)                  ;代数计算系统
 ;;(require 'init-eldoc)             ;Elisp 参数信息提示
 ;;(require 'init-hideshow)          ;代码折叠
 ;;(require 'init-w3m)               ;网页浏览器
 (require 'init-dired)             ;文件管理器
-;;(require 'init-org)               ;笔记管理和组织
+(require 'init-org)               ;笔记管理和组织
 ;;(require 'init-wget)              ;下载管理器
 (require 'init-paredit)           ;括号编辑模式
 (require 'init-flymake)           ;实时语法检查

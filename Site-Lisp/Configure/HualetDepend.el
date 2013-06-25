@@ -60,7 +60,7 @@
 ;(require 'ansi-color)                   ;shell里面显示颜色
 ;(require 'miniedit)                     ;编辑minibuffer
 ;(require 'buffer-move)                  ;buffer移动功能
-;(require 'scroll-mode-line-mode)        ;Mode-line滚动
+(require 'scroll-mode-line-mode)        ;Mode-line滚动
 ;(require 'cc-mode)                      ;C语言模式
 ;(require 'redo)                         ;重做命令
 ;;;(require 'ascii)                        ;ASCII编码

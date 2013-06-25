@@ -182,11 +182,11 @@
 ;;;; ### Mode-line ###
 ;;;; --- mode-line
 ;(delete 'win:mode-string global-mode-string) ;在 `global-mode-string' 中去掉窗口数字
-;
-;;;; ### Scroll-mode-line ###
-;;;; --- 滚动 Mode-line 的信息
-;(scroll-mode-line-mode 1)
-;
+
+;;; ### Scroll-mode-line ###
+;;; --- 滚动 Mode-line 的信息
+(scroll-mode-line-mode 1)
+
 ;;;; ### Ctypes-auto-parse ###
 ;;;; --- 自动对 C 语言的类型定义识别并进行语法加亮
 ;(ctypes-auto-parse-mode 1)

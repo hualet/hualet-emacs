@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 字体设置 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar emacs-font-name "DejaVu Sans Mono"
+(defvar emacs-font-name "文泉驿等宽微米黑"
 	"The default font name")
 (defvar emacs-font-size 12
   "The default font size.")

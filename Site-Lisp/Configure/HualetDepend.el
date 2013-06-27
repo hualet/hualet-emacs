@@ -79,7 +79,6 @@
 ;(require 'browse-kill-ring)            ;超强恢复
 ;(require 'recentf)                     ;打开最近的文件
 ;;; (require 'xcscope)                     ;cscope
-;(require 'linum)                       ;显示行号
 ;(require 'smiley)                      ;整加simpley
 ;(require 'emms-source-file)            ;Emms 文件
 ;(require 'emms-source-playlist)        ;Emms 列表
@@ -198,6 +197,7 @@
 ;;;(require 'file-journal)                ;文件按日期访问
 ;;; (require 'babel)                       ;网络翻译接口
 ;(require 'auto-complete)                ;自动补全
+;(require 'auto-complete-pycomplete)      ;集成 auto-complete 和 pycomplete
 ;(require 'auto-complete-cpp)            ;集成 auto-complete 和 C++
 ;(require 'auto-complete-emacs-lisp)     ;集成 auto-complete 和 emacs-lisp
 ;(require 'auto-complete-gtags)          ;集成 auto-complete 和 gtags

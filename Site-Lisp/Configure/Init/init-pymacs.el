@@ -1,6 +1,3 @@
-;; activate the virtualenv where Pymacs is located
-(virtualenv-workon "emacs/")
-
 (autoload 'pymacs-apply "pymacs")
 (autoload 'pymacs-call "pymacs")
 (autoload 'pymacs-eval "pymacs" nil t)
@@ -10,5 +7,7 @@
 
 ;;(eval-after-load "pymacs"
 ;;  '(add-to-list 'pymacs-load-path YOUR-PYMACS-DIRECTORY"))
+
+(setq pymacs-auto-restart t)
 
 (provide 'init-pymacs)

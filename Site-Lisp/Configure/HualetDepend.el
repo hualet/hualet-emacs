@@ -1,5 +1,4 @@
 ;;; 搜集的扩展加载
-;(require 'tooltip)                 ;工具提示
 ;(require 'eldoc)                   ;函数参数提示
 ;(require 'avoid)                   ;鼠标行为
 ;(require 'shell)                   ;Shell模式
@@ -30,7 +29,7 @@
 (require 'rect)                         ;矩形编辑
 (require 'rect-mark)                    ;矩形操作
 ;(require 'term)                         ;终端模拟器
-;(require 'uniquify)                     ;如果有两个重名buffer, 则再前面加上路径区别
+(require 'uniquify)                     ;如果有两个重名buffer, 则再前面加上路径区别
 ;(require 'org)                          ;个人信息管理
 ;(require 'color-moccur)                 ;人性化的搜索功能
 ;(require 'moccur-edit)                  ;搜索编辑
@@ -324,7 +323,7 @@
 ;(require 'chm-view)                     ;CHM 文件阅读
 ;(require 'org-oddmuse)                  ;转换 Org-mode 到 Oddmuse 模式
 ;(require 'gtk2hs)                       ;gtk2hs绑定工具
-;(require 'python-mode-utils)            ;Python 工具
+(require 'python-mode-utils)            ;Python 工具
 (require 'pymacs)
 ;(require 'qml-mode)                     ;QML mode
 

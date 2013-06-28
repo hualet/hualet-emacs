@@ -217,11 +217,11 @@
 ;(setq recentf-auto-cleanup 300)         ;自动清理最近打开文件列表中重复或其他文件的时间间隔 (秒)
 ;(setq recentf-save-file "~/.emacs.d/deepin-emacs/Configure-File/Recentf/recentf-list") ;最近打开的文件列表
 ;
-;;;; ### Uniquify ###
-;;;; --- 相同缓存名字时加上路径以区别
-;(setq uniquify-buffer-name-style 'post-forward-angle-brackets) ;反方向的显示重复的Buffer名字
-;(setq uniquify-separator "/")                                  ;分隔符
-;(setq uniquify-after-kill-buffer-p t)                          ;删除重复名字的Buffer后重命名
+;; ### Uniquify ###
+;; --- 相同缓存名字时加上路径以区别
+(setq uniquify-buffer-name-style 'post-forward-angle-brackets) ;反方向的显示重复的Buffer名字
+(setq uniquify-separator "/")                                  ;分隔符
+(setq uniquify-after-kill-buffer-p t)                          ;删除重复名字的Buffer后重命名
 ;
 ;;;; ### Miniedit ###
 ;;;; --- 编辑 Minibuffer

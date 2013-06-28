@@ -1,5 +1,6 @@
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/HualetEmacs/Site-Lisp/Packages/auto-complete/ac-dict")
 
+(require 'yasnippet)
 (require 'auto-complete-config)
 (setq ac-dwim t)
 (ac-config-default)
@@ -9,7 +10,8 @@
                                ac-source-pycomplete
                                ac-source-abbrev
                                ac-source-dictionary
-                               ac-source-words-in-same-mode-buffers))
+                               ac-source-words-in-same-mode-buffers
+                               ac-source-yasnippet))
             ))
 
 

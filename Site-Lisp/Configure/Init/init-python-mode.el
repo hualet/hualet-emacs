@@ -31,5 +31,9 @@
           (add-hook 'python-mode-hook 'py-complete-initialize))
       (error "`py-install-directory' not set, see INSTALL"))))
 (eval-after-load 'pymacs '(load-pycomplete))
+;; auto restart pymacs everytime pymacs helper died
+(setq pymacs-auto-restart t)
+
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 
 (provide 'init-python-mode)

@@ -21,8 +21,6 @@
 (require 'init-paredit)           ;括号编辑模式
 (require 'init-flymake)           ;实时语法检查
 (require 'init-python-mode)
-;(require 'init-pymacs)
-;; (require 'init-ropemacs)
 ;;(require 'init-etags)             ;Etags 用于建立代码并提供补全数据
 ;;(require 'init-emms)              ;Emacs 多媒体系统
 ;;(require 'init-newsticker)        ;新闻聚合

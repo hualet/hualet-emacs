@@ -12,7 +12,7 @@
 (require 'init-ispell)            ;拼写检查
 ;;;; (require 'init-rcirc)                   ;IRC客户端
 ;;;; (require 'init-maxima)                  ;代数计算系统
-;;(require 'init-eldoc)             ;Elisp 参数信息提示
+(require 'init-eldoc)             ;Elisp 参数信息提示
 ;;(require 'init-hideshow)          ;代码折叠
 ;;(require 'init-w3m)               ;网页浏览器
 (require 'init-dired)             ;文件管理器

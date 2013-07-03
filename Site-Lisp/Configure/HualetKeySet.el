@@ -227,6 +227,15 @@ ac-complete-mode-map
 ;;  wdired-mode-map
 ;;  )
 
+;; ###Font###
+(lazy-set-key
+ '(
+   ("s--" . text-scale-decrease)        ;减小字体大小
+   ("s-=" . text-scale-decrease)        ;增大字体大小
+   ("M--" . text-scale-decrease-global) ;减少字体大小, 全局
+   ("M-+" . text-scale-increase-global) ;增加字体大小, 全局
+   ("M-=" . text-scale-default-global)  ;恢复字体大小, 全局
+   ))
 
 ;;; ### Buffer Edit ###
 ;;; --- 缓存编辑
@@ -306,7 +315,7 @@ ac-complete-mode-map
 
 ;;; ### Python ###
 ;;; --- Python mode
-(require 'python)
+(require 'python-mode)
 (lazy-set-key
  '(
    ("C-S-j" . jump-to-import)
@@ -348,8 +357,8 @@ ac-complete-mode-map
    ;; ("C-z l" . linum-mode)                   ;行号模式切换
    ;; ("s-Z" . dot-emacs)                      ;打开dot-emacs文件
    ;; ("C-x f" . find-file-at-point)           ;文件跳转
-   ;; ("s-f" . find-file-root)                 ;用root打开文件
-   ;; ("s-r" . find-file-smb)                  ;访问samba
+   ("s-f" . find-file-root)                 ;用root打开文件
+   ("s-r" . find-file-smb)                  ;访问samba
    ;; ("<print>" . save-screenshots)           ;截屏
    ;; ("<M-s-return>" . toggle-debug-on-error) ;切换调试模式
    ;; ("s-R" . re-builder)                     ;可视化构建正则表达式

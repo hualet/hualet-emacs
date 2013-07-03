@@ -246,8 +246,7 @@
 (require 'basic-edit-toolkit)           ;基础编辑包
 (require 'fullscreen)                   ;全屏
 ;(require 'shell-command-extension)      ;shell command 扩展
-(require 'hualet-toolkit)
-;; (require 'lazycat-toolkit)              ;工具包
+(require 'hualet-toolkit)               ;自己的工具包
 ;(require 'wget-extension)               ;wget 扩展
 ;(require 'find-func-extension)          ;`find-func' 的扩展
 (require 'window-extension)             ;窗口增强函数

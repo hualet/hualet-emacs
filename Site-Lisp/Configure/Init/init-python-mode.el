@@ -1,8 +1,11 @@
 (setq py-install-directory "~/.emacs.d/HualetEmacs/Site-Lisp/Packages/python-mode.el-6.1.1/")
-(setq py-shell-name "ipython")
-
 
 (require 'python-mode)
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+;; FIXME this can solve the problem that emacs will take over 99% cpu while opening big python file.
+(add-hook 'python-mode-hook 
+          (lambda ()
+            (setq which-function-mode nil)))
 
 ;; this will show method signatures while typing
 (setq py-set-complete-keymap-p t)
@@ -31,9 +34,9 @@
           (add-hook 'python-mode-hook 'py-complete-initialize))
       (error "`py-install-directory' not set, see INSTALL"))))
 (eval-after-load 'pymacs '(load-pycomplete))
+
 ;; auto restart pymacs everytime pymacs helper died
 (setq pymacs-auto-restart t)
 
-(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 
 (provide 'init-python-mode)

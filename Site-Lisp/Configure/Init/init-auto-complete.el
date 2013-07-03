@@ -8,8 +8,8 @@
           (lambda ()
             (setq ac-sources '(
                                ac-source-pycomplete
-                               ac-source-abbrev
                                ac-source-dictionary
+                               ac-source-words-in-buffer
                                ac-source-words-in-same-mode-buffers
                                ac-source-yasnippet
                                ac-source-filename ))

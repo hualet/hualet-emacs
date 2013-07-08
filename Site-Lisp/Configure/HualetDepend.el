@@ -100,15 +100,15 @@
 ;(require 'emms-cache)                  ;EMMS 缓存
 ;(require 'emms-tag-editor)             ;EMMS 标签编辑器
 ;(require 'executable)                  ;执行解释脚本
-;(require 'w3m)                         ;W3M
-;(require 'w3m-search)                  ;w3m搜索
-;(require 'w3m-bookmark)                ;w3m书签
-;(require 'w3m-tabmenu)                 ;W3m标签菜单
+(require 'w3m)                         ;W3M
+(require 'w3m-search)                  ;w3m搜索
+(require 'w3m-bookmark)                ;w3m书签
+(require 'w3m-tabmenu)                 ;W3m标签菜单
 ;(require 'w3m-wget)                    ;W3m wget 集成
-;(require 'w3m-lnum)                    ;W3M 数字快速导航
-;(require 'w3m-form)                    ;W3m 表格
-;(require 'w3m-util)                    ;w3m 工具
-;(require 'w3m-symbol)                  ;w3m 符号处理
+(require 'w3m-lnum)                    ;W3M 数字快速导航
+(require 'w3m-form)                    ;W3m 表格
+(require 'w3m-util)                    ;w3m 工具
+(require 'w3m-symbol)                  ;w3m 符号处理
 ;(require 'dired)                       ;Dired
 ;(require 'dired+)                      ;增强dired
 ;(require 'dired-details)               ;Dired详细信息

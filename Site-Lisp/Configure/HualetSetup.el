@@ -14,7 +14,7 @@
 ;;;; (require 'init-maxima)                  ;代数计算系统
 (require 'init-eldoc)             ;Elisp 参数信息提示
 ;;(require 'init-hideshow)          ;代码折叠
-;;(require 'init-w3m)               ;网页浏览器
+(require 'init-w3m)               ;网页浏览器
 (require 'init-dired)             ;文件管理器
 (require 'init-org)               ;笔记管理和组织
 ;;(require 'init-wget)              ;下载管理器
@@ -32,7 +32,7 @@
 (require 'init-yasnippet)         ;模版补全模式
 (require 'init-auto-complete)     ;代码补全
 (require 'init-erc)               ;IRC 聊天
-;;(require 'init-gnus)              ;Gnus
+;; (require 'init-gnus)              ;Gnus
 ;;(require 'init-shell)             ;Shell
 ;; (require 'init-bbbd)                    ;bbdb加载
 ;; (require 'init-icicles)                 ;一个强大的命令输入扩展

@@ -3,6 +3,7 @@
 (defvar my-full-name "")
 (defvar my-mail "")
 (defvar my-homepage "")
+(defvar my-default-download-directory "")
 (defvar my-irc-nick "")
 (defvar my-irc-passwd "")
 (defvar my-irc-channel-list '())
@@ -10,12 +11,13 @@
 ;; 扩展自定义变量
 (custom-set-variables
  ;; 基本信息
- '(my-name "Hualet")                          ;名字
- '(my-full-name "Hualet Wang")             ;全名
- '(my-mail "mr.asianwang@gmail.com")     ;邮件地址
- '(my-homepage "http://www.google.com/ncr") ;首页, 无国家/地区的自动转向
- '(my-irc-nick "hualet")                          ;IRC昵称
- '(my-irc-passwd "Wyh19910402")                        ;IRC密码
+ '(my-name "Hualet")                            ;名字
+ '(my-full-name "Hualet Wang")                  ;全名
+ '(my-mail "mr.asianwang@gmail.com")            ;邮件地址
+ '(my-default-download-directory "~/Downloads") ;默认下载目录
+ '(my-homepage "http://www.google.com/") ;首页, 无国家/地区的自动转向
+ '(my-irc-nick "hualet-deepin")          ;IRC昵称
+ '(my-irc-passwd "Wyh19910402")          ;IRC密码
  '(my-irc-channel-list
    '(
      "#emacs"

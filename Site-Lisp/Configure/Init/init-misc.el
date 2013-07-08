@@ -185,6 +185,7 @@
 
 ;;; ### Scroll-mode-line ###
 ;;; --- 滚动 Mode-line 的信息
+(require 'scroll-mode-line-mode)
 (scroll-mode-line-mode 1)
 
 ;;;; ### Ctypes-auto-parse ###

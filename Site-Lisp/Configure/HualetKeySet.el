@@ -45,6 +45,88 @@
         (";" . sdcv-search-input+)))    ;输入的单词, tooltip显示
 (lazy-set-key sdcv-key-alist nil "C-z") ;sdcv的全局按键绑定
 
+;;; ### W3m ###
+;;; --- 网页浏览器
+(lazy-set-key
+ '(
+   ("C-z C-z" . w3m)                          ;启动W3M
+   ("C-z z" . w3m-startup-background)         ;启动W3M, 后台
+   ("C-x C-z" . toggle-w3m-with-other-buffer) ;在W3M和buffer间切换
+   ("s-W" . one-key-menu-w3m-search)          ;w3m 搜索菜单
+   ))
+(lazy-set-key
+ '(("1" . emms-play-online)                             ;在线听音乐
+   ("2" . kill-google-define-windows)                   ;关闭Google定义窗口
+   ("3" . google-define)                                ;查找输入单词的Google定义
+   ("4" . google-define-pointer)                        ;查找当前光标处的Google定义
+   ("5" . w3m-open-rcirc-window)                        ;打开RCIRC窗口
+   ("6" . w3m-session-save)                             ;保存浏览纪录
+   ("7" . w3m-session-select)                           ;加载退出前的浏览器纪录
+   ("8" . w3m-emacswiki-view-other-version)             ;查看当前wiki页面的其他版本
+   ("9" . w3m-auto-install-elisp)                       ;自动安装elisp文件
+   ("0" . w3m-gmail-toggle-mark)                        ;切换标记选项框
+   ("(" . w3m-gmail-mark-all)                           ;标记选项框
+   (")" . w3m-gmail-unmark-all)                         ;取消标记选项框
+   ("c" . w3m-delete-buffer-and-select-right)           ;关闭当前标签并选择右边的标签
+   ("/" . w3m-next-form)                                ;下一个表格处
+   ("e" . w3m-scroll-down-or-previous-url)              ;向上翻页
+   ("b" . w3m-edit-current-url)                         ;编辑当前页面
+   ("z" . w3m-zoom-in-image)                            ;放大图片
+   ("x" . w3m-zoom-out-image)                           ;缩小图片
+   ("O" . w3m-goto-linknum)                             ;数字连接快速跳转
+   ("f" . w3m-view-this-url)                            ;在当前标签打开
+   ("o" . w3m-view-this-url-new-session)                ;在后台标签打开
+   ("M" . w3m-open-link-in-chromium)                    ;Open link in chromium browser
+   ("M-o" . w3m-open-link-file-under-current-directory) ;open link file under current directory
+   ("m" . tabbar-forward-tab)                           ;切换到右边的标签
+   ("n" . tabbar-backward-tab)                          ;切换到左边的标签
+   ("'" . w3m-open-dead-link-with-external-browser)     ;打开死的连接
+   ("s-j" . w3m-visual-scroll-up)                       ;可视化向上滚动
+   ("s-k" . w3m-visual-scroll-down)                     ;可视化向下滚动
+   ("b" . w3m-history)                                  ;历史
+   ("D" . w3m-dtree)                                    ;显示本地目录树
+   ("B" . w3m-view-previous-page)                       ;后退
+   ("F" . w3m-view-next-page)                           ;前进
+   ("S" . w3m-google-desktop-url-open)                  ;Google桌面打开连接
+   ("L" . w3m-submit-form)                              ;提交form中的内容
+   ("C" . w3m-delete-other-buffers)                     ;关闭后台标签
+   ("d" . w3m-download-with-wget-current-position)      ;用Wget异步下载当前地连接
+   ("Y" . wget-web-page)                                ;网页下载
+   ("-" . org-w3m-copy-for-org-mode)                    ;转换网页成 `org-mode' 的链接格式
+   ("_" . w3m-copy-link-in-region)                      ;拷贝w3m buffer 的所有链接
+   ("&" . yaoddmuse-w3m-edit-emacswiki-page)            ;编辑 emacswiki 页面
+   ("*" . w3m-emacswiki-view-diff)                      ;查看当前wiki页面的不同
+   ("\"" . w3m-emacswiki-recent-changes)                ;最近的修改
+   ("C-u s" . w3m-db-history)                           ;历史数据库
+   ("<up>" . emms-volume-mode-plus)                     ;增加音量
+   ("<down>" . emms-volume-mode-minus)                  ;减少音量
+   ("<left>" . emms-seek-backward)                      ;后退
+   ("<right>" . emms-seek-forward)                      ;前进
+   ("<" . w3m-shift-left)                               ;向左滚动屏幕一像素
+   (">" . w3m-shift-right)                              ;向右滚动屏幕一像素
+   ("." . go-to-char-forward-word)                      ;向后查找某一个字符, 以单词为单位前进
+   ("," . go-to-char-backward-word)                     ;向前查找某一个字符, 以单词为单位后退
+   ("M-s" . lazy-search-menu)                           ;懒惰搜索
+   ("M-A" . emms-pause)                                 ;暂停
+   ("M-j" . scim-handle-event)                          ;设置为输入法切换键
+   ("C-M-7" . w3m-tab-move-left)                        ;移动当前标签到左边
+   ("C-M-8" . w3m-tab-move-right)                       ;移动当前标签到右边
+   ("C-S-7" . w3m-delete-left-tabs)                     ;删除左边的标签
+   ("C-S-8" . w3m-delete-right-tabs)                    ;删除右边的标签
+   )
+ w3m-mode-map
+ )
+(lazy-set-key sdcv-key-alist w3m-mode-map) ;sdcv的局部按键绑定
+(lazy-unset-key
+ '("s")
+ w3m-mode-map)                          ;卸载按键
+(lazy-set-key
+ '(
+   ("s" . one-key-menu-w3m-search)      ;w3m 搜索菜单
+   )
+ w3m-mode-map)
+
+
 ;;; ### Auto-complete ###
 ;;; --- 自动补全
 (lazy-unset-key

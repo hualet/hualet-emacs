@@ -233,6 +233,10 @@ ac-complete-mode-map
    ("M-s-o" . toggle-one-window)                      ;切换一个窗口
    ))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Muti-Cursor ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(lazy-set-key
+ '(("M-s-r" . mc/mark-all-like-this-dwim)))
+
 ;;; ### Rect ###
 ;;; --- 矩形操作
 (lazy-set-key

@@ -16,7 +16,7 @@
  '(my-mail "mr.asianwang@gmail.com")            ;邮件地址
  '(my-default-download-directory "~/Downloads") ;默认下载目录
  '(my-homepage "http://www.google.com/") ;首页, 无国家/地区的自动转向
- '(my-irc-nick "hualet-deepin")          ;IRC昵称
+ '(my-irc-nick "hualet_deepin")          ;IRC昵称
  '(my-irc-passwd "Wyh19910402")          ;IRC密码
  '(my-irc-channel-list
    '(

@@ -325,5 +325,6 @@
 (require 'python-mode-utils)            ;Python ¹¤¾ß
 (require 'pymacs)
 ;(require 'qml-mode)                     ;QML mode
+(require 'multiple-cursors)             ;EmacsµÄmulti-cursor
 
 (provide 'HualetDepend)

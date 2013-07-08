@@ -56,6 +56,8 @@
   (setq cycle-buffer-filter (cons '(eq major-mode special-mode) cycle-buffer-filter))
   (cycle-buffer-backward-permissive 1))
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Insert Banner ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun insert-banner (banner-name)
   "Util function for insert delimiters."
@@ -64,5 +66,30 @@
   (insert (concat (concat ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;; " banner-name) " ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"))
   )
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Insert Date and Time ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun insert-date (prefix)
+  "Insert the current date. With prefix-argument, use ISO format. With
+   two prefix arguments, write out the day and month name."
+  (interactive "P")
+  (let ((date-format (cond 
+                      ((not prefix) "%Y-%m-%d")
+                      ((equal prefix '(4)) "%d.%m.%Y")
+                      ((equal prefix '(16)) "%A, %d. %B %Y")))
+        (system-time-locate "zh_CN"))
+  (insert (format-time-string date-format))))
+
+(defun insert-time ()
+  "Insert current time like 23:02:58."
+  (interactive)
+  (let ((time-format "%H:%M:%S"))
+    (insert (format-time-string time-format))))
+
+(defun insert-date-time (prefix)
+  (interactive "P")
+  (insert-date prefix)
+  (insert " ")
+  (insert-time))
+
+ 
 
 (provide 'hualet-toolkit)

@@ -157,6 +157,11 @@ ac-complete-mode-map
    ("M-s-8" . tabbar-select-end-tab)          ;移动到最右边的标签
    ))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Recentf Mode ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(lazy-set-key '(
+                ("C-x C-r" . recentf-open-files)
+                ("C-S-t" . recentf-open-most-recent-file-cycle)))
+
 
 ;;; ### Paredit ###
 ;;; --- 结构化编程

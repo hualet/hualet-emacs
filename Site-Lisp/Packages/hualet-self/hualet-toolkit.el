@@ -90,6 +90,5 @@
   (insert " ")
   (insert-time))
 
- 
 
 (provide 'hualet-toolkit)

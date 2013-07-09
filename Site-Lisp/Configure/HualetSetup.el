@@ -38,5 +38,6 @@
 ;; (require 'init-icicles)                 ;一个强大的命令输入扩展
 (require 'init-sdcv)                    ;星际译王
 ;;(require 'init-coffee-mode)             ;coffee mode
+(require 'init-recentf)
 
 (provide 'HualetSetup)

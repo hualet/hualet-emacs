@@ -253,7 +253,7 @@
 ;(require 'buffer-extension)             ;缓存增强函数
 (require 'lazy-set-key)                 ;懒惰按键设置
 (require 'sdcv)                         ;星际译王的支持
-;(require 'w3m-extension)                ;W3m扩展
+(require 'w3m-extension)                ;W3m扩展
 ;(require 'thing-edit)                   ;基于thingatpt的编辑扩展
 ;(require 'thing-edit-extension)         ;thing-edit 增强
 ;;; (require 'rcirc-notify+)                ;rcirc提醒

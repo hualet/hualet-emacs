@@ -238,9 +238,8 @@ ac-complete-mode-map
    ("M-s-o" . toggle-one-window)                      ;切换一个窗口
    ))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Muti-Cursor ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(lazy-set-key
- '(("M-s-r" . mc/mark-all-like-this-dwim)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Multi-Cursor ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "M-R") 'mc/mark-all-like-this-dwim)
 
 ;;; ### Rect ###
 ;;; --- 矩形操作
@@ -286,7 +285,7 @@ ac-complete-mode-map
 ;;    ("W" . dired-x-find-file)                   ;查找文件
 ;;    ("\"" . find-lisp-find-dired-pwd)           ;查找特定的lisp文件
 ;;    ("J" . dired-goto-file)                     ;跳到某个文件
-;;    ("K" . dired-open-file)                     ;用W3M打开各种文件
+   ("K" . dired-open-file)                     ;根据文件后缀智能打开文件
 ;;    ("X" . traverse-cp-or-mv-extfiles-in-dir)   ;拷贝或移动目录下指定扩展名的文件
 ;;    ("V" . traverse-dired-browse-archive)       ;浏览压缩文件
 ;;    (";" . dired-view-minor-mode-toggle)        ;字母输入导航模式

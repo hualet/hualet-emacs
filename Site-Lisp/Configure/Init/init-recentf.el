@@ -2,7 +2,7 @@
 
 (recentf-mode 1)
 (setq recentf-max-menu-items 25)
-(setq recentf-next-recent-file-id 1)
+(defvar recentf-next-recent-file-id 1)
 
 (defun recentf-open-most-recent-file-cycle ()
   "Open most recent file."

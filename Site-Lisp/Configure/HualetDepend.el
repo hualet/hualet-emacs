@@ -1,4 +1,4 @@
-;;; 搜集的扩展加载
+;; 搜集的扩展加载
 ;(require 'eldoc)                   ;函数参数提示
 ;(require 'avoid)                   ;鼠标行为
 ;(require 'shell)                   ;Shell模式
@@ -278,7 +278,7 @@
 (require 'dired-extension)              ;dired 的一些扩展
 ;(require 'wdired-extension)             ;wdired 的扩展
 ;(require 'dired-sort)                   ;排序 dired 文件
-;(require 'dired-open)                   ;在 dired 中打开不同文件
+(require 'dired-open)                   ;在 dired 中打开不同文件
 ;(require 'flymake-extension)            ;flymake 的一些扩展
 ;(require 'haskell-extension)            ;Haskell的一些扩展
 ;(require 'show-help)                    ;用 showtip 显示帮助信息

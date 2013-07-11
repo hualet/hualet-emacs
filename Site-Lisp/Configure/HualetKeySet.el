@@ -403,9 +403,9 @@ ac-complete-mode-map
    )
  )
 
-;;; ### Python ###
-;;; --- Python mode
-(require 'python-mode)
+;; ### Python ###
+;; --- Python mode
+(require 'python)
 (lazy-set-key
  '(
    ("C-S-j" . jump-to-import)

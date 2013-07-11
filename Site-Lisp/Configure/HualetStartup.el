@@ -1,8 +1,3 @@
-
-(add-to-list 'load-path "PATH/TO/PYTHON-MODE/") 
-(setq py-install-directory "PATH/TO/PYTHON-MODE/")
-(require 'python-mode)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 启动设置 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar LazyCatStartup-execute t        ;只在启动时执行
   "Just eval current buffer when startup.")

@@ -39,5 +39,6 @@
 (require 'init-sdcv)                    ;星际译王
 ;;(require 'init-coffee-mode)             ;coffee mode
 (require 'init-recentf)
+(require 'init-weibo)                   ;新浪微博
 
 (provide 'HualetSetup)

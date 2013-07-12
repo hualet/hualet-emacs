@@ -307,7 +307,7 @@
 
 ;; ### Highlight-parentheses ###
 ;;--- 增强的括号高亮
-;; (highlight-parentheses-mode t)
+(highlight-parentheses-mode t)
 (define-globalized-minor-mode global-highlight-parentheses-mode
   highlight-parentheses-mode
   (lambda ()

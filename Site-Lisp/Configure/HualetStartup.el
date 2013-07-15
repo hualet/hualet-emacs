@@ -1,8 +1,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 启动设置 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar LazyCatStartup-execute t        ;只在启动时执行
+(defvar HualetStartup-execute t        ;只在启动时执行
   "Just eval current buffer when startup.")
 
-(when LazyCatStartup-execute
+(when HualetStartup-execute
   (server-start)                      ;启动emacs服务
   ;; (if (file-exists-p emms-source-file-default-directory)
   ;;     (emms-history-load))              ;自动加载播放列表历史
@@ -12,7 +12,11 @@
   ;; (startup-close)                       ;关闭指定的文件
   ;; (resume-windows 'a)                   ;加载窗口布局
   ;; (unmark-all-buffers)                  ;除去所有缓存的标记
-  (setq LazyCatStartup-execute nil)     ;关闭启动标志
+  (setq HualetStartup-execute nil)     ;关闭启动标志
+  
+  
+  ;; 在emacs启动的时候显示一只可爱的奶牛
+  (cowsay-how-to-become-a-hacker)
   )
 
 (provide 'HualetStartup)

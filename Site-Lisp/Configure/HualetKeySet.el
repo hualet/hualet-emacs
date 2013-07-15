@@ -279,7 +279,7 @@ ac-complete-mode-map
 ;;    ("8" . dired-move-to-first-file)            ;移动到第一个文件
 ;;    ("9" . auto-install-from-dired)             ;自动从EmacsWiki安装标记的文件
    ("E" . dired-touch-now)                     ;Touch命令
-;;    ("z" . dired-do-moccur)                     ;搜索dired
+   ("z" . dired-do-moccur)                     ;搜索dired
 ;;    ("I" . image-dired)                         ;打开浏览模式
    ("w" . wdired-change-to-wdired-mode)        ;切换到dired编辑模式
 ;;    ("W" . dired-x-find-file)                   ;查找文件

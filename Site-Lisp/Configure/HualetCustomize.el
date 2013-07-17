@@ -1,6 +1,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;; 需要修改的定义 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar my-name "")
 (defvar my-full-name "")
+(defvar startup-open-file-list "")
+(defvar startup-close-file-list "")
 (defvar my-mail "")
 (defvar my-homepage "")
 (defvar my-default-download-directory "")
@@ -30,6 +32,7 @@
  '(startup-open-file-list               ;启动打开的文件列表
    '(
      "~/Notes/hualet.org"
+     "~/Notes/WeeklyReviews.org"
      ))
  '(startup-close-file-list              ;启动关闭的buffer列表
    '(

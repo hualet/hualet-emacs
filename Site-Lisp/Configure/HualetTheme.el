@@ -1,95 +1,1258 @@
-;; (custom-set-faces
-;;  ;; highlight parenthese
-;;  '(hl-paren-colors (quote ("Cyan" "Gold" "Red")))
- 
-;;  ;; Flymake.
-;;  '(flymake-errline                      ;é”™è¯¯è¡Œ
-;;    ((t (:background "white" :underline "red"))))
-;;  '(flymake-infoline                     ;ä¿¡æ¯è¡Œ
-;;    ((t (:background "white" :underline "yellow" :slant italic))))
-;;  '(flymake-warnline                     ;è­¦å‘Šè¡Œ
-;;    ((((class color)) (:background "Gold3" :foreground "Black"))))
-;;  ;; Dired
- 
-;;  '(dired-directory                      ;ç›®å½•
-;;    ((t (:inherit font-lock-function-name-face
-;;                  :foreground "DodgerBlue"))))
-;;  '(dired-ignored                        ;å¿½ç•¥æ–‡ä»¶
-;;    ((t (:inherit shadow
-;;                  :foreground "grey50"))))
-;;  '(dired-header                         ;å½“å‰è·¯å¾„
-;;    ((t (:inherit font-lock-type-face
-;;                  :foreground "gold"))))
-;;  '(dired-symlink                        ;è½¯é“¾æ¥
-;;    ((t (:inherit font-lock-keyword-face
-;;                  :foreground "OrangeRed3"))))
-;;  '(diredp-date-time                     ;ä¿®æ”¹æ—¶é—´
-;;    ((t (:foreground "Grey60"))))
-;;  '(diredp-deletion                      ;åˆ é™¤æ ‡è®°
-;;    ((t (:background "Black" :foreground "red"))))
-;;  '(diredp-deletion-file-name            ;åˆ é™¤æ–‡ä»¶
-;;    ((t (:foreground "red"))))
-;;  '(diredp-dir-heading                   ;ç›®å½•
-;;    ((t (:background "Black" :foreground "Gold"))))
-;;  '(diredp-dir-priv                      ;ç›®å½•æ©ç 
-;;    ((t (:background "Black" :foreground "DodgerBlue"))))
-;;  '(diredp-display-msg                   ;è·¯å¾„
-;;    ((t (:foreground "Gold"))))
-;;  '(diredp-exec-priv                     ;å¯æ‰§è¡Œæ©ç 
-;;    ((t (:background "Black" :foreground "DeepSkyBlue3"))))
-;;  '(diredp-file-name                     ;æ–‡ä»¶
-;;    ((t (:foreground "Green3"))))
-;;  '(diredp-file-suffix                   ;æ–‡ä»¶æ‰©å±•å
-;;    ((t (:foreground "Green4"))))
-;;  '(diredp-flag-mark                     ;é€‰ä¸­æ ‡è®°
-;;    ((t (:background "Black" :foreground "Cyan"))))
-;;  '(diredp-flag-mark-line                ;é€‰ä¸­æ–‡ä»¶
-;;    ((t (:background "Black" :foreground "Cyan"))))
-;;  '(diredp-ignored-file-name             ;å¿½ç•¥çš„æ–‡ä»¶
-;;    ((t (:foreground "grey40"))))
-;;  '(diredp-no-priv                       ;æ— æ©ç 
-;;    ((t (:background "Black" :foreground "Green"))))
-;;  '(diredp-other-priv                    ;å…¶ä»–æ©ç 
-;;    ((t (:background "Black" :foreground "khaki"))))
-;;  '(diredp-rare-priv                     ;ç¨€æœ‰çš„æ©ç 
-;;    ((t (:background "Black" :foreground "Red"))))
-;;  '(diredp-read-priv                     ;è¯»å–æ©ç 
-;;    ((t (:background "Black" :foreground "IndianRed"))))
-;;  '(diredp-write-priv                    ;å†™å…¥æ©ç 
-;;    ((t (:background "Black" :foreground "Gold3"))))
-;;  )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Emacs Ö÷ÌâÉèÖÃ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ÓÃ»§×Ô¶¨Òå±äÁ¿
+(custom-set-variables
+ ;; Term
+ '(term-default-bg-color "#000000")     ;termÄ¬ÈÏ±³¾°É«
+ '(term-default-fg-color "#dddd00")     ;termÄ¬ÈÏÇ°¾°É«
+ ;; Imaxima
+ '(imaxima-bg-color "black")            ;±³¾°
+ '(imaxima-fg-color "DarkGreen")        ;Ç°¾°
+ '(imaxima-equation-color "Green3")     ;±í´ïÊ½
+ '(imaxima-label-color "slategrey")     ;±êÇ©
+ '(imaxima-fnt-size "Large")            ;×ÖÌå´óĞ¡
+ '(imaxima-max-scale 0.85)              ;±í´ïÊ½×î´ó±ÈÀı
+ '(imaxima-pt-size 12)                  ;µã´óĞ¡
+ ;; ¸ßÁÁÀ¨ºÅ½á¹¹
+ '(hl-paren-colors (quote (
+                           "Cyan"       ;Ò»¼¶ÑÕÉ«
+                           "Gold"       ;¶ş¼¶ÑÕÉ«
+                           "Red"        ;Èı¼¶ÑÕÉ«
+                           )))
+ ;; Smiley
+ '(smiley-style (quote medium))         ;Ğ¦Á³µÄ·ç¸ñ, ÖĞµÈ, 10ÖÖÑÕÉ«
+ )
 
+;; ÓÃ»§×Ô¶¨ÒåÍâ¹Û
+(custom-set-faces
+ ;; Default
+ '(default
+    ((t
+      (:background "black"               ;Ç°¾°
+                   :foreground "#137D11" ;±³¾°
+                   ))))
+ ;; Header line
+ '(header-line                          ;±êÌâÀ¸
+   ((t (:background "Black"
+                    :foreground "Green"))))
+ ;; Cursor
+ '(cursor                               ;¹â±ê
+   ((t (:background "red"))))
+ ;; Newsticker
+ '(newsticker-date-face                 ;Ê±¼ä
+   ((t (:foreground "red"
+                    :slant italic
+                    :height 0.8
+                    ))))
+ '(newsticker-default-face              ;Ä¬ÈÏ
+   ((((class color) (background dark))
+     (:inherit default
+               ))))
+ '(newsticker-enclosure-face            ;¸½¼ş
+   ((t (:background "orange"
+                    :weight bold
+                    ))))
+ '(newsticker-extra-face                ;¶îÍâ
+   ((t (:foreground "gray50"
+                    :slant italic
+                    :height 0.9
+                    ))))
+ '(newsticker-feed-face                 ;ÖÖ×Ó
+   ((t (:foreground "Green"
+                    :weight bold
+                    :height 1.2
+                    ))))
+ '(newsticker-immortal-item-face        ;ÓÀ¾ÃµÄÌõÄ¿
+   ((t (:foreground "green"
+                    :slant italic
+                    :weight bold
+                    ))))
+ '(newsticker-new-item-face             ;ĞÂÌõÄ¿
+   ((t (:foreground "Gold"
+                    :weight bold
+                    ))))
+ '(newsticker-obsolete-item-face        ;³Â¾ÉµÄÌõÄ¿
+   ((t (:strike-through t
+                        :weight bold
+                        ))))
+ '(newsticker-old-item-face             ;ÀÏÌõÄ¿
+   ((t (:foreground "purple"
+                    :weight bold
+                    ))))
+ '(newsticker-statistics-face           ;Í³¼Æ
+   ((t (:foreground "red"
+                    :slant italic
+                    :height 0.8
+                    ))))
+ '(newsticker-treeview-face             ;ä¯ÀÀÊ÷
+   ((t (:foreground "Green4"
+                    :weight normal
+                    ))))
+ '(newsticker-treeview-new-face         ;ĞÂÌõÄ¿
+   ((t (:inherit newsticker-treeview-face
+                 :foreground "DodgerBlue"
+                 :weight bold
+                 ))))
+ '(newsticker-treeview-old-face         ;¾ÍÌõÄ¿
+   ((((class color) (background dark))
+     (:inherit newsticker-treeview-face
+               :foreground "purple"))))
+ '(newsticker-treeview-selection-face   ;Ñ¡ÖĞ
+   ((((class color) (background dark))
+     (:background "DarkRed"
+                  :foreground "White"))))
+ ;; Org-mode
+ '(org-todo                             ;TODO
+   ((t (:foreground "Red" :weight bold))))
+ '(org-date                             ;ÈÕÆÚ
+   ((((class color) (background dark))
+     (
+      :foreground "ivory4"
+                  :underline t))))
+ '(org-special-keyword                  ;¹Ø¼ü×Ö
+   ((((class color) (min-colors 16) (background dark))
+     (:foreground "rosybrown1"))))
+ '(org-level-3                          ;µÚÈı¼¶
+   ((t (
+        :inherit outline-3
+                 :foreground "DeepSkyBlue"))))
+ '(org-level-5                          ;µÚÎå¼¶
+   ((t (
+        :inherit outline-5
+                 :foreground "VioletRed3"))))
+ '(org-level-6                          ;µÚÁù¼¶
+   ((t (
+        :inherit outline-6
+                 :foreground "violet"))))
+ '(org-level-7                          ;µÚÆß¼¶
+   ((t (
+        :inherit outline-7
+                 :foreground "khaki3"))))
+ '(org-level-8                          ;µÚ°Ë¼¶
+   ((t (
+        :inherit outline-8
+                 :foreground "DarkSeaGreen"))))
+ '(org-hide                             ;Òş²ØĞÇºÅ
+   ((((background dark))
+     (:foreground "black"))))
+ '(org-ellipsis                         ;Ê¡ÂÔºÅ
+   ((((class color) (background dark))
+     (
+      :background "black"
+                  :foreground "Cyan"
+                  :strike-through nil
+                  ))))
+ '(org-link                             ;Á´½Ó
+   ((((class color) (background dark))
+     (:foreground "Cyan"))))
+ ;; Minibuffer
+ '(minibuffer-prompt                    ;ÌáÊ¾
+   ((((background dark))
+     (:foreground "green"))))
+ ;; Isearch
+ '(isearch                              ;ËÑË÷¹Ø¼ü×Ö
+   ((((class color) (min-colors 88) (background dark))
+     (
+      :background "brown"
+                  :foreground "white"))))
+ '(isearch-fail                         ;ËÑË÷Ê§°Ü
+   ((((class color) (min-colors 88) (background dark))
+     (:background "red4"
+                  :foreground "white"))))
+ ;; Flymake.
+ '(flymake-errline                      ;´íÎóĞĞ
+   ((t (:background "black" :underline "red"))))
+ '(flymake-infoline                     ;ĞÅÏ¢ĞĞ
+   ((t (:background "black" :underline "yellow" :slant italic))))
+ '(flymake-warnline                     ;¾¯¸æĞĞ
+   ((((class color)) (:background "Gold3" :foreground "Black"))))
+ ;; Dired
+ '(dired-directory                      ;Ä¿Â¼
+   ((t (:inherit font-lock-function-name-face
+                 :foreground "DodgerBlue"))))
+ '(dired-ignored                        ;ºöÂÔÎÄ¼ş
+   ((t (:inherit shadow
+                 :foreground "grey50"))))
+ '(dired-header                         ;µ±Ç°Â·¾¶
+   ((t (:inherit font-lock-type-face
+                 :foreground "gold"))))
+ '(dired-symlink                        ;ÈíÁ´½Ó
+   ((t (:inherit font-lock-keyword-face
+                 :foreground "OrangeRed3"))))
+ '(diredp-date-time                     ;ĞŞ¸ÄÊ±¼ä
+   ((t (:foreground "Grey60"))))
+ '(diredp-deletion                      ;É¾³ı±ê¼Ç
+   ((t (:background "Black" :foreground "red"))))
+ '(diredp-deletion-file-name            ;É¾³ıÎÄ¼ş
+   ((t (:foreground "red"))))
+ '(diredp-dir-heading                   ;Ä¿Â¼
+   ((t (:background "Black" :foreground "Gold"))))
+ '(diredp-dir-priv                      ;Ä¿Â¼ÑÚÂë
+   ((t (:background "Black" :foreground "DodgerBlue"))))
+ '(diredp-display-msg                   ;Â·¾¶
+   ((t (:foreground "Gold"))))
+ '(diredp-exec-priv                     ;¿ÉÖ´ĞĞÑÚÂë
+   ((t (:background "Black" :foreground "DeepSkyBlue3"))))
+ '(diredp-file-name                     ;ÎÄ¼ş
+   ((t (:foreground "Green3"))))
+ '(diredp-file-suffix                   ;ÎÄ¼şÀ©Õ¹Ãû
+   ((t (:foreground "Green4"))))
+ '(diredp-flag-mark                     ;Ñ¡ÖĞ±ê¼Ç
+   ((t (:background "Black" :foreground "Cyan"))))
+ '(diredp-flag-mark-line                ;Ñ¡ÖĞÎÄ¼ş
+   ((t (:background "Black" :foreground "Cyan"))))
+ '(diredp-ignored-file-name             ;ºöÂÔµÄÎÄ¼ş
+   ((t (:foreground "grey40"))))
+ '(diredp-no-priv                       ;ÎŞÑÚÂë
+   ((t (:background "Black" :foreground "Green"))))
+ '(diredp-other-priv                    ;ÆäËûÑÚÂë
+   ((t (:background "Black" :foreground "khaki"))))
+ '(diredp-rare-priv                     ;Ï¡ÓĞµÄÑÚÂë
+   ((t (:background "Black" :foreground "Red"))))
+ '(diredp-read-priv                     ;¶ÁÈ¡ÑÚÂë
+   ((t (:background "Black" :foreground "IndianRed"))))
+ '(diredp-write-priv                    ;Ğ´ÈëÑÚÂë
+   ((t (:background "Black" :foreground "Gold3"))))
+ ;; Yasnippet
+ '(yas/field-highlight-face             ;Ä£°æÇøÓò
+   ((t (
+        :background "grey20"
+                    :foreground "gold"))))
+ '(yas/mirror-highlight-face            ;Í¬²½Ä£°æÇøÓò
+   ((t (
+        :background "brown"
+                    :foreground "white"))))
+ ;; Tabbar±êÇ©ÑÕÉ«
+ '(tabbar-default                       ;Ä¬ÈÏ
+   ((((class color grayscale)
+      (background dark))
+     (
+      :inherit variable-pitch
+               :height 1.1
+               ;; :family "DejaVu Sans YuanTi Mono"
+               :family "ÎÄÈªæäµÈ¿íÎ¢Ã×ºÚ"
+               ))))
+ '(tabbar-separator                     ;·Ö¸ôÏß
+   ((t (
+        :inherit tabbar-default
+                 :background "black"
+                 :foreground "brown" :height 0.1
+                 ))))
+ '(tabbar-button-highlight              ;°´Å¥
+   ((t (
+        :inherit tabbar-default
+                 :background "black"
+                 :foreground "green"
+                 :box (:color "red")
+                 ))))
+ '(tabbar-button
+   ((t (
+        :inherit tabbar-default
+                 :background "black"
+                 :foreground "red"
+                 :box (
+                       :line-width 1
+                                   :color "black"
+                                   :style released-button)))))
+ '(tabbar-selected                      ;µ±Ç°ÕıÔÚÊ¹ÓÃµÄ±êÇ©
+   ((t (
+        :inherit tabbar-default
+                 :background "black"
+                 :foreground "LawnGreen"
+                 :box (
+                       :line-width 1
+                                   :color "#014500"
+                                   :style released-button)))))
+ '(tabbar-selected-face
+   ((t (
+        :inherit tabbar-default-face
+                 :background "black"
+                 :foreground "grey"
+                 :box (
+                       :line-width -1
+                                   :color "grey"
+                                   :style released-button)))))
+ '(tabbar-unselected                    ;Î´Ê¹ÓÃµÄ±êÇ©
+   ((t (
+        :inherit tabbar-default
+                 :background "black"
+                 :foreground "#10650F"
+                 :box (
+                       :line-width 1
+                                   :color "Grey10"
+                                   :style pressed-button)))))
+ '(tabbar-unselected-face
+   ((t (
+        :inherit tabbar-default-face
+                 :background "black"
+                 :foreground "white"
+                 :box (
+                       :line-width -1
+                                   :color "black"
+                                   :style pressed-button)))))
+ ;; Widget
+ '(widget-field                         ;ÊäÈëÇøÓò
+   ((((class grayscale color) (background dark))
+     (
+      :background "grey10"
+                  :foreground "DeepSkyBlue"))))
+ '(widget-single-line-field             ;µ¥ĞĞÊäÈëÇøÓò
+   ((((class grayscale color) (background dark))
+     (
+      :background "grey10"
+                  :foreground "DeepSkyBlue"))))
+ ;; Comint
+ '(comint-highlight-input               ;ÃüÁîĞĞÊäÈë
+   ((t (
+        :background "black"
+                    :foreground "gold3"
+                    :weight bold))))
+ '(comint-highlight-prompt              ;ÃüÁîĞĞÌáÊ¾
+   ((((min-colors 88)
+      (background dark))
+     (
+      :foreground "Green"))))
+ ;; W3Mä¯ÀÀÆ÷ÑÕÉ«
+ '(w3m-anchor                           ;Î´·ÃÎÊµÄ±êÌâ
+   ((((class color) (background dark))
+     (:foreground "DodgerBlue2"
+                  :underline t))))
+ '(w3m-arrived-anchor                   ;ÒÑ·ÃÎÊµÄ±êÌâ
+   ((((class color) (background dark))
+     (:foreground "Purple4"
+                  :underline t))))
+ '(w3m-bold                             ;¸ßÁÁ¹â¼ü×Ö
+   ((t (:foreground "Green3"
+                    :weight bold))))
+ '(w3m-current-anchor                   ;µ±Ç°±êÌâ
+   ((t (:box (:line-width -1
+                          :color "Grey30")
+             :underline t))))
+ '(w3m-form                             ;±í¸ñ
+   ((((class color) (background dark))
+     (:foreground "Red"
+                  :box nil
+                  :underline "DarkRed"
+                  ))))
+ '(w3m-form-button                      ;±í¸ñ°´Å¥
+   ((((type x w32 mac) (class color))
+     (:background "black"
+                  :foreground "LawnGreen"
+                  :box (:line-width -1
+                                    :color "#014500"
+                                    :style released-button)))))
+ '(w3m-form-button-mouse                ;±í¸ñ°´Å¥Êó±ê¾­¹ı
+   ((((type x w32 mac) (class color))
+     (:background "Black"
+                  :foreground "Red"
+                  :box (:line-width -1
+                                    :color "Grey30"
+                                    :style released-button)))))
+ '(w3m-form-button-pressed              ;±í¸ñ°´Å¥Êó±ê°´ÏÂ
+   ((((type x w32 mac) (class color))
+     (:background "Black"
+                  :foreground "DarkRed"
+                  :box (:line-width -1
+                                    :color "Grey60"
+                                    :style pressed-button)))))
+ '(w3m-form-face                        ;±í¸ñÖĞ×ÖÌå
+   ((((class color) (background dark))
+     (:foreground "khaki2"
+                  :underline "brown"
+                  ))) t)
+ '(w3m-header-line-location-content     ;µØÖ·ÄÚÈİ
+   ((((class color) (background dark))
+     (:background "black"
+                  :foreground "Green"))))
+ '(w3m-header-line-location-title       ;µØÖ·±êÌâ
+   ((((class color) (background dark))
+     (:background "black"
+                  :foreground "brown"))))
+ '(w3m-history-current-url              ;µ±Ç°ÀúÊ·Á¬½Ó
+   ((t (:background "black"
+                    :foreground "DodgerBlue"))))
+ '(w3m-image                            ;Í¼Ïñ
+   ((((class color) (background dark))
+     (:background "Black"
+                  :foreground "DarkRed"))))
+ '(w3m-image-anchor                     ;Í¼ÏñÃª¶¨
+   ((((class color) (background dark))
+     (:background "Black"))))
+ '(w3m-session-select                   ;ÈÎÎñÑ¡Ôñ
+   ((((class color) (background dark))
+     (:foreground "grey50"))))
+ '(w3m-tab-background                   ;±êÇ©±³¾°
+   ((((type x w32 mac) (class color))
+     (:background "black"
+                  :foreground "black"))))
+ '(w3m-tab-selected-background          ;±êÇ©Ñ¡Ôñ±³¾°
+   ((((type x w32 mac) (class color))
+     (:background "black"
+                  :foreground "black"))))
+ '(w3m-tab-mouse                        ;Êó±êµã»÷±êÇ©
+   ((((type x w32 mac) (class color))
+     (:background "DarkRed"
+                  :foreground "white"
+                  :box (:line-width -1
+                                    :color "Red"
+                                    :style released-button)))))
+ '(w3m-tab-selected                     ;Ñ¡ÔñµÄä¯ÀÀ¹ıµÄ±êÇ©
+   ((((type x w32 mac) (class color))
+     (:background "black"
+                  :foreground "LawnGreen"
+                  :box (:line-width -1
+                                    :color "#014500"
+                                    :style released-button)))))
+ '(w3m-tab-selected-retrieving          ;Ñ¡ÔñµÄËÀµôµÄ±êÇ©
+   ((((type x w32 mac) (class color))
+     (:background "black"
+                  :foreground "grey80"
+                  :box (:line-width -1
+                                    :color "Grey40"
+                                    :style released-button)))))
+ '(w3m-tab-unselected                   ;Î´Ñ¡ÔñÒÑä¯ÀÀµÄ±êÇ©
+   ((((type x w32 mac) (class color))
+     (:background "black"
+                  :foreground "#10650F"
+                  :box (:line-width 1
+                                    :color "Black"
+                                    :style pressed-button)))))
+ '(w3m-tab-unselected-retrieving        ;Î´Ñ¡ÔñµÄËÀµôµÄ±êÇ©
+   ((((type x w32 mac) (class color))
+     (:background "black"
+                  :foreground "grey30"
+                  :box (:line-width 1
+                                    :color "Black"
+                                    :style pressed-button)))))
+ '(w3m-tab-unselected-unseen            ;Î´Ñ¡ÔñµÄÃ»ÓĞä¯ÀÀ¹ıµÄ±êÇ©
+   ((((type x w32 mac) (class color))
+     (:background "black"
+                  :foreground "DodgerBlue"
+                  :box (:line-width 1
+                                    :color "black"
+                                    :style pressed-button)))))
+ '(w3m-link-numbering                   ;Êı×ÖÁ¬½Ó
+   ((((class color) (background dark))
+     (:background "Black"
+                  :foreground "Grey"))))
+ ;; ĞĞºÅ
+ '(linum                                ;ĞĞºÅ
+   ((t (
+        :background "black"
+                    :foreground "green3"
+                    ))))
+ ;; Tooltip
+ '(tooltip                              ;Ä¬ÈÏ
+   ((((class color))
+     (
+      :inherit variable-pitch
+               :background "DarkRed"
+               :foreground "White"
+               ;; :family "DejaVu Sans YuanTi Mono"
+               :family "ÎÄÈªæäµÈ¿íÎ¢Ã×ºÚ"
+               ))))
+ ;; Showtip
+ '(showtip-face
+   ((((class color))
+     (:inherit tooltip
+               :background "#730D0D"
+               :foreground "White"
+               :height 1.0
+               ;; :family "DejaVu Sans YuanTi Mono"
+               :family "ÎÄÈªæäµÈ¿íÎ¢Ã×ºÚ"
+               ))))
+ ;; Óï·¨¸ßÁÁ
+ '(show-paren-match                     ;À¨ºÅÆ¥Åä
+   ((((class color)
+      (background dark))
+     (
+      :background "green"
+                  :foreground "black"))))
+ '(show-paren-mismatch                  ;À¨ºÅÃ»ÓĞÆ¥Åä
+   ((((class color))
+     (
+      :background "red"
+                  :foreground "white"))))
+ '(font-lock-warning-face               ;¾¯¸æ
+   ((((class color) (min-colors 88)
+      (background dark))
+     (
+      :foreground "red"
+                  :weight bold))))
+ '(font-lock-doc-face                   ;½âÊÍÎÄµµ
+   ((t (
+        :inherit font-lock-string-face
+                 :foreground "khaki4"))))
+ '(font-lock-builtin-face               ;ÄÚ½¨
+   ((((class color) (min-colors 88)
+      (background dark))
+     (:foreground "RosyBrown4"))))
+ '(font-lock-constant-face              ;³£Á¿
+   ((((class color) (min-colors 88)
+      (background dark))
+     (:foreground "magenta4"))))
+ '(font-lock-string-face                ;×Ö·û
+   ((((class color) (min-colors 88)
+      (background dark))
+     (:foreground "DarkKhaki"))))
+ '(font-lock-comment-face               ;×¢ÊÍ
+   ((((class color) (min-colors 88)
+      (background dark))
+     (:foreground "OrangeRed3"))))
+ '(font-lock-keyword-face               ;¹Ø¼ü×Ö
+   ((((class color) (min-colors 88)
+      (background dark))
+     (:foreground "#0048FF"
+                  :weight bold
+                  ))))
+ '(font-lock-function-name-face         ;º¯Êı
+   ((((class color) (min-colors 88)
+      (background dark))
+     (:foreground "gold3"
+                  ))))
+ '(font-lock-type-face                  ;ÀàĞÍ
+   ((((class color) (min-colors 88)
+      (background dark))
+     (:foreground "DeepSkyBlue2"))))
+ '(font-lock-preprocessor-face          ;Ô¤´¦Àí×Ö
+   ((t (
+        :inherit font-lock-builtin-face
+                 :foreground "Cyan3"
+                 :weight bold
+                 ))))
+ '(font-lock-variable-name-face         ;±äÁ¿
+   ((((class color) (min-colors 88)
+      (background dark))
+     (:foreground "DarkOrchid"))))
+ ;; ¸ßÁÁ CL º¯Êı
+ '(highlight-cl                         ;`cl' º¯Êı
+   ((t (:foreground "#20ABFC"
+                    :underline nil))))
+ '(highlight-cl-and-other               ;`cl' º¯Êı£¬ µ«ÊÇ¶¨ÒåÔÚÆäËû°ü
+   ((t (:foreground "#20ABFC"
+                    :underline nil))))
+ '(highlight-cl-macro                   ;`cl' ºê
+   ((t (:underline nil))))
+ ;; Mode-line
+ '(mode-line                            ;ÕıÔÚÊ¹ÓÃµÄ±êÇ©ÃÔÄãBUFFER
+   ((t (
+        :foreground "White"               ;Ç°¾°É«
+                    :background "DarkRed" ;±³¾°É«
+                    :box (
+                          :line-width -1
+                                      :style released-button)))))
+ '(mode-line-inactive                   ;Î´Ê¹ÓÃµÄ±êÇ©ÃÔÄãBUFFER
+   ((default (:inherit mode-line))
+    (((class color) (min-colors 88)
+      (background dark))
+     (
+      :background "Black"
+                  :foreground "Green4"
+                  :box (
+                        :line-width -1
+                                    :color "#013500"
+                                    :style released-button)
+                  :weight light))))
+ '(mode-line-highlight                  ;¸ßÁÁ
+   ((((class color) (min-colors 88))
+     (:box (:line-width 1
+                        :color "Green4"
+                        :style released-button)))))
+ '(region                               ;Ñ¡ÖĞÇøÓòµÄÑÕÉ«
+   ((((class color)
+      (min-colors 88) (background dark))
+     (
+      :background "Green3"
+                  :foreground "black"))))
+ '(which-func                           ;µ±Ç°º¯Êı
+   ((((class color) (min-colors 88)
+      (background dark))
+     (:foreground "Yellow"))))
+ ;; Xrefactory
+ '(custom-group-tag                     ;×é±êÇ©
+   ((t (
+        :inherit variable-pitch
+                 :foreground "DodgerBlue"
+                 :underline t
+                 :weight bold
+                 :height 1.2))))
+ '(custom-variable-tag                  ;±äÁ¿±êÇ©
+   ((t (
+        :foreground "gold"
+                    :underline t
+                    :weight bold))))
+ '(xref-keyword-face                    ;¹Ø¼ü×Ö
+   ((t (:foreground "grey"))) t)
+ '(xref-list-pilot-face                 ;Òıµ¼
+   ((t (:foreground "gold"))) t)
+ '(xref-list-symbol-face                ;·ûºÅ
+   ((t (:foreground "green"))) t)
+ ;; Whitespace
+ '(whitespace-highlight                 ;¿Õ¸ñ
+   ((((class color)
+      (background dark))
+     (
+      :background "yellow2"
+                  :foreground "black"))))
+ ;; Highlight
+ '(highlight ((((class color)
+                (min-colors 88) (background dark))
+               (:background "DarkRed"               ;±³¾°É«
+                            :foreground "White")))) ;Ç°¾°É«
+ ;; Highlight symbol
+ '(highlight-symbol-face
+   ((((class color)
+      (background dark))
+     (
+      :background "grey"                ;±³¾°É«
+                  :foreground "white"   ;Ç°¾°É«
+                  ))))
+ ;; ´°¿Ú±ßÔµ
+ '(fringe ((((class color)
+             (background dark))
+            (:background "grey10"))))
+ ;; Speedbar
+ '(speedbar-file-face                   ;ÎÄ¼ş
+   ((((class color)
+      (background dark))
+     (:foreground "SeaGreen2"))))
+ '(speedbar-highlight-face              ;¸ßÁÁ
+   ((((class color)
+      (background dark))
+     (
+      :background "LightGoldenrod"
+                  :foreground "black"))))
+ '(speedbar-selected-face               ;Ñ¡ÖĞ
+   ((((class color)
+      (background dark))
+     (
+      :foreground "Cyan"
+                  :underline t))))
+ '(speedbar-separator-face              ;·Ö¸ôÏß
+   ((((class color)
+      (background dark))
+     (
+      :background "DarkRed"
+                  :foreground "white" :overline "gray"))))
+ ;; Lazy highlight
+ '(lazy-highlight
+   ((((class color)
+      (min-colors 88)
+      (background dark))
+     (:background "grey20"))))
+ ;; Isearch
+ '(isearch
+   ((((class color)
+      (min-colors 88)
+      (background dark))
+     (:background "khaki" :foreground "black"))))
+ ;; Completion dynamic
+ '(completion-dynamic-face
+   ((((class color)
+      (background dark))
+     (
+      :background "DarkOrange"
+                  :foreground "black"))))
+ ;; Top-mode
+ '(top-mode-mark-face
+   (quote isearch))
+ ;; Pabbrev
+ '(pabbrev-suggestions-face             ;¹Ø¼ü×Ö²¹È«
+   ((((class color)
+      (background dark))
+     (:background "Black"
+                  :foreground "khaki1"))))
+ '(pabbrev-suggestions-label-face       ;±êÇ©
+   ((t (:background "Black"
+                    :foreground "Grey"
+                    :inverse-video nil))))
+ ;; Completion ui
+ '(completion-tooltip-face
+   ((t (:inherit tooltip
+                 :background "grey5"
+                 :foreground "khaki1"
+                 ;; :family "DejaVu Sans YuanTi Mono"
+                 :family "ÎÄÈªæäµÈ¿íÎ¢Ã×ºÚ"
+                 ))))
+ ;; modelinepos-column-warning
+ '(modelinepos-column-warning           ;ÁĞÊıÏŞÖÆ¾¯¸æ
+   ((t (:foreground "Yellow"))))
+ ;; Gnus
+ '(gnus-header-content                  ;±¨Í·ÄÚÈİ
+   ((t (
+        :foreground "Green"
+                    :slant italic))))
+ '(gnus-header-from                     ;±¨Í··¢ĞÅ
+   ((((class color)
+      (background dark))
+     (:foreground "khaki"))))
+ '(gnus-header-name                     ;±¨Í·Ãû×Ö
+   ((((class color)
+      (background dark))
+     (:foreground "DodgerBlue"))))
+ '(gnus-header-subject                  ;±¨Í·ÌâÄ¿
+   ((((class color)
+      (background dark))
+     (:foreground "HotPink"))))
+ '(gnus-signature                       ;Ç©Ãû
+   ((t (
+        :foreground "Orange"
+                    :slant italic))))
+ '(gnus-summary-high-read               ;ÒÑ¶Á, ¸ßĞËÈ¤
+   ((t (
+        :foreground "Gold2"
+                    :weight bold
+                    ))))
+ '(gnus-summary-normal-read             ;ÒÑ¶Á, Õı³£ĞËÈ¤
+   ((((class color) (background dark))
+     (:foreground "khaki2"
+                  ))))
+ '(gnus-summary-low-read                ;ÒÑ¶Á, µÍĞËÈ¤
+   ((t (
+        :foreground "Gold4"
+                    :slant italic
+                    ))))
+ '(gnus-summary-high-ancient            ;¾ÉµÄ, ¸ßĞËÈ¤
+   ((t (
+        :foreground "Grey50"
+                    :weight bold
+                    ))))
+ '(gnus-summary-normal-ancient          ;¾ÉµÄ, Õı³£ĞËÈ¤
+   ((((class color) (background dark))
+     (:foreground "Grey40"
+                  ))))
+ '(gnus-summary-low-ancient             ;¾ÉµÄ, µÍĞËÈ¤
+   ((t (
+        :foreground "Grey10"
+                    :slant italic
+                    ))))
+ '(gnus-cite-1                          ;ÒıÓÃ, Ò»¼¶
+   ((((class color) (background dark))
+     (:foreground "Grey50"))))
+ '(gnus-button                          ;°´Å¥
+   ((t (:foreground "khaki3" :weight bold))))
+ '(italic                               ;·¢¼şÈË
+   ((t (:underline nil
+                   :slant normal))))
+ ;; Mail
+ '(mm-uu-extract                        ;ÕªÂ¼
+   ((((class color)
+      (background dark))
+     (:background "Black"
+                  :foreground "Gold3"))))
+ '(message-header-to                    ;ÓÊ¼şÍ· £¨·¢ËÍ£©
+   ((t (:foreground "DarkRed"
+                    :weight bold))))
+ '(message-header-subject               ;ÓÊ¼ş±êÌâ
+   ((t (:foreground "gold"
+                    :weight bold))))
+ ;; hideshow
+ '(hs-face                              ;ÕÛµşÑÕÉ«
+   ((t (
+        :background "DarkRed"
+                    :foreground "grey"
+                    :box (:line-width 1 :color "grey50")))))
+ '(hs-fringe-face                       ;ÕÛµş±ßÔµÑÕÉ«
+   ((t (
+        :background "DarkRed"
+                    :foreground "grey"
+                    :box (:line-width 2 :color "grey75" :style released-button)))))
+ ;; Anything
+ '(anything-header                      ;±êÌâ
+   ((t (
+        :background "Black"
+                    :foreground "Gold"
+                    :underline t))) t)
+ '(anything-isearch-match               ;isearch Æ¥Åä
+   ((t (
+        :background "White"
+                    :foreground "DarkRed"))))
+ '(anything-file-name                   ;ÎÄ¼şÃû
+   ((t (:foreground "Green3"))))
+ '(anything-dir-priv                    ;Ä¿Â¼Ãû
+   ((t (:foreground "Grey"))))
+ ;; Completions
+ '(completions-common-part              ;²¹È«ÏàÍ¬²¿·Ö
+   ((t (:foreground "Green3"))))
+ '(completions-first-difference         ;²¹È«²»Í¬²¿·Ö
+   ((t (:foreground "Grey60"))))
+ ;; Ascii
+ '(ascii-ascii-face                     ;ascii×Ö·ûµÄ±àÂë
+   ((((class color)
+      (background dark))
+     (
+      :background "Black"
+                  :foreground "Grey"))))
+ '(ascii-non-ascii-face                 ;Non-ascii×Ö·ûµÄ±àÂë
+   ((((class color)
+      (background dark))
+     (
+      :background "Black"
+                  :foreground "Gold"))))
+ ;; Info
+ '(info-menu-header                     ;²Ëµ¥±êÌâ
+   ((t (
+        :inherit variable-pitch
+                 :foreground "khaki3"
+                 :weight bold
+                 ))))
+ '(info-title-1                         ;±êÌâ1
+   ((t (
+        :inherit info-title-2
+                 :foreground "Gold"
+                 :height 1.1
+                 ))))
+ '(info-title-2                         ;±êÌâ2
+   ((t (
+        :inherit info-title-3
+                 :foreground "red"
+                 :height 1.1
+                 ))))
+ '(info-title-3                         ;±êÌâ3
+   ((t (
+        :inherit info-title-4
+                 :foreground "DodgerBlue"
+                 :height 1.1
+                 ))))
+ '(info-title-4                         ;±êÌâ4
+   ((t (
+        :inherit variable-pitch
+                 :foreground "Green"
+                 :weight bold
+                 ))))
+ '(info-elisp-command-ref-item          ;elispÃüÁîÒıÓÃÏîÄ¿
+   ((t (:background "Black"
+                    :foreground "yellow3"))))
+ '(info-elisp-function-ref-item         ;elispº¯ÊıÒıÓÃÏîÄ¿
+   ((t (:background "Black"
+                    :foreground "Gold3"))))
+ '(info-elisp-macro-ref-item            ;elispºêÒıÓÃÏîÄ¿
+   ((t (:background "Black"
+                    :foreground "Yellow3"))))
+ '(info-elisp-reference-item            ;elispÒıÓÃÏîÄ¿
+   ((t (:background "Black"
+                    :foreground "DarkRed"))))
+ '(info-elisp-special-form-ref-item     ;elispÌØÊâ±í¸ñÒıÓÃÏîÄ¿
+   ((t (:background "Black"
+                    :foreground "OrangeRed2"))))
+ '(info-elisp-syntax-class-item         ;elispÓï·¨ÀàĞÍÏîÄ¿
+   ((t (:background "Black"
+                    :foreground "Khaki3"))))
+ '(info-elisp-user-option-ref-item      ;elispÓÃ»§Ñ¡ÏîÒıÓÃÏîÄ¿
+   ((t (:background "Black"
+                    :foreground "LawnGreen"))))
+ '(info-elisp-variable-ref-item         ;elisp±äÁ¿ÒıÓÃÏîÄ¿
+   ((t (:background "Black"
+                    :foreground "#0048FF"))))
+ '(info-file                            ;ÎÄ¼ş
+   ((t (:background "Black"
+                    :foreground "Blue"))))
+ '(info-menu                            ;²Ëµ¥
+   ((t (:foreground "DarkRed"))))
+ '(info-quoted-name                     ;ÒıÓÃÃû×Ö
+   ((t (:foreground "Purple"))))
+ '(info-string                          ;×Ö·û´®
+   ((t (:foreground "Grey50"))))
+ ;; Customzie
+ '(custom-button
+   ((((type x w32 ns)                   ;×Ô¶¨Òå°´Å¥
+      (class color))
+     (
+      :background "darkred"
+                  :foreground "white"
+                  :box (:line-width 1 :style released-button)
+                  ))))
+ '(custom-comment                       ;×Ô¶¨Òå×¢ÊÍ
+   ((((class grayscale color) (background dark))
+     (
+      :background "grey5"
+                  :foreground "green"
+                  ))))
+ '(custom-group-tag                     ;×é±êÇ©
+   ((t (:inherit variable-pitch
+                 :foreground "gold"
+                 :underline t
+                 :weight bold
+                 :height 1.2
+                 ))))
+ ;; icicles
+ '(icicle-candidate-part                ;ºòÑ¡²¿·Ö
+   ((((background dark))
+     (:background "Black"
+                  :foreground "Purple"))))
+ '(icicle-complete-input                ;²¹È«ÊäÈë
+   ((((background dark))
+     (:foreground "Gold"))))
+ '(icicle-completion                    ;²¹È«
+   ((((background dark))
+     (:foreground "Gold"))))
+ '(icicle-current-candidate-highlight   ;µ±Ç°ºòÑ¡¸ßÁÁ
+   ((((background dark))
+     (:background "DarkRed" :foreground "White"))))
+ '(icicle-input-completion-fail         ;ÊäÈë²¹È«Ê§°Ü
+   ((((background dark))
+     (:background "DarkRed"
+                  :foreground "White"))))
+ '(icicle-input-completion-fail-lax     ;laxÊäÈë²¹È«Ê§°Ü
+   ((((background dark))
+     (:background "khaki"
+                  :foreground "Black"))))
+ '(icicle-match-highlight-Completions   ;Æ¥Åä²¹È«¸ßÁÁ
+   ((((background dark))
+     (:foreground "DodgerBlue1"))))
+ '(icicle-multi-command-completion      ;¶àÖØÃüÁî²¹È«
+   ((((background dark))
+     (:foreground "Gold"))))
+ '(icicle-mustmatch-completion          ;Æ¥Åä²¹È«
+   ((((type x w32 mac graphic) (class color))
+     (:inherit nil))))
+ '(icicle-saved-candidate               ;±£´æºòÑ¡
+   ((((background dark))
+     (:background "Black"
+                  :foreground "khaki"))))
+ '(icicle-special-candidate             ;ÌØÊâºòÑ¡
+   ((((background dark))
+     (:background "Black"
+                  :foreground "Grey"))))
+ '(icicle-whitespace-highlight          ;¿Õ¸ñ¸ßÁÁ
+   ((((background dark))
+     (:background "DarkRed"))))
+ ;; hl-line+
+ '(hl-line ((t                          ;µ±Ç°ĞĞ¸ßÁÁ±³¾°É«
+             (:background "grey5"))))
+ ;; col-highlight
+ '(col-highlight                        ;µ±Ç°ÁĞµÄ¸ßÁÁ±³¾°É«
+   ((t (:background "Grey5"))))
+ ;; hl-sexp
+ '(hl-sexp-face                         ;¸ßÁÁ sexp
+   ((((class color) (background dark))
+     (:background "gray2"))))
+ ;; Emms Playlist
+ '(emms-playlist-selected-face          ;Éè¶¨Ñ¡ÖĞÏîÄ¿ÎÄ×ÖµÄÑÕÉ«
+   ((t (:foreground "Green"))))
+ '(emms-playlist-track-face             ;Éè¶¨²¥·ÅÁĞ±íÎÄ×ÖµÄµ×É«
+   ((t (:foreground "DarkGreen"))))
+ ;; Emms Browser
+ '(emms-browser-album-face              ;×¨¼­
+   ((((class color) (background dark))
+     (:foreground "Green3"
+                  :height 1.1))))
+ '(emms-browser-artist-face             ;ÒÕÊõ¼Ò
+   ((((class color) (background dark))
+     (:foreground "Gold3"
+                  :height 1.3))))
+ '(emms-browser-track-face              ;¸èÇú
+   ((((class color) (background dark))
+     (:foreground "khaki3"
+                  :height 1.0))))
+ ;; Rcirc
+ '(rcirc-bright-nick                    ;¹Ø×¢µÄÄİ³Æ
+   ((((class color) (min-colors 88) (background dark))
+     (:foreground "White"))))
+ '(rcirc-dim-nick                       ;ºöÂÔµÄÄİ³Æ
+   ((t (:foreground "Grey25"))))
+ '(rcirc-keyword
+   ((t (:foreground "khaki"             ;¹Ø¼ü×Ö¸ßÁÁ
+                    :slant normal
+                    :weight ultra-bold))))
+ '(rcirc-my-nick                        ;ÎÒµÄÄİ³Æ
+   ((((class color) (min-colors 88) (background dark))
+     (:foreground "Green3"
+                  :weight semi-bold))))
+ '(rcirc-nick-in-message                ;ÏûÏ¢ÖĞÎÒµÄÄİ³Æ
+   ((((class color) (min-colors 88) (background dark))
+     (:foreground "Gold"))))
+ '(rcirc-nick-in-message-full-line      ;ÏûÏ¢ÖĞÎÒµÄÄİ³Æ, È«ĞĞ
+   ((t (:underline "grey20"))))
+ '(rcirc-other-nick                     ;ÆäËûÄİ³Ì
+   ((((class color) (min-colors 88) (background dark))
+     (:foreground "tomato"))))
+ '(rcirc-prompt                         ;ÌáÊ¾·û
+   ((((min-colors 88) (background dark))
+     (:foreground "Purple"))))
+ '(rcirc-server                         ;·şÎñÆ÷ÏûÏ¢
+   ((((class color) (min-colors 88) (background dark))
+     (:foreground "DarkRed"))))
+ '(rcirc-server-prefix                  ;·şÎñÆ÷ÏûÏ¢Ç°×º
+   ((default (:foreground "khaki4"))
+    (((class color) (min-colors 16)) nil)))
+ '(rcirc-timestamp                      ;Ê±¼äÖá
+   ((t (:foreground "grey35"))))
+ '(rcirc-track-keyword                  ;¹Ø¼ü×Ö¸ú×Ù
+   ((t (:foreground "Yellow"
+                    :weight bold))))
+ '(rcirc-track-nick                     ;Äİ³Æ¸ú×Ù
+   ((t (:foreground "Green"))))
+ '(rcirc-url                            ;Á¬½Ó
+   ((t (:foreground "Grey50"
+                    :weight ultra-light))))
+ ;; eperiodic (»¯Ñ§ÔªËØÖÜÆÚ±í)
+ '(eperiodic-d-block-face               ;D ¿é
+   ((((class color) (background dark))
+     (:inherit eperiodic-generic-block-face
+               :background "DarkRed"
+               :foreground "White"))))
+ '(eperiodic-f-block-face               ;F ¿é
+   ((((class color) (background dark))
+     (:inherit eperiodic-generic-block-face
+               :background "DarkRed"
+               :foreground "Grey"))))
+ '(eperiodic-s-block-face               ;S ¿é
+   ((((class color))
+     (:inherit eperiodic-generic-block-face
+               :background "tan3"
+               :foreground "cornsilk2"))))
+ '(eperiodic-generic-block-face         ;Í¨ÓÃ ¿é
+   ((((class color)) nil)))
+ '(eperiodic-p-block-face               ;P ¿é
+   ((((class color))
+     (:inherit eperiodic-generic-block-face
+               :background "Green4"
+               :foreground "Grey"))))
+ '(eperiodic-header-face                ;±êÌâ
+   ((t (:foreground "Gold"
+                    :weight bold))))
+ '(eperiodic-group-number-face          ;×éÊı
+   ((t (:inherit eperiodic-generic-block-face
+                 :foreground "grey"
+                 :weight bold))))
+ '(eperiodic-period-number-face         ;ÖÜÆÚÊı
+   ((t (:foreground "grey"
+                    :weight bold))))
+ ;; Company-mode
 
+ ;; cal-china-x
+ '(cal-china-x-priority1-holiday-face   ;¼ÙÈÕ
+   ((((class color) (background dark))
+     (:background "DarkRed"
+                  :foreground "White"))))
+ '(cal-china-x-priority2-holiday-face   ;¼ÙÈÕ
+   ((((class color) (background dark))
+     (:background "Khaki"
+                  :foreground "Black"))))
+ ;; Xgtags
+ '(xgtags-file-face                     ;ÎÄ¼ş
+   ((((class color) (background dark))
+     (:foreground "Grey50"))))
+ '(xgtags-file-selected-face            ;Ñ¡ÔñµÄÎÄ¼ş
+   ((t (:foreground "Grey70"
+                    :weight bold))))
+ '(xgtags-line-face                     ;ËÑË÷ĞĞ
+   ((((class color) (background dark))
+     (:foreground "khaki4"))))
+ '(xgtags-line-selected-face            ;Ñ¡ÔñµÄËÑË÷ĞĞ
+   ((t (:foreground "khaki"))))
+ '(xgtags-line-number-face              ;ĞĞºÅ
+   ((((class color) (background dark))
+     (:foreground "DarkRed"))))
+ '(xgtags-line-number-selected-face     ;Ñ¡ÔñµÄĞĞºÅ
+   ((t (:foreground "Red"
+                    :weight bold))))
+ '(xgtags-match-face                    ;¹Ø¼ü×Ö
+   ((((class color) (background dark))
+     (:foreground "Green4"))))
+ '(xgtags-match-selected-face           ;Ñ¡ÔñµÄ¹Ø¼ü×Ö
+   ((t (:foreground "Green"
+                    :weight bold))))
+ ;; eldoc
+ '(eldoc-highlight-function-argument    ;²ÎÊıÑÕÉ«
+   ((t (:inherit bold
+                 :foreground "Red"))))
+ ;; elscreen
+ '(elscreen-tab-background-face         ;±³¾°±êÇ©
+   ((((type x w32 mac) (class color))
+     (:background "Black"))))
+ '(elscreen-tab-control-face            ;¿ØÖÆ±êÇ©
+   ((((type x w32 mac) (class color))
+     (:background "Black"
+                  :foreground "Green"))))
+ '(elscreen-tab-current-screen-face     ;µ±Ç°±êÇ©
+   ((((class color))
+     (:background "DarkRed"
+                  :foreground "Grey"
+                  :box (:line-width -1
+                                    :color "Red"
+                                    :style released-button)))))
+ '(elscreen-tab-other-screen-face       ;±³¾°
+   ((((type x w32 mac) (class color))
+     (:background "Black"
+                  :foreground "Green3"
+                  :box (:line-width -1
+                                    :color "Grey20"
+                                    :style released-button)))))
+ ;; Window nubmer
+ '(window-number-face ((((type x w32 mac)) (:foreground "Gold"))))
+ ;; re-builder
+ '(reb-match-0
+   ((((class color) (background dark))
+     (:background "khaki3"
+                  :foreground "Black"))))
+ '(reb-match-1
+   ((((class color) (background dark))
+     (:background "dodgerblue3"
+                  :foreground "black"))))
+ '(reb-match-2
+   ((((class color) (background dark))
+     (:background "chartreuse3"
+                  :foreground "black"))))
+ '(reb-match-3
+   ((((class color) (background dark))
+     (:background "sienna3"
+                  :foreground "black"))))
+ ;; Highlight fixme
+ '(fixme-face
+   ((t (:foreground "orange"
+                    :box (:line-width 1
+                                      :color "orange")
+                    :weight bold))))
+ ;; Basic
+ '(secondary-selection                  ;´ÎÒª¼¶µÄÑ¡Ôñ
+   ((((class color) (min-colors 88) (background dark))
+     (:background "Black"))))
+ ;; Go-to-char
+ '(go-to-char-highlight                 ;Ìø×ªµ½×Ö·û¸ßÁÁ
+   ((((class color) (background dark))
+     (:background "Pink"
+                  :foreground "Black"))))
+ ;; Match
+ '(match                                ;Æ¥ÅäµÄ
+   ((((class color) (min-colors 88) (background dark))
+     (:background "Black"
+                  :foreground "Grey70"
+                  :weight extra-bold))))
+ ;; Woman
+ '(woman-addition                       ;¸½¼ÓµÄ
+   ((t (:foreground "Gold3"))))
+ '(woman-bold                           ;±êÌâ
+   ((((background dark))
+     (:foreground "Green3"
+                  :weight bold))))
+ '(woman-italic                         ;²ÎÊı
+   ((((background dark))
+     (:foreground "DarkRed"
+                  :underline t))))
+ '(woman-unknown                        ;Î´ÖªµÄ
+   ((((min-colors 88) (background dark))
+     (:foreground "Cyan3"))))
+ ;; Company
+ '(company-preview                      ;Ô¤ÀÀ
+   ((t (:background "gold3"
+                    :foreground "black"))))
+ '(company-preview-common               ;Ô¤ÀÀ £¨¹«¹²²¿·Ö£©
+   ((t (:background "gold3"
+                    :foreground "grey20"))))
+ '(company-preview-search               ;Ô¤ÀÀ £¨ËÑË÷£©
+   ((t (:background "green4"
+                    :foreground "green"))))
+ '(company-tooltip                      ;tooltip
+   ((t (:background "darkred"
+                    :foreground "grey"))))
+ '(company-tooltip-common               ;tooltip (¹«¹²²¿·Ö£©
+   ((t (:inherit company-tooltip
+                 :foreground "gold"))))
+ '(company-tooltip-common-selection     ;tooltip £¨Ñ¡Ôñ¹«¹²²¿·Ö£©
+   ((t (:inherit company-tooltip-selection
+                 :foreground "gold"))))
+ '(company-tooltip-selection            ;tooltip (Ñ¡Ôñ£©
+   ((default (:background "red3"
+                          :foreground "black"))
+    (((class color) (min-colors 88)) (:background "orange1"))))
+ ;; Auto-complete
+ '(ac-menu-face                         ;²Ëµ¥ÑÕÉ«
+   ((t (:background "Grey10"
+                    :foreground "Grey40"))))
+ '(ac-selection-face                    ;Ñ¡ÔñÑÕÉ«
+   ((t (:background "Green4"
+                    :foreground "Green"))))
+ '(ac-yasnippet-menu-face               ;Yasnippet ²Ëµ¥ÑÕÉ«
+   ((t (:background "Grey10"
+                    :foreground "Grey40"))))
+ '(ac-yasnippet-selection-face          ;Yasnippet Ñ¡ÔñÑÕÉ«
+   ((t (:background "DarkRed"
+                    :foreground "Grey"))))
+ ;; ERC
+ '(erc-direct-msg-face                  ;Ö±½ÓÏûÏ¢
+   ((t (:foreground "DodgerBlue"))))
+ '(erc-input-face                       ;ÊäÈë
+   ((t (:foreground "Green2"))))
+ '(erc-my-nick-face                     ;ÎÒµÄêÇ³Æ
+   ((t (:foreground "DarkRed"
+                    :weight bold))))
+ '(erc-notice-face                      ;×¢Òâ
+   ((t (:foreground "Gray20"
+                    :weight bold))))
+ '(erc-prompt-face                      ;ÌáÊ¾
+   ((t (:background "Black"
+                    :foreground "Gold"
+                    :weight bold))))
+ ;; Diff
+ '(diff-header ((((class color) (min-colors 88) (background dark))
+                 (:background "grey30" :foreground "gold"))))
+ ;; Egg
+ '(egg-diff-hunk-header                 ;²»Í¬µÄ±êÌâ
+   ((((class color) (background dark))
+     (:background "grey30"
+                  :foreground "Gold"))))
+ '(egg-log-HEAD                         ;ÈÕÖ¾±êÌâ
+   ((t (:background "Black"
+                    :foreground "Red"))))
+ '(egg-text-help                        ;ÎÄ±¾°ïÖú
+   ((t (:inherit egg-text-base
+                 :height 0.9))))
+ ;; scim-bridge
+ '(scim-preedit-default-face            ;Ô¤Ñ¡´°¿ÚµÄÄ¬ÈÏÍâ¹Û
+   ((t (:background "DarkRed"
+                    :foreground "White"))))
+ ;; rfcview
+ '(rfcview-headlink-face                ;Á´½Ó
+   ((t (:foreground "DodgerBlue"))))
+ '(rfcview-headname-face                ;½ÚÃû³Æ
+   ((t (:foreground "DarkRed"
+                    :underline t :weight bold))))
+ '(rfcview-headnum-face                 ;½ÚÊı×Ö
+   ((t (:foreground "DarkRed"
+                    :weight bold))))
+ '(rfcview-mouseover-face               ;Êó±êÒÆ¶¯
+   ((t (:background "DarkRed"
+                    :foreground "white" :weight bold))))
+ '(rfcview-rfcnum-face                  ;RFC ID
+   ((t (:foreground "Green3"
+                    :weight bold))))
+ '(rfcview-stdnum-face                  ;STD ID
+   ((t (:foreground "Grey"
+                    :weight bold))))
+ '(rfcview-title-face                   ;±êÌâ
+   ((t (:foreground "Gold"
+                    :weight bold))))
+ ;; Helm Themes
+ '(helm-selection ((t (:background "dark red" :foreground "light gray"))))
+ '(helm-selection-line ((t (:background "dark red" :foreground "light gray"))))
+ '(helm-source-header ((t (:foreground "yellow" :underline t :family "Sans Serif"))))
 
-;; ;;;; è®¾ç½®tabbarå¤–è§‚
-;; ;; è®¾ç½®é»˜è®¤ä¸»é¢˜: å­—ä½“, èƒŒæ™¯å’Œå‰æ™¯é¢œè‰²ï¼Œå¤§å°
-;; (set-face-attribute 'tabbar-default nil
-;;                     :family "Vera Sans YuanTi Mono"
-;;                     :background "gray80"
-;;                     :foreground "gray30"
-;;                     :height 1.0
-;;                     )
-;; ;; è®¾ç½®å·¦è¾¹æŒ‰é’®å¤–è§‚ï¼šå¤–æ¡†æ¡†è¾¹å¤§å°å’Œé¢œè‰²
-;; (set-face-attribute 'tabbar-button nil
-;;                     :inherit 'tabbar-default
-;;                     :box '(:line-width 1 :color "gray30")
-;;                     )
-;; ;; è®¾ç½®å½“å‰tabå¤–è§‚ï¼šé¢œè‰²ï¼Œå­—ä½“ï¼Œå¤–æ¡†å¤§å°å’Œé¢œè‰²
-;; (set-face-attribute 'tabbar-selected nil
-;;                     :inherit 'tabbar-default
-;;                     :foreground "DarkGreen"
-;;                     :background "LightGoldenrod"
-;;                     :box '(:line-width 2 :color "DarkGoldenrod")
-;;                     ;; :overline "black"
-;;                     ;; :underline "black"
-;;                     :weight 'bold
-;;                     )
-;; ;; è®¾ç½®éå½“å‰tabå¤–è§‚ï¼šå¤–æ¡†å¤§å°å’Œé¢œè‰²
-;; (set-face-attribute 'tabbar-unselected nil
-;;                     :inherit 'tabbar-default
-;;                     :box '(:line-width 2 :color "gray70")
-;;                     )
+ )
 
-(require 'hyperplane-theme)
+(setq
+ ;; rcirc Äİ³ÆµÄËæ»úÑÕÉ«
+ rcirc-colors '("LightGrey" "SlateBlue" "DeepPink"
+                "HotPink" "DodgerBlue1" "OliveDrab2"
+                "Chartreuse" "LightCyan" "DarkMagenta"
+                "DarkKhaki" "Grey" "Pink" "FireBrick3"
+                "Chocolate3" "sienna" "Orange2")
+ ;; ÈÕÀúÑÕÉ«
+ calendar-load-hook
+ '(lambda ()
+    (set-face-foreground 'diary-face "skyblue")
+    (set-face-background 'holiday-face "slate blue")
+    (set-face-foreground 'holiday-face "white"))
+ ;; ÓÊ¼şÍ¼±ê
+ display-time-mail-icon
+ '(image
+   :type jpeg
+   :file "/usr/share/deepin-emacs/Image/mail1.jpeg"
+   :background "DarkRed"
+   :ascent center)
+ ;; Scim-bridge ¹â±êÑÕÉ« (¿ªÆô . ¹Ø±Õ)
+ scim-cursor-color
+ '("Gold3" . "Red3")
+ )
 
 (provide 'HualetTheme)

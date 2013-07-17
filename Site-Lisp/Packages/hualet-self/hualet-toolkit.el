@@ -90,5 +90,22 @@
   (insert " ")
   (insert-time))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Startup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun startup-open ()
+  "The files that need open when emacs startup."
+  (interactive)
+  (let* ((file-list startup-open-file-list)
+         file-name)
+    (dolist (file-name file-list)
+      (find-file file-name))))
+
+(defun startup-close ()
+  "Close when emacs startup."
+  (interactive)
+  (dolist (file-name startup-close-file-list)
+    (if (get-buffer file-name)
+        (kill-buffer file-name))))
+
+
 
 (provide 'hualet-toolkit)

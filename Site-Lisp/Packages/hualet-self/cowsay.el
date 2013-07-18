@@ -28,10 +28,16 @@
   (if (file-exists-p "/usr/games/cowsay")
       (progn
         (switch-to-buffer "*Welcome to HualetEmacs!")
-        (animate-string (shell-command-to-string (concat "cowsay " (concat (concat "\"" str) "\""))) 0))))
+        (delete-other-windows)
+        (animate-string (shell-command-to-string (concat "cowsay " (concat (concat "\"" str) "\""))) 0)
+        (toggle-read-only 1))))
 
 (defun cowsay-how-to-become-a-hacker ()
   (cowsay-animation cowsay-word)
   )
 
 (provide 'cowsay)
+
+
+
+

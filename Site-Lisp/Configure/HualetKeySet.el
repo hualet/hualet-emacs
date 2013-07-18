@@ -241,6 +241,17 @@ ac-complete-mode-map
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Multi-Cursor ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "M-R") 'mc/mark-all-like-this-dwim)
 
+;;; ### Multi-Term ###
+;;; --- 多标签式的shell
+(lazy-set-key
+ '(
+   ("s-e" . multi-term-next)                 ;下一个终端
+   ("s-w" . multi-term-prev)                 ;上一个终端
+   ("s-n" . multi-term)                      ;新建一个终端
+   ("s-x s-x" . multi-term-dedicated-toggle) ;切换专注终端
+   ("s-x s-z" . multi-term-dedicated-select) ;选择专注终端
+   ))
+
 ;;; ### Rect ###
 ;;; --- 矩形操作
 (lazy-set-key

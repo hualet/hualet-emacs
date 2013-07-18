@@ -364,16 +364,16 @@
 ;;;; ### Doc View ###
 ;;;; --- PDF, PS, DVI 图书浏览器
 ;(setq doc-view-cache-directory my-translate-png-directory) ;doc-view转换的图书目录
-;
-;;;; ### Color moccur ###
-;;;; --- 增强的Buffer搜索
-;(setq moccur-kill-moccur-buffer t)         ;退出buffer时自动关闭其buffer
-;(setq moccur-edit-highlight-edited-text t) ;高亮编辑过的内容
-;(defadvice moccur-edit-change-file         ;编辑过后自动保存buffer
-;  (after save-after-moccur-edit-buffer activate)
-;  "Automatically save buffer when edit in moccur."
-;  (save-buffer))
-;
+
+;;; ### Color moccur ###
+;;; --- 增强的Buffer搜索
+(setq moccur-kill-moccur-buffer t)         ;退出buffer时自动关闭其buffer
+(setq moccur-edit-highlight-edited-text t) ;高亮编辑过的内容
+(defadvice moccur-edit-change-file         ;编辑过后自动保存buffer
+  (after save-after-moccur-edit-buffer activate)
+  "Automatically save buffer when edit in moccur."
+  (save-buffer))
+
 ;;;; ### Auto-fill ###
 ;;;; --- 自动换行
 ;(setq default-fill-column 100)          ;默认显示 100列就换行
@@ -422,19 +422,21 @@
 ;(setq traverse-use-avfs t)                           ;开启AVFS
 ;(add-to-list 'traverse-ignore-files ".ledger-cache") ;忽略的文件
 ;
-;;;; ### Term ###
-;;;; --- 终端模拟器
-;(setq term-eol-on-send t)               ;输入前跳转到最后一行
-;
-;;;; ### Multi-term ###
-;;;; --- 多标签 term
-;(setq multi-term-program "/bin/zsh")    ;设置默认终端
-;(setq multi-shell-command "/bin/zsh")
-;(setq multi-term-dedicated-skip-other-window-p t) ;`other-window' 不在专注窗口中经过
-;(setq multi-term-scroll-show-maximum-output t)    ;最大输出时滚动
-;(setq multi-term-scroll-to-bottom-on-output nil)  ;到达底部时不滚动
-;(setq multi-term-dedicated-select-after-open-p t) ;打开专注终端窗口时聚焦
-;
+;; ### Term ###
+;; --- 终端模拟器
+(setq term-eol-on-send t)               ;输入前跳转到最后一行
+(add-hook 'term-mode-hook (lambda()
+                            (yas-minor-mode -1))) ;这样就能再term下使用tab进行补全了
+
+;; ### Multi-term ###
+;; --- 多标签 term
+(setq multi-term-program "/bin/zsh")    ;设置默认终端
+(setq multi-shell-command "/bin/zsh")
+(setq multi-term-dedicated-skip-other-window-p t) ;`other-window' 不在专注窗口中经过
+(setq multi-term-scroll-show-maximum-output t)    ;最大输出时滚动
+(setq multi-term-scroll-to-bottom-on-output nil)  ;到达底部时不滚动
+(setq multi-term-dedicated-select-after-open-p t) ;打开专注终端窗口时聚焦
+
 ;;;; ### Xgtags ###
 ;;;; --- Gtags 的界面
 ;(add-hook 'c-mode-common-hook 'xgtags-mode)
@@ -605,11 +607,11 @@
 ;;; --- Pretty lambda
 ;(add-hook 'python-mode-hook 'pretty-lambda)
 ;
-;;; ### Smooth scrolling ###
-;;; --- Smooth scrolling
-;(setq scroll-step 1
-;      scroll-conservatively 10000
-;      auto-window-vscroll nil)
+;; ### Smooth scrolling ###
+;; --- Smooth scrolling
+(setq scroll-step 1
+     scroll-conservatively 10000
+     auto-window-vscroll nil)
 ;
 ;(add-hook 'js-mode-hook
 ;          (lambda () (flymake-mode 1)))

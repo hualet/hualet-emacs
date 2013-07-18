@@ -266,7 +266,7 @@
 ;(require 'gnus-notify+)                 ;Gnus提醒
 ;(require 'speedbar-extension)           ;speedbar扩展
 ;;; (require 'etags-extension)              ;etags扩展
-;(require 'multi-term)                   ;多标签SHELL
+(require 'multi-term)                   ;多标签SHELL
 ;(require 'lazycat-c-style)              ;C 的编程风格
 ;;; (require 'festival-extension)           ;Festival扩展
 ;(require 'emms-extension)               ;emms扩展

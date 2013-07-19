@@ -77,6 +77,8 @@
 
 
 ;;; Code:
+(defvar point-stack nil
+  "The stack of marked positions.")
 
 (defun open-newline-above (arg)
   "Move to the previous line (like vi) and then opens a line."

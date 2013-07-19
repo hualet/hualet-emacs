@@ -398,11 +398,11 @@ ac-complete-mode-map
    ;; ("C-M-e" . end-of-defun)                ;函数末尾
    ;; ("C-c j" . go-to-char-forward)          ;快速字母导航, 向前
    ;; ("C-c k" . go-to-char-backward)         ;快速字母导航, 向后
-   ;; ("C->" . remember-init)                 ;记忆初始函数
-   ;; ("C-<" . remember-jump)                 ;记忆跳转函数
+   ("C->" . remember-init)                 ;记忆初始函数
+   ("C-<" . remember-jump)                 ;记忆跳转函数
    ;; ("M-s" . lazy-search-menu)              ;懒惰搜索
-   ;; ("M-s-," . point-stack-pop)             ;buffer索引跳转
-   ;; ("M-s-." . point-stack-push)            ;buffer索引标记
+   ("M-s-," . point-stack-pop)             ;buffer索引跳转
+   ("M-s-." . point-stack-push)            ;buffer索引标记
    ;; ("s-{" . current-line-move-to-top)      ;移动当前行到最上面一行
    ))
 

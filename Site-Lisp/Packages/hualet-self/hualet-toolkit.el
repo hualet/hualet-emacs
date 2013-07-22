@@ -14,14 +14,14 @@
 
 ;; #####Font#####
 (defun text-scale-increase-global()
-  "Descrease the font size of the frame"
+  "Decrease the font size of the frame"
   (interactive)
   (setq frame-current-font-size (truncate (* 0.8 frame-current-font-size)))
   (set-face-attribute 'default nil :height frame-current-font-size)
   )
 
 (defun text-scale-decrease-global()
-  "Descrease the font size of the frame"
+  "Increase the font size of the frame"
   (interactive)
   (setq frame-current-font-size (truncate (* 1.2 frame-current-font-size)))
   (set-face-attribute 'default nil :height frame-current-font-size)

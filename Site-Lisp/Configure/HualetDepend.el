@@ -201,7 +201,7 @@
 ;(require 'auto-complete-emacs-lisp)     ;集成 auto-complete 和 emacs-lisp
 ;(require 'auto-complete-gtags)          ;集成 auto-complete 和 gtags
 ;;; (require 'auto-complete-semantic)      ;集成 auto-complete 和 semantic
-(require 'auto-complete-yasnippet)      ;集成 auto-complete 和 yasnippet
+;(require 'auto-complete-yasnippet)      ;集成 auto-complete 和 yasnippet
 ;;;(require 'auto-complete-css)           ;集成 auto-complete 和 css
 ;(require 'ac-dabbrev)                  ;auto-complete 的 `dabbrev' 支持
 ;;; (require 'boxquote)                    ;文本引用工具

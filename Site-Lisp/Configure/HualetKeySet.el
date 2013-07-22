@@ -158,9 +158,9 @@ ac-complete-mode-map
    ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Recentf Mode ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(lazy-set-key '(
-                ("C-x C-r" . recentf-open-files)
-                ("C-S-t" . recentf-open-most-recent-file-cycle)))
+;; (lazy-set-key '(
+;;                 ("C-x C-r" . recentf-open-files)
+;;                 ("C-S-t" . recentf-open-most-recent-file-cycle)))
 
 
 ;;; ### Paredit ###
@@ -332,7 +332,7 @@ ac-complete-mode-map
 (lazy-set-key
  '(
    ("s--" . text-scale-decrease)        ;减小字体大小
-   ("s-=" . text-scale-decrease)        ;增大字体大小
+   ("s-=" . text-scale-increase)        ;增大字体大小
    ("M--" . text-scale-decrease-global) ;减少字体大小, 全局
    ("M-+" . text-scale-increase-global) ;增加字体大小, 全局
    ("M-=" . text-scale-default-global)  ;恢复字体大小, 全局
@@ -384,7 +384,7 @@ ac-complete-mode-map
    ("C-z j" . end-of-buffer)               ;缓存结尾
    ;; ("M-p" . go-to-next-pair-right)         ;在( ),' ', " ", [ ], { }中跳到匹配符号的右边
    ;; ("M-n" . go-to-next-pair-left)          ;在( ), ' ', " ", [ ], { }中跳到匹配符号的左边
-   ;; ("%" . match-paren)                     ;当在括号上按 % 时, 自动跳转到与当前括号匹配的另一个括号
+   ("%" . match-paren)                     ;当在括号上按 % 时, 自动跳转到与当前括号匹配的另一个括号
    ;; ("s-g" . goto-percent)                  ;跳转到当前Buffer的文本百分比, 单位为字符
    ;; ("M-g" . goto-line)                     ;到指定行
    ;; ("M-G" . goto-column)                   ;到指定列

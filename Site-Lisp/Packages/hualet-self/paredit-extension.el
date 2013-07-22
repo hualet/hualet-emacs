@@ -12,4 +12,5 @@
                                           (message "Already yanked. :-)")))
    (t (message "Yank failed..."))))
 
+
 (provide 'paredit-extension)

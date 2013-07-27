@@ -106,6 +106,20 @@
     (if (get-buffer file-name)
         (kill-buffer file-name))))
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Screensaver & Lock ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun lock-screen ()
+  "Lock screen using (zone) and xtrlock
+calls M-x zone on all frames and runs xtrlock.
+To use this extension, you need install xtrlock in your system."
+  (interactive)
+  (save-excursion
+    ;; Don't burn LCD power.
+    (shell-command "xset dpms force off && sleep 1")
+    ;; Lock screen.
+    (set-process-sentinel
+     (start-process "xtrlock" nil "xtrlock")
+     '(lambda (process event)
+        (zone-leave-me-alone)))
+    (zone)))
 
 (provide 'hualet-toolkit)

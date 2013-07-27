@@ -232,7 +232,7 @@
 ;(require 'darcsum)                      ;darcs mode
 ;;; (require 'mumamo)
 ;(require 'js2-mode)                     ;javascript mode
-;(require 'pretty-lambdada)              ;pretty lambda
+(require 'pretty-lambdada)              ;pretty lambda
 ;(require 'html-helper-mode)             ;html helper mode
 ;(require 'zencoding-mode)
 ;(require 'tuareg)                       ;ocaml edit mode
@@ -307,8 +307,8 @@
 ;(require 'isearch-extension)            ;isearch扩展
 (require 'one-key)                      ;one-key
 (require 'one-key-config)               ;one-key 扩展
-;(require 'lazy-search)                  ;懒惰搜索
-;(require 'lazy-search-extension)        ;lazy-seach 扩展
+(require 'lazy-search)                  ;懒惰搜索
+(require 'lazy-search-extension)        ;lazy-seach 扩展
 ;(require 'gnus-extension)               ;gnus扩展
 ;(require 'ispell-extension)             ;ispell扩展
 ;(require 'yaoddmuse)                    ;另一种 oddmuse 模式

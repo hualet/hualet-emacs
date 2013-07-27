@@ -9,7 +9,7 @@
                    ac-source-filename
                    ac-source-dictionary
                    ac-source-words-in-same-mode-buffers
-                   ;; ac-source-yasnippet
+                   ac-source-yasnippet
                    ))
 
 

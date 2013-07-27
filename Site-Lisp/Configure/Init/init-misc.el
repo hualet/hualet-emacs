@@ -602,11 +602,11 @@
 ;;; ### nxhtml-mode ###
 ;;;; --- nxhtml mode.
 ;;; (load "/home/andy/MyEmacs/Site-Lisp/Packages/nxhtml/autostart.el")
-;
-;;; ### Pretty lambda ###
-;;; --- Pretty lambda
-;(add-hook 'python-mode-hook 'pretty-lambda)
-;
+
+;; ### Pretty lambda ###
+;; --- Pretty lambda
+(add-hook 'python-mode-hook 'pretty-lambda)
+
 ;; ### Smooth scrolling ###
 ;; --- Smooth scrolling
 (setq scroll-step 1

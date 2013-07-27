@@ -1160,15 +1160,14 @@
  '(ac-menu-face                         ;菜单颜色
    ((t (:background "Grey10"
                     :foreground "Grey40"))))
- '(ac-selection-face                    ;选择颜色
-   ((t (:background "Green4"
-                    :foreground "Green"))))
  '(ac-yasnippet-menu-face               ;Yasnippet 菜单颜色
    ((t (:background "Grey10"
                     :foreground "Grey40"))))
  '(ac-yasnippet-selection-face          ;Yasnippet 选择颜色
    ((t (:background "DarkRed"
                     :foreground "Grey"))))
+ '(ac-selection-face ((t (:background "dark red" :foreground "white"))))
+
  ;; ERC
  '(erc-direct-msg-face                  ;直接消息
    ((t (:foreground "DodgerBlue"))))
@@ -1227,7 +1226,13 @@
  '(helm-selection ((t (:background "dark red" :foreground "light gray"))))
  '(helm-selection-line ((t (:background "dark red" :foreground "light gray"))))
  '(helm-source-header ((t (:foreground "yellow" :underline t :family "Sans Serif"))))
-
+ '(helm-ff-directory ((t (:foreground "blue"))))
+ 
+ ;; popup Themes
+ '(popup-face ((t (:background "gray10" :foreground "green"))))
+ '(popup-tip-face ((t (:background "gray10" :foreground "white"))))
+ '(popup-scroll-bar-foreground-face ((t nil)))
+ '(popup-scroll-bar-background-face ((t nil)))
  )
 
 (setq

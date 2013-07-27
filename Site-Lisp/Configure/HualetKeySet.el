@@ -7,7 +7,7 @@
    ;; ("<f3>" . visit-tags-table)                   ;查找TAGS文件 (更新TAGS表)
    ;; ("<f4>" . generate-gtags-files)               ;生成gtags引用文件
    ;;("<f5>" . emacs-exit)                         ;退出emacs
-   ;; ("<f6>" . lock-screen)                        ;锁屏
+   ("<f6>" . lock-screen)                        ;锁屏
    ;; ("<f7>" . one-key-menu-ui)                    ;用户界面菜单
    ("<f8>" . dired-jump)                         ;文件管理起
    ;; ("<f9>" . list-load-path-shadows)             ;显示重复加载的库
@@ -220,9 +220,9 @@ ac-complete-mode-map
 ;;; --- 窗口操作
 (lazy-set-key
  '(
-   ;; ("C-c v" . split-window-vertically)                ;纵向分割窗口
-   ;; ("C-c h" . split-window-horizontally)              ;横向分割窗口
-   ;; ("C-'" . delete-current-buffer-and-window)         ;关闭当前buffer, 并关闭窗口
+   ("C-c v" . split-window-vertically)                ;纵向分割窗口
+   ("C-c h" . split-window-horizontally)              ;横向分割窗口
+   ("C-'" . delete-current-buffer-and-window)         ;关闭当前buffer, 并关闭窗口
    ;; ("C-\"" . delete-current-buffer-window)            ;删除当前buffer的窗口
    ("C-;" . kill-this-buffer)                         ;关闭当前buffer
    ;; ("C-M-;" . kill-other-window-buffer)               ;关闭其他窗口的buffer
@@ -400,7 +400,7 @@ ac-complete-mode-map
    ;; ("C-c k" . go-to-char-backward)         ;快速字母导航, 向后
    ("C->" . remember-init)                 ;记忆初始函数
    ("C-<" . remember-jump)                 ;记忆跳转函数
-   ;; ("M-s" . lazy-search-menu)              ;懒惰搜索
+   ("M-s" . lazy-search-menu)              ;懒惰搜索
    ("M-s-," . point-stack-pop)             ;buffer索引跳转
    ("M-s-." . point-stack-push)            ;buffer索引标记
    ;; ("s-{" . current-line-move-to-top)      ;移动当前行到最上面一行

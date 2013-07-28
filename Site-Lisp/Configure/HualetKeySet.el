@@ -126,7 +126,6 @@
    )
  w3m-mode-map)
 
-
 ;;; ### Auto-complete ###
 ;;; --- 自动补全
 (lazy-unset-key
@@ -440,6 +439,11 @@ ac-complete-mode-map
    ("C-c i" . erc)
    )
  )
+(lazy-set-key
+ '(
+   ("C-c o" . open-url-under-cursor)        ;使w3m打开鼠标下的url
+   )
+ erc-mode-map)
 
 ;;; ### Toolkit ###
 ;;; --- 工具函数

@@ -122,4 +122,13 @@ To use this extension, you need install xtrlock in your system."
         (zone-leave-me-alone)))
     (zone)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; URL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun open-url-under-cursor ()
+  "Open thr url under cursor either using w3m or unix command \"xdg-open\""
+  (interactive)
+  (let ((url (thing-at-point 'url)))
+    (if (featurep 'w3m)
+        (w3m-view-this-url-1 url nil t)
+      (shell-command (format "xdg-open %s" url)))))
+
 (provide 'hualet-toolkit)

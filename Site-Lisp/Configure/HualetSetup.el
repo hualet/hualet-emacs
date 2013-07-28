@@ -26,7 +26,7 @@
 ;;(require 'init-newsticker)        ;新闻聚合
 ;;;; (require 'init-auctex)                  ;排版文档模式
 ;;(require 'init-haskell)           ;Hakell 语言模式
-;;(require 'init-predictive)        ;英文助手
+(require 'init-predictive)        ;英文助手
 ;;(require 'init-anything)          ;Anything
 (require 'init-helm)
 (require 'init-yasnippet)         ;模版补全模式

@@ -126,7 +126,7 @@
 ;(require 'shell-history)               ;Shell历史
 (require 'paredit)                     ;括号编辑模式
 ;;; (require 'mwe-log-commands)       ;命令日志
-;(require 'predictive)                  ;英文助手
+(require 'predictive)                  ;英文助手
 ;(require 'contentswitch)               ;按内容切换缓存或文件
 ;;; (require 'etest)                  ;测试工具
 ;(require 'fringe-helper)               ;边缘帮助
@@ -288,7 +288,7 @@
 ;(require 'tabbar-extension)             ;Tabbar 的扩展
 ;(require 'auto-complete-extension)      ;Auto-complete 的扩展
 ;(require 'erc-extension)                ;ERC的一些扩展
-;(require 'erc-nick-notify)              ;ERC 消息提醒
+(require 'erc-nick-notify)              ;ERC 消息提醒
 ;;; (require 'lisppaste-extension)          ;lisppaste 的扩展
 ;(require 'eldoc-extension)              ;Eldoc扩展
 ;(require 'gnus-switch)                  ;智能gnus切换

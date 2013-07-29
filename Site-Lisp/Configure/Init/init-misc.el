@@ -117,6 +117,8 @@
 (put 'narrow-to-region 'disabled nil)   ;开启变窄区域
 (setq print-escape-newlines t)          ;显示字符窗中的换行符为 \n
 
+(delete-selection-mode 1)               ;像在其他环境下一样编辑region
+
 ;;; ### Coding ###
 ;;; --- 编码设置
 (setq default-buffer-file-coding-system 'utf-8-unix)            ;缓存文件编码
@@ -210,14 +212,14 @@
 ;;;; ### Browse-kill-ring ###
 ;;;; --- 浏览删除环
 ;(browse-kill-ring-default-keybindings)  ;加载默认的按键邦定
-;
-;;;; ### Recentf ###
-;;;; --- 打开最近的文件
-;(recentf-mode 1)
-;(setq recentf-max-saved-items 100)      ;最近打开文件的最大数量
-;(setq recentf-auto-cleanup 300)         ;自动清理最近打开文件列表中重复或其他文件的时间间隔 (秒)
-;(setq recentf-save-file "~/.emacs.d/deepin-emacs/Configure-File/Recentf/recentf-list") ;最近打开的文件列表
-;
+
+;; ### Recentf ###
+;; --- 打开最近的文件
+(recentf-mode 1)
+(setq recentf-max-saved-items 100)      ;最近打开文件的最大数量
+(setq recentf-auto-cleanup 300)         ;自动清理最近打开文件列表中重复或其他文件的时间间隔 (秒)
+(setq recentf-save-file "~/.emacs.d/Configure-File/Recentf/recentf-list") ;最近打开的文件列表
+
 ;; ### Uniquify ###
 ;; --- 相同缓存名字时加上路径以区别
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets) ;反方向的显示重复的Buffer名字

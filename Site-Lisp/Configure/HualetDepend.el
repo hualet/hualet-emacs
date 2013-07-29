@@ -33,7 +33,7 @@
 ;(require 'org)                          ;个人信息管理
 (require 'color-moccur)                 ;人性化的搜索功能
 ;(require 'moccur-edit)                  ;搜索编辑
-;(require 'apt-utils)                    ;APT搜索管理工具
+(require 'apt-utils)                    ;APT搜索管理工具
 ;;; (require 'g)                  ;Google Client, 包括Google日历, 博客, 阅读器
 (require 'cycle-buffer)       ;buffer循环切换
 ;;; (require 'tramp)            ;很强大远程文件访问工具
@@ -76,7 +76,7 @@
 ;(require 'ido)                         ;ido模式
 (require 'tabbar)                      ;标签管理
 ;(require 'browse-kill-ring)            ;超强恢复
-;(require 'recentf)                     ;打开最近的文件
+(require 'recentf)                     ;打开最近的文件
 ;;; (require 'xcscope)                     ;cscope
 ;(require 'smiley)                      ;整加simpley
 ;(require 'emms-source-file)            ;Emms 文件
@@ -254,6 +254,7 @@
 (require 'lazy-set-key)                 ;懒惰按键设置
 (require 'sdcv)                         ;星际译王的支持
 (require 'w3m-extension)                ;W3m扩展
+(require 'thing-at-point-extension)     ;thingatpt包的扩展
 ;(require 'thing-edit)                   ;基于thingatpt的编辑扩展
 ;(require 'thing-edit-extension)         ;thing-edit 增强
 ;;; (require 'rcirc-notify+)                ;rcirc提醒

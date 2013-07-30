@@ -218,7 +218,6 @@
 (recentf-mode 1)
 (setq recentf-max-saved-items 100)      ;最近打开文件的最大数量
 (setq recentf-auto-cleanup 300)         ;自动清理最近打开文件列表中重复或其他文件的时间间隔 (秒)
-(setq recentf-save-file "~/.emacs.d/Configure-File/Recentf/recentf-list") ;最近打开的文件列表
 
 ;; ### Uniquify ###
 ;; --- 相同缓存名字时加上路径以区别
@@ -310,11 +309,11 @@
 ;; ### Highlight-parentheses ###
 ;;--- 增强的括号高亮
 (highlight-parentheses-mode t)
-(define-globalized-minor-mode global-highlight-parentheses-mode
-  highlight-parentheses-mode
-  (lambda ()
-    (highlight-parentheses-mode t)))
-(global-highlight-parentheses-mode t)
+;; (define-globalized-minor-mode global-highlight-parentheses-mode
+;;   highlight-parentheses-mode
+;;   (lambda ()
+;;     (highlight-parentheses-mode t)))
+;; (global-highlight-parentheses-mode t)
 
 ;;;; ### Kill ring search ###
 ;;;; --- 删除环搜索

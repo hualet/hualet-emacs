@@ -2063,7 +2063,8 @@ Key definitions:
   (when (and (fboundp 'easy-menu-add)
              apt-utils-menu)
     (easy-menu-add apt-utils-menu))
-  (make-local-hook 'kill-buffer-hook)
+  (if (fboundp 'kill-buffer-hook)
+      (make-local-hook 'kill-buffer-hook))
   (add-hook 'kill-buffer-hook 'apt-utils-cleanup nil t)
   (run-hooks 'apt-utils-mode-hook))
 

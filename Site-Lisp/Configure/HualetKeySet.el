@@ -511,7 +511,6 @@ ac-complete-mode-map
  apt-utils-mode-map
  )
 (lazy-set-key sdcv-key-alist apt-utils-mode-map)    ;sdcv的局部按键绑定
-(lazy-set-key vi-move-key-alist apt-utils-mode-map) ;vi-move 的局部按键
 
 
 (provide 'HualetKeySet)

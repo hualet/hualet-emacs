@@ -47,6 +47,11 @@
   (find-file (concat "smb:" file))
   )
 
+(defun dot-emacs ()
+  "Open my .emacs."
+  (interactive)
+  (find-file (expand-file-name "~/.emacs")))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Cycle buffer ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

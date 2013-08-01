@@ -5,7 +5,6 @@
 (defvar startup-close-file-list "")
 (defvar my-mail "")
 (defvar my-homepage "")
-(defvar my-default-download-directory "")
 (defvar my-irc-nick "")
 (defvar my-irc-passwd "")
 (defvar my-irc-channel-list '())
@@ -45,11 +44,12 @@
  '(my-book-directory "~/Book/")                                     ;图书目录
  '(my-reading-directory "~/Book/Reading/")                          ;看书目录
  '(my-picture-directory "~/Pictures/")                               ;图片目录
- '(my-emacs-lisp-package-directory-directory "~/.emacs.d/HualetEmacs/Site-Lisp/Packages/")                              
- '(my-elisp-directory "~/.emacs.d/HualetEmacs/Site-Lisp/Packages/")                              
+ '(my-emacs-package-directory "~/.emacs.d/HualetEmacs/Site-Lisp/Packages/")                              
+ '(my-emacs-configure-directory "~/.emacs.d/HualetEmacs/Site-Lisp/Configure/")                              
  '(my-screenshots-storage-directory "~/Pictures/Screenshots/")       ;屏幕截图目录
  '(my-notes-directory "~/Notes/")                             ;笔记目录
  '(my-project-directory "~/project/")                             ;项目目录
+
 
  ;; ERC
  '(erc-server "irc.freenode.net")       ;设置服务器

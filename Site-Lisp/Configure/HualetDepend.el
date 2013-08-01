@@ -8,7 +8,7 @@
 (require 'flymake-cursor)          ;把flymake的错误信息显示在minibuf
 ;(require 'kill-ring-search)        ;Kill ring 搜索
 (require 'highlight-parentheses)   ;智能括号
-;(require 'top-mode)                ;top
+(require 'top-mode)                ;top
 ;(require 'pick-backup)             ;备份浏览
 ;(require 'autoload)                ;用于'autoload'的处理
 ;(require 'ppindent)                ;管理C预处理格式
@@ -212,7 +212,7 @@
 ;;; (require 'egg)                          ;基于 magit 的界面
 ;;; (require 'egg-grep)                     ;egg grep 支持
 ;(require 'speedbar)
-;(require 'sr-speedbar)           ;集成speedbar到当前frame
+(require 'sr-speedbar)           ;集成speedbar到当前frame
 ;(require 'winpoint)              ;记录每一个窗口buffer的特定位置
 ;;; (require 'xray)                         ;显示Emacs对象的内部结构
 ;(require 'ispell)                       ;拼写检查

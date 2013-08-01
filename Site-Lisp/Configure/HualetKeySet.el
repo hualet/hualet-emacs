@@ -274,47 +274,47 @@ ac-complete-mode-map
 ;;; --- 文件浏览器
 (lazy-set-key
  '(
- ;;   ("h" . dired-next-subdir)                   ;下一个子目录
-;;    ("l" . dired-prev-subdir)                   ;上一个子目录
-;;    ("j" . dired-next-file-line)                ;下一行
-;;    ("k" . dired-previous-file-line)            ;上一行
-;;    ("n" . dired-next-dirline)                  ;下一个目录
-;;    ("p" . dired-prev-dirline)                  ;上一个目录
-;;    ("f" . dired-find-file+)                    ;打开当前文件或目录
-;;    ("C-m" . dired-find-file+)                  ;打开当前文件或目录
-;;    ("P" . dired-do-kill-lines)                 ;删除标记的行
-;;    ("4" . dired-serial-rename)                 ;批量重命名
-;;    ("5" . dired-translate-to-html)             ;转换到HTML格式
-;;    ("7" . dired-move-to-last-file)             ;移动到最后一个文件
-;;    ("8" . dired-move-to-first-file)            ;移动到第一个文件
-;;    ("9" . auto-install-from-dired)             ;自动从EmacsWiki安装标记的文件
+   ("h" . dired-next-subdir)                   ;下一个子目录
+   ("l" . dired-prev-subdir)                   ;上一个子目录
+   ("j" . dired-next-file-line)                ;下一行
+   ("k" . dired-previous-file-line)            ;上一行
+   ("n" . dired-next-dirline)                  ;下一个目录
+   ("p" . dired-prev-dirline)                  ;上一个目录
+   ("f" . dired-find-file+)                    ;打开当前文件或目录
+   ("C-m" . dired-find-file+)                  ;打开当前文件或目录
+   ("P" . dired-do-kill-lines)                 ;删除标记的行
+   ("4" . dired-serial-rename)                 ;批量重命名
+   ("5" . dired-translate-to-html)             ;转换到HTML格式
+   ("7" . dired-move-to-last-file)             ;移动到最后一个文件
+   ("8" . dired-move-to-first-file)            ;移动到第一个文件
+   ("9" . auto-install-from-dired)             ;自动从EmacsWiki安装标记的文件
    ("E" . dired-touch-now)                     ;Touch命令
    ("z" . dired-do-moccur)                     ;搜索dired
-;;    ("I" . image-dired)                         ;打开浏览模式
+   ("I" . image-dired)                         ;打开浏览模式
    ("w" . wdired-change-to-wdired-mode)        ;切换到dired编辑模式
-;;    ("W" . dired-x-find-file)                   ;查找文件
-;;    ("\"" . find-lisp-find-dired-pwd)           ;查找特定的lisp文件
-;;    ("J" . dired-goto-file)                     ;跳到某个文件
+   ("W" . dired-x-find-file)                   ;查找文件
+   ("\"" . find-lisp-find-dired-pwd)           ;查找特定的lisp文件
+   ("J" . dired-goto-file)                     ;跳到某个文件
    ("K" . dired-open-file)                     ;根据文件后缀智能打开文件
-;;    ("X" . traverse-cp-or-mv-extfiles-in-dir)   ;拷贝或移动目录下指定扩展名的文件
-;;    ("V" . traverse-dired-browse-archive)       ;浏览压缩文件
-;;    (";" . dired-view-minor-mode-toggle)        ;字母输入导航模式
-;;    ("," . dired-diff)                          ;比较文件
-;;    ("'" . dired-up-directory-single)           ;返回上一级目录
-;;    ("C-s" . dired-isearch-forward)             ;向后搜索
-;;    ("C-r" . dired-isearch-backward)            ;向前搜索
-;;    ("ESC C-s" . dired-isearch-forward-regexp)  ;向前正则表达式搜索
-;;    ("ESC C-r" . dired-isearch-backward-regexp) ;向后正则表达式搜索
-;;    ("SPC" . scroll-up)                         ;向下翻页
-;;    ("e" . scroll-down)                         ;向上翻页
-;;    ("c" . kill-this-buffer)                    ;关闭当前标签
-;;    ("/" . copy-buffer-file-name-as-kill)       ;显示路径或名称
-;;    ("[" . dired-rename-with-copy)              ;重命名函数
-;;    ("]" . dired-nautilus)                      ;用 Nautils 加载当前目录
-;;    ("{" . dired-gnome-open-file)               ;用GNOME方式打开文件
-;;    ("s" . one-key-menu-dired-sort)             ;排序
-;;    ("?" . dired-get-size)                      ;得到文件的大小
-;;    ("M-o" . dired-toggle-omit)                 ;切换忽略状态
+   ("X" . traverse-cp-or-mv-extfiles-in-dir)   ;拷贝或移动目录下指定扩展名的文件
+   ("V" . traverse-dired-browse-archive)       ;浏览压缩文件
+   (";" . dired-view-minor-mode-toggle)        ;字母输入导航模式
+   ("," . dired-diff)                          ;比较文件
+   ("'" . dired-up-directory-single)           ;返回上一级目录
+   ;; ("C-s" . dired-isearch-forward)             ;向后搜索
+   ;; ("C-r" . dired-isearch-backward)            ;向前搜索
+   ;; ("ESC C-s" . dired-isearch-forward-regexp)  ;向前正则表达式搜索
+   ;; ("ESC C-r" . dired-isearch-backward-regexp) ;向后正则表达式搜索
+   ("SPC" . scroll-up)                         ;向下翻页
+   ("e" . scroll-down)                         ;向上翻页
+   ("c" . kill-this-buffer)                    ;关闭当前标签
+   ("/" . copy-buffer-file-name-as-kill)       ;显示路径或名称
+   ("[" . dired-rename-with-copy)              ;重命名函数
+   ("]" . dired-nautilus)                      ;用 Nautils 加载当前目录
+   ("{" . dired-gnome-open-file)               ;用GNOME方式打开文件
+   ("s" . one-key-menu-dired-sort)             ;排序
+   ("?" . dired-get-size)                      ;得到文件的大小
+   ("M-o" . dired-toggle-omit)                 ;切换忽略状态
    )
  dired-mode-map
  )
@@ -462,7 +462,7 @@ ac-complete-mode-map
    ;; ("s-&" . killall)                        ;杀掉进程
    ;; ("C-x w" . count-words)                  ;计算单词的数量
    ;; ("C-z l" . linum-mode)                   ;行号模式切换
-   ;; ("s-Z" . dot-emacs)                      ;打开dot-emacs文件
+   ("s-Z" . dot-emacs)                      ;打开dot-emacs文件
    ;; ("C-x f" . find-file-at-point)           ;文件跳转
    ("s-f" . find-file-root)                 ;用root打开文件
    ("s-r" . find-file-smb)                  ;访问samba
@@ -512,5 +512,68 @@ ac-complete-mode-map
  )
 (lazy-set-key sdcv-key-alist apt-utils-mode-map)    ;sdcv的局部按键绑定
 
+;;; ### Speedbar ###
+;;; --- 快速访问文件和tags
+(setq speedbar-buffers-key-map nil)     ;卸载一些按键
+(setq speedbar-file-key-map nil)
+(lazy-set-key
+ '(
+   ("s-z s-z" . sr-speedbar-toggle)        ;显示/隐藏speedbar
+   ("s-z s-x" . sr-speedbar-select-window) ;选中speedbar窗口
+   ))
+(lazy-set-key
+ '(
+   ;; 导航操作
+   ("f" . speedbar-edit-line)             ;进入当前条目
+   ("C-m" . speedbar-edit-line)           ;进入当前条目
+   ("j" . speedbar-next)                  ;下一行
+   ("k" . speedbar-prev)                  ;上一行
+   ("n" . speedbar-forward-list)          ;下一条目
+   ("p" . speedbar-backward-list)         ;上一条目
+   ("u" . speedbar-forced-contract)       ;跳到上一级
+   ("F" . speedbar-files)                 ;切换文件视图
+   ("B" . speedbar-buffers)               ;切换缓存视图
+   ("q" . sr-speedbar-toggle)             ;退出
+   ;; 树操作
+   ("x" . speedbar-expand-line)           ;展开当前行
+   ("z" . speedbar-contract-line)         ;收缩当前行
+   ("v" . speedbar-toggle-line-expansion) ;切换当前行的状态
+   ;; 文件操作
+   ("g" . speedbar-refresh)             ;刷新
+   ("'" . speedbar-up-directory)        ;上一级目录
+   ("i" . speedbar-item-info)           ;显示信息
+   ("b" . speedbar-item-byte-compile)   ;编译
+   ("l" . speedbar-item-load)           ;加载
+   ("c" . speedbar-item-copy)           ;拷贝
+   ("d" . speedbar-item-delete)         ;删除
+   ("o" . speedbar-item-object-delete)  ;删除对象
+   ("r" . speedbar-item-rename)         ;重命令
+   ("m" . speedbar-create-directory)    ;创建目录
+   ("K" . speedbar-buffer-kill-buffer)  ;关闭当前buffer
+   )
+ speedbar-key-map
+ )
+;;; ### Top ###
+;;; --- 进程管理器
+(lazy-set-key
+ '(
+   ("<s-f8>" . top)                     ;TOP
+   ))
+(lazy-set-key
+ '(
+   ("s" . isearch-forward)              ;搜索
+   ("g" . top)                          ;刷新
+   ("q" . quit-window)                  ;退出
+   ("d" . top-mode-kill)                ;删除
+   ("D" . top-mode-kill-noconfirm)      ;不需要确认删除
+   ("t" . top-mode-strace)
+   ("T" . top-mode-strace-noconfirm)
+   ("r" . top-mode-renice)
+   ("R" . top-mode-renice-noconfirm)
+   ("m" . top-mode-mark)                ;标记
+   ("u" . top-mode-unmark)              ;删除标记
+   ("U" . top-mode-show-specific-user))
+ top-mode-map
+ )
 
 (provide 'HualetKeySet)

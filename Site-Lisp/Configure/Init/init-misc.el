@@ -308,12 +308,8 @@
 
 ;; ### Highlight-parentheses ###
 ;;--- 增强的括号高亮
-(highlight-parentheses-mode t)
-;; (define-globalized-minor-mode global-highlight-parentheses-mode
-;;   highlight-parentheses-mode
-;;   (lambda ()
-;;     (highlight-parentheses-mode t)))
-;; (global-highlight-parentheses-mode t)
+(add-hook 'find-file-hook 'highlight-parentheses-mode t)
+(add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode t)
 
 ;;;; ### Kill ring search ###
 ;;;; --- 删除环搜索

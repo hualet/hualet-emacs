@@ -77,16 +77,16 @@
 ;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Variable ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar my-home-directory "")
 (defvar my-default-download-directory "")
+(defvar my-emacs-package-directory "")
+(defvar my-emacs-configure-directory "")
+(defvar my-home-directory "")
 (defvar my-resource-backup-directory "")
 (defvar my-book-directory "")
 (defvar my-reading-directory "")
 (defvar my-picture-directory "")
-(defvar my-emacs-lisp-package-directory "")
 (defvar my-notes-directory "")
 (defvar my-screenshots-storage-directory "")
-(defvar my-elisp-directory "")
 (defvar my-project-directory "")
 
 
@@ -328,13 +328,14 @@
       '(
         (("h" . "Home") . (lambda () (interactive) (dired-x-find-file my-home-directory)))
         (("d" . "Downloads") . (lambda () (interactive) (dired-x-find-file my-default-download-directory)))
-        (("b" . "Book") . (lambda () (interactive) (dired-x-find-file my-book-directory)))
-        (("i" . "Image") . (lambda () (interactive) (dired-x-find-file my-picture-directory)))
+        (("b" . "Books") . (lambda () (interactive) (dired-x-find-file my-book-directory)))
+        (("i" . "Pictures") . (lambda () (interactive) (dired-x-find-file my-picture-directory)))
         (("s" . "Screenshots") . (lambda () (interactive) (dired-x-find-file my-screenshots-storage-directory)))
         (("r" . "Backup") . (lambda () (interactive) (dired-x-find-file my-resource-backup-directory)))
         (("n" . "Notes") . (lambda () (interactive) (dired-x-find-file my-notes-directory)))
         (("x" . "Reading") . (lambda () (interactive) (dired-x-find-file my-reading-directory)))
-        (("e" . "Elisp") . (lambda () (interactive) (dired-x-find-file my-elisp-directory)))
+        (("e" . "Emacs Packages") . (lambda () (interactive) (dired-x-find-file my-emacs-package-directory)))
+        (("c" . "Emacs Configure") . (lambda () (interactive) (dired-x-find-file my-emacs-configure-directory)))
         (("p" . "Project") . (lambda () (interactive) (dired-x-find-file my-project-directory)))
         ))
 

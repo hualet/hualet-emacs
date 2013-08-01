@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 字体设置 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar emacs-font-name "文泉驿等宽微米黑"
+(defvar emacs-font-name "MONACO"
 	"The default font name")
-(defvar emacs-font-size 12
+(defvar emacs-font-size 13
   "The default font size.")
 (if (display-grayscale-p)
     (progn

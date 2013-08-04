@@ -1225,7 +1225,7 @@
  ;; Helm Themes
  '(helm-selection ((t (:background "dark red" :foreground "light gray"))))
  '(helm-selection-line ((t (:background "dark red" :foreground "light gray"))))
- '(helm-source-header ((t (:foreground "yellow" :underline t :family "Sans Serif"))))
+ '(helm-source-header ((t (:foreground "yellow" :underline t :height 1.5))))
  '(helm-ff-directory ((t (:foreground "blue"))))
  
  ;; popup Themes

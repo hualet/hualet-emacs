@@ -1,6 +1,5 @@
 ;; 搜集的扩展加载
-;(require 'eldoc)                   ;函数参数提示
-;(require 'avoid)                   ;鼠标行为
+(require 'avoid)                   ;鼠标行为
 ;(require 'shell)                   ;Shell模式
 ;(require 'shell-command)           ;增强的shell-command
 ;(require 'ansi-color)              ;转换shell中的颜色序列为face

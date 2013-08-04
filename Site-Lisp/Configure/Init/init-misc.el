@@ -89,7 +89,7 @@
 (show-paren-mode t)               ;显示括号匹配
 (which-function-mode t)           ;在状态条上显示当前光标在哪个函数体内部
 (auto-compression-mode 1)         ;打开压缩文件时自动解压缩
-;; (mouse-avoidance-mode "banish")         ;只要一操作鼠标自动闪开
+(mouse-avoidance-mode "banish")         ;只要一操作鼠标自动闪开
 (setq-default comment-style 'indent)    ;设定自动缩进的注释风格
 (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
 (setq inhibit-startup-message t)        ;关闭起动时闪屏

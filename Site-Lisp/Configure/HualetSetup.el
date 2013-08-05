@@ -40,5 +40,6 @@
 ;;(require 'init-coffee-mode)             ;coffee mode
 ;; (require 'init-recentf)
 (require 'init-weibo)                   ;新浪微博
+(require 'init-highlight-indentation)   ;代码对齐线
 
 (provide 'HualetSetup)

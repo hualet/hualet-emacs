@@ -286,21 +286,21 @@
 ;  (add-hook hook 'doxymacs-mode)                                              ;加载文档模式
 ;  (add-hook hook (lambda () (local-set-key (kbd "C-m") 'my-doxymacs-return))) ;注释智能换行
 ;  )
-;
-;;;; ### Whitespace ###
-;;;; --- 空格清理
-;(setq whitespace-global-mode t)         ;全局检测多余空格
-;
+
+;; ### Whitespace ###
+;; --- 空格清理
+;; (setq whitespace-global-mode t)         ;全局检测多余空格
+
 ;;;; ### Mail-notify ###
 ;;;; --- 邮件提醒
 ;(setq mail-notify-directory "~/.emacs.d/deepin-emacs/Mail/inbox/new/") ;新邮件存放目录
 ;(setq mail-notify-status t)                                            ;默认打开邮件提醒
 ;(setq mail-notify-repeat 60)                                           ;邮件提醒的周期 (秒)
-;
-;;;; ### Speedbar ###
-;;;; --- 资源管理器
-;(setq speedbar-show-unknown-files t)    ;显示文件
-;
+
+;; ### Speedbar ###
+;; --- 资源管理器
+(setq speedbar-show-unknown-files t)    ;显示文件
+
 ;;;; ### sr-speedbar ###
 ;;;; --- Same Frame Speedbar
 ;(setq sr-speedbar-skip-other-window-p t)

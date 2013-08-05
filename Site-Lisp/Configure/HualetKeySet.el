@@ -428,9 +428,9 @@ ac-complete-mode-map
 ;; 
 (lazy-set-key
  '(
-   ("C-1" . multi-scratch-prev)
-   ("C-2" . multi-scratch-next)
-   ("C-3" . multi-scratch-new)
+   ("C-1" . multi-scratch-new)
+   ("C-2" . multi-scratch-prev)
+   ("C-3" . multi-scratch-next)
    )
  )
 

@@ -503,14 +503,14 @@
 ;               'lisp-interaction-mode-hook
 ;               ))
 ;  (add-hook hook 'imenu-add-menubar-index))
-;
-;;;; ### Woman ###
-;;;; --- 手册查询
-;(setq woman-default-indent 7            ;缩进格式
-;      woman-fill-frame t                ;填充满屏幕
-;      woman-use-own-frame nil           ;同一个frame
-;      woman-cache-level 3)              ;缓存级别, 最快
-;
+
+;; ### Woman ###
+;; --- 手册查询
+(setq woman-default-indent 7            ;缩进格式
+     woman-fill-frame t                ;填充满屏幕
+     woman-use-own-frame nil           ;同一个frame
+     woman-cache-level 3)              ;缓存级别, 最快
+
 ;;;; ### File-Journal ###
 ;;;; ---
 ;(setq fj-journal-size 10)               ;设置保留文件的天数

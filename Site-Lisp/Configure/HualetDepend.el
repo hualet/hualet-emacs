@@ -8,6 +8,8 @@
 ;(require 'kill-ring-search)        ;Kill ring 搜索
 (require 'highlight-parentheses)   ;智能括号
 (require 'top-mode)                ;top
+(require 'man)
+(require 'woman)
 ;(require 'pick-backup)             ;备份浏览
 ;(require 'autoload)                ;用于'autoload'的处理
 ;(require 'ppindent)                ;管理C预处理格式

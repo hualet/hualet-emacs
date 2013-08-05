@@ -21,4 +21,9 @@
       (unless (derived-mode-p 'w3m-mode)
         (call-interactively 'w3m)))))
 
+(defun w3m-search-emacswiki-random ()
+  "Get the random pages from emacswiki."
+  (interactive)
+  (w3m-view-this-url-1 "http://www.emacswiki.org/cgi-bin/wiki?action=random" nil t))
+
 (provide 'w3m-extension)

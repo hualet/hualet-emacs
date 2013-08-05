@@ -575,5 +575,29 @@ ac-complete-mode-map
    ("U" . top-mode-show-specific-user))
  top-mode-map
  )
+;;; ### Man ###
+;;; --- Man
+(lazy-set-key
+ '(("C-<f1>" . woman)))
+(lazy-set-key
+ '(
+   ("j" . next-line)                    ;向上滚动一行
+   ("k" . previous-line)                ;向下滚动一行
+   ("," . end-of-buffer)                ;buffer末尾
+   ("." . beginning-of-buffer)          ;buffer开始
+   ("M-n" . Man-next-section)           ;下一节
+   ("M-p" . Man-previous-section)       ;上一节
+   ("g" . Man-goto-section)             ;跳转到某一节
+   ("G" . Man-goto-see-also-section)    ;跳转到 see-also
+   ("f" . Man-follow-manual-reference)  ;当前处的man手册引用
+   ("F" . man-follow)                   ;某man手册引用
+   ("N" . Man-next-manpage)             ;下一个页面
+   ("P" . Man-previous-manpage)         ;上一个页面
+   ("q" . Man-quit)                     ;隐藏
+   ("Q" . Man-kill)                     ;退出
+   )
+ Man-mode-map
+ )
+(lazy-set-key sdcv-key-alist Man-mode-map)    ;sdcv的局部按键绑定
 
 (provide 'HualetKeySet)

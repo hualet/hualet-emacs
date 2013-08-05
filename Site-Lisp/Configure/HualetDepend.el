@@ -22,7 +22,7 @@
 ;(require 'zone)                      ;锁屏
 ;;; (require 'maxima)                       ;代数计算系统
 ;;; (require 'imaxima)                      ;用Tex显示代数表达式
-;(require 'tempbuf)                      ;自动关闭临时buffer
+(require 'tempbuf)                      ;自动关闭临时buffer
 ;(require 'doxymacs)                     ;文档系统
 ;(require 'info)                         ;Info
 ;(require 'info+)                        ;Info 增强

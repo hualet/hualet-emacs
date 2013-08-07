@@ -16,14 +16,14 @@
 (defun text-scale-increase-global()
   "Decrease the font size of the frame"
   (interactive)
-  (setq frame-current-font-size (truncate (* 0.8 frame-current-font-size)))
+  (setq frame-current-font-size (truncate (* 1.2 frame-current-font-size)))
   (set-face-attribute 'default nil :height frame-current-font-size)
   )
 
 (defun text-scale-decrease-global()
   "Increase the font size of the frame"
   (interactive)
-  (setq frame-current-font-size (truncate (* 1.2 frame-current-font-size)))
+  (setq frame-current-font-size (truncate (* 0.8 frame-current-font-size)))
   (set-face-attribute 'default nil :height frame-current-font-size)
   )
 
@@ -135,5 +135,11 @@ To use this extension, you need install xtrlock in your system."
     (if (featurep 'w3m)
         (w3m-view-this-url-1 url nil t)
       (shell-command (format "xdg-open %s" url)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun hualet-insert-filename (filename)
+  "Insert filename using the completion ability of minibuffer."
+  (interactive "FFilename: ")
+  (insert filename))
 
 (provide 'hualet-toolkit)

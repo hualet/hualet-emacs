@@ -289,7 +289,7 @@
 
 ;; ### Whitespace ###
 ;; --- 空格清理
-;; (setq whitespace-global-mode t)         ;全局检测多余空格
+(add-hook 'python-mode-hook 'whitespace-cleanup)
 
 ;;;; ### Mail-notify ###
 ;;;; --- 邮件提醒

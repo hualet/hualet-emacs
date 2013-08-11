@@ -479,6 +479,7 @@ ac-complete-mode-map
    ;; ("M-s-u" . ediff-buffers)             ;ediff
    ;; ("C-s-q" . quoted-insert)             ;读取系一个输入字符并插入
    ("C-c f" . hualet-insert-filename)   ;
+   ("C-x 5" . rotate-windows)           ;选装两个窗口，[-] --> [|]
    ))
 
 ;;; ### Apt-utils ###

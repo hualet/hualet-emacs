@@ -619,6 +619,16 @@
 ;(add-hook 'asm-mode-hook
 ;          (lambda () (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Package Management ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'package)
+(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Jedi ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(autoload 'jedi:setup "jedi" nil t)
+(add-hook 'python-mode-hook 'jedi:setup)
+(add-hook 'python-mode-hook 'jedi:ac-setup)
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here

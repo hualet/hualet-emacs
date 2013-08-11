@@ -303,8 +303,8 @@
 
 ;;;; ### sr-speedbar ###
 ;;;; --- Same Frame Speedbar
-;(setq sr-speedbar-skip-other-window-p t)
-;(setq sr-speedbar-right-side nil)
+(setq sr-speedbar-skip-other-window-p t)
+(setq sr-speedbar-right-side nil)
 
 ;; ### Highlight-parentheses ###
 ;;--- 增强的括号高亮
@@ -389,9 +389,11 @@
               'compilation-mode-hook     ;编译模式
               'comint-mode-hook          ;comint 模式
               'completion-list-mode-hook ;补全列表模式
+              'custom-mode-hook          ;自定义
               'help-mode-hook            ;帮助模式
               'Info-mode-hook            ;Info 模式
               'calc-mode-hook            ;计算器模式
+              'Man-mode-hook             ;man 模式
               'gnus-article-mode-hook    ;Gnus 文章模式
               'gnus-kill-file-mode       ;Gnus 删除文件模糊
               ))

@@ -34,12 +34,23 @@
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Find file ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun find-file-root (file)
-  "Open file as root."
-  (interactive "fOpen file as root: ")
-  (tramp-cleanup-all-connections)
-  (find-file (concat find-file-root-prefix file))
-  )
+;; (defun find-file-root (file)
+;;   "Open file as root."
+;;   (interactive "fOpen file as root: ")
+;;   (tramp-cleanup-all-connections)
+;;   (find-file (concat find-file-root-prefix file))
+;;   )
+(defun find-file-root (&optional arg)
+  "Edit currently visited file as root.
+
+With a prefix ARG prompt for a file to visit.
+Will also prompt for a file to visit if current
+buffer is not visiting a file."
+  (interactive "P")
+  (if (or arg (not buffer-file-name))
+      (find-file (concat "/sudo:root@localhost:"
+                         (ido-read-file-name "Find file(as root): ")))
+    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
 (defun find-file-smb (file)
   "Access file through samba protocol."
@@ -76,12 +87,12 @@
   "Insert the current date. With prefix-argument, use ISO format. With
    two prefix arguments, write out the day and month name."
   (interactive "P")
-  (let ((date-format (cond 
+  (let ((date-format (cond
                       ((not prefix) "%Y-%m-%d")
                       ((equal prefix '(4)) "%d.%m.%Y")
                       ((equal prefix '(16)) "%A, %d. %B %Y")))
         (system-time-locate "zh_CN"))
-  (insert (format-time-string date-format))))
+    (insert (format-time-string date-format))))
 
 (defun insert-time ()
   "Insert current time like 23:02:58."

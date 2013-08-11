@@ -15,9 +15,9 @@
    ("<f11>" . fullscreen-toggle)                 ;全屏切换
    ;; ("<f12>" . hibernate-disk)                    ;休眠
    ;; ("M-1" . strip-blank-lines)                   ;删除选中区域的所有空行
-   ;; ("M-2" . indent-buffer)                       ;自动格式化当前Buffer
-   ;; ("M-3" . delete-trailing-whitespace)          ;删除行末空格
-   ;; ("M-4" . whitespace-cleanup)                  ;清理空格
+   ("M-2" . indent-buffer)                       ;自动格式化当前Buffer
+   ("M-3" . flymake-goto-prev-error)    ;上一个错误
+   ("M-4" . flymake-goto-next-error)    ;下一个错误
    ;; ("M-5" . insert-line-number+)                 ;自动在行首添加行号
    ;; ("M-6" . strip-line-number)                   ;删除选中区域的行号
    ;; ("C-4" . insert-changelog-date)               ;插入日志时间 (%Y/%m/%d)

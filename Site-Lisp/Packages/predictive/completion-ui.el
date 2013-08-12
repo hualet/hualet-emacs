@@ -2,360 +2,313 @@
 ;;; completion-ui.el --- in-buffer completion user interface
 
 
-;; Copyright (C) 2006-2008 Toby Cubitt
+;; Copyright (C) 2006-2012 Toby Cubitt
 
 ;; Author: Toby Cubitt <toby-predictive@dr-qubit.org>
-;; Version: 0.9
-;; Keywords: completion, ui, user interface
+;; Package-Version: 0.12
+;; Version: 0.12
+;; Keywords: convenience, extenions, abbrev, completion, ui, user interface
 ;; URL: http://www.dr-qubit.org/emacs.php
-
 
 ;; This file is NOT part of Emacs.
 ;;
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License
-;; as published by the Free Software Foundation; either version 2
-;; of the License, or (at your option) any later version.
+;; This file is free software: you can redistribute it and/or modify it under
+;; the terms of the GNU General Public License as published by the Free
+;; Software Foundation, either version 3 of the License, or (at your option)
+;; any later version.
 ;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
+;; This program is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+;; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+;; more details.
 ;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-;; MA 02110-1301, USA.
+;; You should have received a copy of the GNU General Public License along
+;; with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ;;; Commentary:
 ;;
-;; This package provides a user-interface for in-buffer text
-;; completion. It doesn't find completions itself. Instead, a completion
-;; package can simply set the `completion-function' variable to a
-;; function that takes two arguments, a string PREFIX and an integer
-;; MAXNUM, and returns a list of at most MAXNUM completion candidates
-;; for PREFIX. Completion-UI does the rest.
+;; Overview
+;; ========
 ;;
-;; That's it! Completion-UI, the auto-completion minor mode, and user
-;; customizations take care of the rest. (Avoid the temptation to set
-;; completion-UI customization variables from Elisp code to alter its
-;; behaviour. The user knows what they want better than you do!)
+;; The goal of Completion-UI is to be the swiss-army knife of in-buffer
+;; completion user-interfaces. It doesn't do the work of finding the
+;; completions itself. Instead, anything that can find completions, be it a
+;; built-in Emacs function or an external Elisp package, can be hooked up to
+;; Completion-UI to provide a source of completions.
 ;;
-;; Examples are available on the Emacs wiki, at:
-;; www.emacswiki.org/cgi-bin/wiki/CompletionUI
+;; Completion-UI comes with built-in support for a number of completion
+;; sources: the standard Emacs dabbrevs, etags, Elisp completion and file-name
+;; completion, as well as (if installed) CEDET's Semantic completion,
+;; nxml-mode, and the Predictive completion package.
 ;;
-;; Why use completion-UI? Typically, a lot of code in packages providing
-;; some kind of text completion deals with the user interface. The
-;; ultimate goal is that all packages providing in-buffer (and possibly
-;; one day also mini-buffer) completion should use this package to
-;; provide a common user interface, freeing them to concentrate on
-;; finding the completion candidates in the first place. The Elisp
-;; programmer benfits by not having to reinvent the wheel, and the Emacs
-;; user benefits by having a standard yet highly customizable
-;; user-interface that they can customize once and for all to to suit
-;; their preferences, for all completion mechanisms they use.
+;; Completion-UI provides the following user-interfaces and features (though
+;; it is also easy to add new ones, see below):
 ;;
-;; Various completion user-interfaces are provided, all of which can be
-;; individually enabled, disabled and extensively tweaked via
-;; customization variables:
+;; * Dynamic completion
+;;     provisionally insert the first available completion candidate into the
+;;     buffer
 ;;
-;; * Dynamic completion: provisionally insert the first available
-;;   completion candidate into the buffer.
+;; * Completion hotkeys
+;;     single-key selection of a completion candidate
 ;;
-;; * Completion hotkeys: single-key selection of a completion
-;;   candidate.
+;; * Cycling
+;;     cycle through completion candidates.
 ;;
-;; * Cycling: cycle through completion candidates.
+;; * Tab-completion
+;;     "traditional" expansion to longest common substring
 ;;
-;; * Tab-completion: "traditional" expansion to longest common
-;;   substring.
+;; * Echo
+;;     display a list of completion candidates in the echo-area
 ;;
-;; * Help-echo: display a list of completion candidates in the
-;;   echo-area.
+;; * Tooltip
+;;     display a list of completion candidates in a tool-tip located below the
+;;     point, from which completions can be selected
 ;;
-;; * Tooltip: display a list of completion candidates in a tool-tip
-;;   located below the point, from which completions can be selected.
+;; * Pop-up frame
+;;     display a list of completion candidates in a pop-up frame located below
+;;     the point, which can be toggled between displaying some or all
+;;     completions, and from which completions can be selected
 ;;
-;; * Pop-up frame: display a list of completion candidates in a pop-up
-;;   frame located below the point, which can be toggled between display
-;;   some or all completions, and from which completions can be
-;;   selected.
+;; * Completion menu
+;;     allow completion candidates to be selected from a drop-down menu
+;;     located below the point
 ;;
-;; * Completion menu: allow completion candidates to be selected from
-;;   a drop-down menu located below the point.
+;; * Completion browser
+;;     browse through all possible completion candidates in a hierarchical
+;;     deck-of-cards menu located below the point
 ;;
-;; * Completion browser: browse through all possible completion
-;;   candidates in a hierarchical deck-of-cards menu located below the
-;;   point.
-;;
-;; Completion-UI also provides a new minor mode, called
-;; auto-completion-mode. When enabled, Emacs will automatically complete
-;; words as they are typed, using the `completion-function' to find
-;; completion candidates. The same customization variables determine how
-;; those candidates are displayed and can be selected. This works
-;; particularly well with dynamic completion (see above).
-;;
-;; This package will work alongside the auto-overlays package if it's
-;; available, but does not require it.
-
-
-
-;;; Change Log:
-;;
-;; Version 0.9
-;; * added `completion-includes-prefix' variable to indicate that completions
-;;   returned by `completion-function' include the prefix
-;; * added `completion-replaces-prefix' variable to indicate that completions
-;;   should replace the prefix when they're accepted, and made changes to
-;;   almost all of the user-interface functions to cope with this non-prefix
-;;   completion (thanks to Henry Weller for helpful discussions about this)
-;; * move point to appropriate position in parent frame when cycling through
-;;   completions in pop-up frame
-;; * added `completion-show-browser-menu' command
-;;
-;; Version 0.8.2
-;; * prevented `completion-show-tooltip' from moving mouse unless absolutely
-;;   necessary (thanks to Martin Pohlack for reporting this)
-;; * modified `completion-show-tooltip' to ensure tooltip is cancelled before
-;;   (re)displaying it, otherwise `x-show-tip' "magically" moves it to the top
-;;   of the frame! (thanks to Martin Pohlack for reporting this)
-;; * added option to highlight longest common prefix in a dynamic completion
-;;   (thanks to Vagn Johansen for the suggestion)
-;; * actually make use of `completion-popup-frame-function' variable!
-;; * fixed bug in some calls to `completion-reject-functions' that only passed
-;;   two arguments instead of three (thanks to Vagn Johansen for reporting
-;;   this)
-;;
-;; Version 0.8,1
-;; * fix `completion-define-word-syntax-binding' so it creates key binding in
-;;   `auto-completion-dynamic-map' as it should
-;; * fix `completion-setup-overlay' to assign correct keymap to 'keymap
-;;   property, depending on whether `auto-completion-mode' is enabled or not
-;;
-;; Version 0.8
-;; * give completion overlay a non-nil end-advance property, because...
-;; * ...keymap property works for zero-length overlays with non-nil
-;;   end-advance since Emacs 22! So disable work-around from that versions on.
-;;
-;; Version 0.7.5
-;; * added `completion-simulate-overlay-bindings' function that can
-;;   automatically create key bindings to simulate overlay keymap bindings
-;;   using the `completion-run-if-within-overlay' hack
-;;
-;; Version 0.7.4
-;; * split `completion-self-insert' into two: one function, the new
-;;   `completion-self-insert', deals with completion-related stuff if
-;;   auto-completion-mode is disabled, the other,
-;;   `auto-completion-self-insert', does auto-completion as
-;;   before. This allows individual printable characters to invoke
-;;   auto-completion without auto-completion-mode being enabled.
-;; * `auto-completion-self-insert' is now only directly bound to
-;;   printable characters in auto-completion-map
-;; * overlay keymap now binds printable characters to the new
-;;   `completion-self-insert' (which hands off to
-;;   `auto-completion-self-insert' if auto-completion is enabled)
-;;
-;; Version 0.7.3
-;; * fixed bug in `completion-popup-frame-toggle-show-all'
-;; * fixed bug in definition of `completion-tooltip-face'
-;;
-;; Version 0.7.2
-;; * prevent `complete-in-buffer' from auto-displaying the tooltip/menu/pop-up
-;;   frame if there are no completions (otherwise Emacs CVS seems to crash!)
-;; * bug fixes to key bindings and `completion-tab-complete'
-;; * bug fixes to pop-up frames
-;;
-;; Version 0.7.1
-;; * minor key binding fixes
-;; * `complete-in-buffer' can now take an optional prefix argument to override
-;;   automatically determined prefix
-;; * `completion-self-insert' can now take an optional argument that causes
-;;   `auto-completion-syntax-override-alist' to be ignored, as can
-;;   `completion-define-word-constituent-binding'
-;; * bug fixes to `completion-self-insert'
-;; * switched ordering of `auto-completion[-override]-syntax-alist' entries
-;;   back to something closer to old ordering
-;;
-;; Version 0.7
-;; * modified core `complete-in-buffer', `complete-word-at-point',
-;;   `completion-self-insert' and `completion-backward-delete' functions
-;;   to allow `completion-prefix-function' to properly take over prefix
-;;   finding
-;; * created default `completion-prefix' function
-;; * modified same core functions so that completion behaviour is more
-;;   intelligent, especially when a character is inserted within a
-;;   completion overlay
-;; * `completion-overwrite' option now controls whether completions
-;;   over-write the remainder of the word at the point or not
-;; * renamed `completion-dynamic-*syntax-alist' to
-;;   `auto-completion-*syntax-alist' and modified their format somewhat;
-;;   behaviour now accessed through interface macros
-;; * added new pop-up frame completion method (thanks to anon. on the
-;;   Emacs wiki for the suggestion)
-;; * auto-show can now display one out of the tooltip, completion menu,
-;;   or pop-up frame
-;; * `completion-tooltip-delay' and `completion-auto-show-menu' options
-;;   subsumed into `completion-auto-show' and
-;;   `completion-auto-show-delay'
-;; * RET binding now respects customization options
-;;
-;; Version 0.6.5
-;; * bug-fixes to interactive definitions
-;; * moved modification hook setting to end of file
-;;
-;; Version 0.6.4
-;; * defined properties to make delete-selection-mode work correctly
-;;   (thanks to Sivaram for drawing my attention to this)
-;; * minor improvement to text displayed in completion browser bucket
-;;   menu entries
-;;
-;; Version 0.6.3
-;; * fixed M-<space> bindings so that prefix argument is passed to
-;;   `completion-reject', and fixed C-<space> bindings
-;;
-;; Version 0.6.2
-;; * modified the default `completion-dynamic-syntax-alist' to make
-;;   parentheses behave like punctuation
-;; * minor bug-fix to `completion-show-menu-if-within-overlay'
-;; * fixed `completion-self-insert' again so that it works if called with
-;;   an explicit char (auto-fill will not work in that case)
-;; * fixed `complete-dynamic' so that the completion overlay ends up in
-;;   the right place even when modification hooks cause text to be
-;;   inserted in the buffer during its execution
-;;
-;; Version 0.6.1
-;; * modified define-minor-mode usage for auto-completion-mode to work in
-;;   older Emacs versions
-;; * fixed `completion-self-insert' so that auto-fill works again
-;; * if command remapping isn't supported, attempt to simulate it more
-;;   effectively for deletion commands
-;;
-;; Version 0.6
-;; * added `completion-prefix' and `completion-tooltip' variables to
-;;   allow overriding of default methods for determining prefix at point
-;;   and constructing tooltip text
-;; * fixed bugs related to backwards-deletion (thanks to Maciej
-;;   Katafiasz for pointing some of these out)
-;; * added optional arguements to `completion-self-insert' to allow
-;;   automatically determined character and syntax to be overridden, and
-;;   created key bindings to insert characters as word constituents
-;; * modified `completion-backward-delete', created corresponding
-;;   `completion-delete' function, and defined a whole host of deletion
-;;   and kill commands that are substituted for the standard ones
-;; * added convenience function
-;;   `completion-define-word-constituent-binding' for defining bindings
-;;   to insert characters as word-constituents
+;; * `auto-completion-mode'
+;;     automatically complete words as you type
 ;;
 ;;
-;; Version 0.5.2
-;; * fixed tooltip face issues, which included defining a new
-;;   `completion-tooltip-face'
-;; * implemented better method of positioning tooltip, avoiding moving
-;;   the mouse (thanks to Nikolaj Schumacher for this!)
 ;;
-;; Version 0.5.1
-;; * fixed small bug in `completion-self-insert' (thanks to Nikolaj
-;;   Schumacher for pointing it out)
+;; For Emacs users:
+;; ================
 ;;
-;; Version 0.5
-;; Modifications arising from discussions with rms:
-;; * removed `completion-define-minor-mode' macro; to use completion-UI,
-;;   `completion-function' should just be set appropriately
-;; * auto-completion is now a separate minor mode
-;; * renamed various variables and functions
+;; INSTALLING
+;; ----------
+;; To install this package, save this and all the other accompanying
+;; "completion-ui-*.el" files to a directory in your `load-path' (you can view
+;; the current `load-path' using "C-h v load-path" within Emacs), then add the
+;; following line to your .emacs startup file:
 ;;
-;; Version 0.4.1
-;; * small but important bug-fix to `completion-accept'
+;;    (require 'completion-ui)
 ;;
-;; Version 0.4
-;; * accept and reject hooks now called with two or three arguments
-;;   instead of one: the prefix, the full word (this is what was passed
-;;   previously) and possibly the interactive prefix argument.
-;; * moved some anonymous commands into named functions to sanitize
-;;   key-bindings
 ;;
-;; Version 0.3.13
-;; * Tried to work around annoying `completion-select' bug
+;; USING
+;; -----
+;; For each source of completions, Completion-UI provides an interactive
+;; command that completes the word next to the point using that source, e.g:
+;; `complete-dabbrev' to complete using dabbrevs, `complete-etags' to complete
+;; using etags, `complete-elisp' to complete Elisp symbols, `complete-files'
+;; to complete file names, `complete-semantic' to use Semantic completion,
+;; `complete-nxml' and `complete-predictive' to use nxml-mode and
+;; predictive-mode completion, respectively.
 ;;
-;; Version 0.3.12
-;; * added `completion-backward-delete-delay' customization option
+;; The `complete-<name>' commands are not bound to any key by default. As with
+;; any Emacs command, you can run them via "M-x complete-<name>", or you can
+;; bind them to keys, either globally or in a minor-mode keymap. E.g. to
+;; globally bind "M-/" to `complete-dabbrev', you would put the following line
+;; in your .emacs file:
 ;;
-;; Version 0.3.11
-;; * finally figured out how to prevent list of completions displayed in
-;;   echo area from being logged
+;;   (global-set-key [?\M-/] 'complete-dabbrev)
 ;;
-;; Version 0.3.10
-;; * fixed start-of-word behaviour in `completion-self-insert'
+;; To bind "M-<tab>" to `complete-elisp' in `emacs-lisp-mode', you would bind
+;; the command in the `emacs-lisp-mode-map' keymap:
 ;;
-;; Version 0.3.9
-;; * `completion-select' now uses the `completion-trap-recursion'
-;;   variable, instead of testing if 'trap-recursion is bound
+;;   (define-key emacs-lisp-mode-map [?\M-\t] 'complete-elisp)
 ;;
-;; Version 0.3.8
-;; * fixed `completion-run-if-within-overlay' so it doesn't error if
-;;   there's no "normal" binding for the key sequence used to invoke it
-;; * defined a new `completion-trap-recursion' variable in case the
-;;   symbol trap-recursion is bound outside
-;;   `completion-run-if-within-overlay'
+;; You're free to bind the `complete-<name>' commands to any keys of your
+;; choosing, though "M-<tab>" or "M-/" fit best with the default Completion-UI
+;; key bindings that are enabled when you're completing a word. These are:
 ;;
-;; Version 0.3.7
-;; * fixed M-<space> binding so it's only active within an overlay
+;; M-<tab>  M-/
+;;   Cycle through completions.
 ;;
-;; Version 0.3.6
-;; * fixed bug in `completion-define-minor-mode'
+;; M-S-<tab>  M-?
+;;   Cycle backwards through completions.
 ;;
-;; Version 0.3.5
-;; * added eval-when-compile to prevent bogus compilation errors
+;; C-<ret>
+;;   Accept the current completion.
 ;;
-;; Version 0.3.4
-;; * added function to `after-change-functions' to hide tooltip
-;; * made self-insert behaviour alists more flexible
-;; * minor fix to `completion-cycle' to leave point at end of word if
-;;   dynamic completion is disabled
-;; * `completion-hotkey-list' no longer a customization option, since it
-;;   must be set *before* completion-ui.el is loaded
+;; C-<del>
+;;    Reject the current completion.
 ;;
-;; Version 0.3.3
-;; * minor bug-fix to `completion-self-insert'
-;; * removed cl dependency
+;; <tab>
+;;    Traditional tab-completion, i.e. insert longest common substring.
 ;;
-;; Version 0.3.2
-;; * bug fixes
-;; * incorporated compatability code
+;; C-<tab>
+;;    Accept current completion and re-complete the resulting word.
 ;;
-;; Version 0.3.1
-;; * bug fixes
+;; S-<down>
+;;    Display the completion tooltip (then use <up> and <down> to cycle).
 ;;
-;; Version 0.3
-;; * incorporated a lot of code from predictive.el
-;; * rewrote things so that all a package needs to do is set
-;;   the `completion-function' variable
-;; * `completon-overlay-at-point' is kludgy no more
+;; M-<down>
+;;    Display the completion menu.
 ;;
-;; Version 0.2.1
-;; * added commentary
-;; * prevented any attempt to display tooltips and menus when not
-;;   running X
+;; C-<down>
+;;    Display the completion pop-up frame.
 ;;
-;; Version 0.2
-;; * bug fixes (thanks to Mark Zonzon for patch)
-;; * added `completion-min-chars' and `completion-delay' options
-;;   (thanks to Jin Tong for suggestions)
-;; * renamed to `completion-ui.el'
+;; S-<up> C-<up> M-<up> (in pop-up frame)
+;;    Dismiss the completion pop-up frame.
 ;;
-;; Version 0.1
-;; * initial release
+;; M-/ (in pop-up frame)
+;;    Toggle between displaying all completions.
+;;
+;;
+;; Completion-UI also provides a minor-mode, `auto-completion-mode', which
+;; automatically completes words as you type them using any one of the
+;; completion sources. You can select the source to use for
+;; `auto-completion-mode' by customizing `auto-completion-source' (the default
+;; is dabbrev).
+;;
+;; To enable and disable `auto-completion-mode', use:
+;;
+;;   M-x auto-completion-mode
+;;
+;; Note that `auto-completion-mode' is not very useful if the completion
+;; source takes a long time to find completions.
+;;
+;; <shameless-plug>
+;; The Predictive completion package (available separately from the above URL)
+;; is designed from the ground up to be extremely fast, even when a very large
+;; number of completion candidates are available. As you type, it also learns
+;; to predict which completion is the most likely. So it is particularly
+;; suited to being used as the `auto-completion-mode' source when typing plain
+;; text.
+;; </shameless-plug>
+;;
+;;
+;; CUSTOMIZING
+;; -----------
+;; The completion user-interfaces can be heavily customized and tweaked to
+;; suit your every desire, via the `completion-ui' customization group, (and
+;; subgroups thereof):
+;;
+;;   M-x customize-group <ret> completion-ui <ret>
+;;
+;; All the customization options and settings are well documented via the
+;; usual built-in Emacs documentation features.
+;;
+;;
+;;
+;; For Elisp coders:
+;; =================
+;;
+;; In fact, Completion-UI is even better than a swiss-army knife, because it's
+;; also extensible: it's easy to add new user-interfaces, as well as new
+;; completion sources.
+;;
+;; The philosophy of Completion-UI is that customization of the user-interface
+;; should be left up to USERS. They know what they want better than you do!
+;; By providing a universal user-interface that can be used by all completion
+;; packages, Completion-UI lets users customize their in-buffer completion
+;; user interface once-and-for-all to suit their tastes, rather than having to
+;; learn how to customize each new package separately. All you have to do (as
+;; a completion package writer) is supply the completions.
+;;
+;;
+;; Adding new sources
+;; ------------------
+;; See `completion-ui-register-source'.
+;;
+;; One call to `completion-ui-register-source' is all there is to it!
+;; Registering a new source will define a new interactive command,
+;; `complete-<name>' (where <name> is the supplied source name) which
+;; completes whatever is at the point using the new completion source. It will
+;; also add the new source to the list of choices for the
+;; `auto-completion-source' customization option.
+;;
+;;
+;; Adding new interfaces
+;; ---------------------
+;; See `completion-ui-register-interface'.
+;;
+;; A number of Completion-UI functions are intended for use in creating new
+;; user-interfaces. These all start with the prefix `completion-ui-' (as
+;; opposed to `completion-', which are user commands plus a few general
+;; purpose utility functions, or `completion--', which are internal functions
+;; that are NOT intended for external use).
 
 
 ;;; Code:
 
-(provide 'completion-ui)
-(require 'auto-overlay-common nil t)
+(eval-when-compile (require 'cl))
+;;(require 'auto-overlay-common nil t)
+
+
+(defvar completion-ui-interface-definitions nil
+  "Completion-UI user-interface definitions.")
+
+(defvar completion-ui-source-definitions nil
+  "Compltion-UI source definitions.")
 
 
 
+
+;;; ============================================================
+;;;          Dynamically updated customization types
 
+;; list of customization variables that can be customized per source
+(defvar completion-ui-per-source-defcustoms nil)
+
+
+(defun completion-ui-customize-list-sources ()
+  (mapcar (lambda (def) (list 'const (car def)))
+	  completion-ui-source-definitions))
+
+
+(defmacro completion-ui-defcustom-per-source (symbol standard doc &rest args)
+  "Declare SYMBOL as a customization variable.
+Value of SYMBOL can either be set globally, or it can be set to a
+different value for each completion source."
+  (declare (indent defun) (debug (name body)) (doc-string 3))
+  ;; NOTE: we're assuming type is a quoted symbol or sexp
+  (let ((type (cadr (plist-get args :type))))
+    (plist-put
+     args :type
+     `(quote
+       (choice (cons :tag "global" (const global) ,type)
+		     ;;,(if (listp type) (copy-sequence type) type))
+	       (cons :tag "per source"
+		     (const source)
+		     (alist :key-type
+			    (choice :tag "source" (const :tag "default" t))
+			    :value-type ,type))))))
+			    ;;,(if (listp type) (copy-sequence type) type)))))))
+  ;; construct defcustom definition
+  `(progn
+     (add-to-list 'completion-ui-per-source-defcustoms ',symbol)
+     (defcustom ,symbol '(global . ,(eval standard)) ,doc ,@args)))
+
+
+(defun completion-ui-get-value-for-source (source value-list)
+  ;; extract value that applies to SOURCE from VALUE-LIST
+  (when (symbolp value-list) (setq value-list (symbol-value value-list)))
+  (if (eq (car value-list) 'source)
+      (let ((v (or (assq (if (overlayp source)
+			     (overlay-get source 'completion-source)
+			   source)
+			 value-list)
+		   (assq t value-list))))
+	(cdr v))
+    (cdr value-list)))
+
+
+(defun completion-ui-update-per-source-defcustoms (source &optional del)
+  ;; add SOURCE to choices in all per-source defcustoms, or delete it if
+  ;; DEL is non-nil.
+  (dolist (var completion-ui-per-source-defcustoms)
+    (let ((choices (nth 2 (nth 4 (nth 2 (get var 'custom-type))))))
+      (if del (delete '(const ,name) choices)
+	(unless (member `(const ,source) choices)
+	  (delete nil choices)
+	  (nconc choices `((const ,source))))))))
+
+
+
+
 ;;; ============================================================
 ;;;                    Customization variables
 
@@ -364,122 +317,166 @@
   :group 'convenience)
 
 
-(defcustom completion-max-candidates 10
-  "*Maximum number of completion candidates to offer."
+(completion-ui-defcustom-per-source completion-max-candidates 10
+  "Maximum number of completion candidates to offer."
   :group 'completion-ui
-  :type 'integer)
+  :type '(choice integer (const :tag "all" nil)))
 
 
-(defcustom completion-resolve-behaviour 'accept
-  "*What to do with unfinished completions elsewhere in the buffer:
+(completion-ui-defcustom-per-source completion-accept-or-reject-by-default
+  'accept
+  "Default action for the current completion:
 
-  'leave:   leave the old completions pending
-  'accept:  automatically accept the old completions
-  'reject:  automatically reject the old completions
-  'ask:     ask what to do with the old completions"
+  'accept:        automatically accept the completion
+  'accept-common: automatically accept the common part of the completion
+  'reject:        automatically reject the completion"
   :group 'completion-ui
-  :type '(choice (const :tag "leave" leave)
-                 (const :tag "accept" accept)
-                 (const :tag "reject" reject)
-                 (const :tag "ask" ask)))
+  :type '(choice (const accept) (const reject) (const accept-common)))
+
+
+(defcustom completion-how-to-resolve-old-completions 'accept
+  "What to do with unfinished and abandoned completions
+left behind in the buffer:
+
+  'leave:         leave the old completions pending
+  'accept:        automatically accept the old completions
+  'reject:        automatically reject the old completions
+  'ask:           ask what to do with the old completions"
+  :group 'completion-ui
+  :type '(choice (const leave) (const accept) (const reject) (const ask)))
 
 
 (defcustom completion-overwrite t
-  "*When non-nil, completing in the middle of a word over-writes
+  "When non-nil, completing in the middle of a word over-writes
 the rest of the word. `completion-word-thing' determines what is
 considered a word."
   :group 'completion-ui
   :type 'boolean)
 
 
-(defcustom completion-auto-show 'tooltip
-  "*Display completion tooltip/menu/pop-up frame automatically.
-When null, nothing is auto-displayed. When set to 'tooltip, 'menu
-or 'pop-up, the corresponding completion interface is displayed
-automatically, after a delay of `completion-auto-show-delay' if
-one is set."
+(completion-ui-defcustom-per-source completion-auto-update t
+  "When non-nil, completion candidates are updated automatically
+when characters are added to the current completion prefix.
+\(Effectively, it is as though `auto-completion-mode' is
+temporarily enabled for the duration of the completion.\)"
   :group 'completion-ui
-  :type '(choice (const :tag "none" nil)
-                 (const tooltip)
-                 (const menu)
-                 (const :tag "pop-up frame" pop-up))
-  )
+  :type 'boolean)
 
 
-(defcustom completion-auto-show-delay 3
-  "*Number of seconds to wait after completion is invoked
-before auto-displaying tooltip/menu/pop-up frame when
-`completion-auto-show' is enabled."
+(completion-ui-defcustom-per-source completion-auto-show
+  'completion-show-popup-tip
+  "Function to call to display a completion user-interface.
+When null, nothing is auto-displayed.
+
+The function is called after a completion command, possibly after
+a delay of `completion-auto-show-delay' seconds if one is set. It
+is passed one argument, a completion overlay."
   :group 'completion-ui
-  :type '(choice (const :tag "Off" nil)
-                 (float :tag "On")))
+  :type '(choice (const nil)))
+
+
+(completion-ui-defcustom-per-source completion-auto-show-delay 3
+  "Number of seconds to wait after completion is invoked
+before the `completion-auto-show' interface is activated."
+  :group 'completion-ui
+  :type '(choice (const :tag "Off" nil) (float :tag "On")))
+
+
+(defface completion-highlight-face
+  '((((class color) (background dark))
+     (:background "blue" :foreground "white"))
+    (((class color) (background light))
+     (:background "orange" :foreground "black")))
+  "Face used to highlight completions in various user-interfaces."
+  :group 'completion-ui)
 
 
 
+
 ;;; ===== Auto-completion customizations =====
 
-(defcustom auto-completion-min-chars nil
-  "*Minimum number of characters before completions are offered."
-  :group 'completion-ui
-  :type '(choice (const :tag "Off" nil)
-                 (integer :tag "On")))
+(defgroup auto-completion-mode nil
+  "auto-completion-mode"
+  :group 'completion-ui)
 
 
-(defcustom auto-completion-delay nil
-  "*Number of seconds to wait before activating completion mechanisms
+(defcustom auto-completion-source 'dabbrev
+  "Completion source for `auto-completion-mode'."
+  :group 'auto-completion-mode
+  :type `(choice
+	  (const nil)
+	  ,@(completion-ui-customize-list-sources)))
+
+
+(completion-ui-defcustom-per-source auto-completion-min-chars nil
+  "Minimum number of characters before completions are offered."
+  :group 'auto-completion-mode
+  :type '(choice (const :tag "Off" nil) (integer :tag "On")))
+
+
+(completion-ui-defcustom-per-source auto-completion-delay nil
+  "Number of seconds to wait before activating completion mechanisms
 in auto-completion mode."
-  :group 'completion-ui
-  :type '(choice (const :tag "Off" nil)
-                 (float :tag "On")))
+  :group 'auto-completion-mode
+  :type '(choice (const :tag "Off" nil) (float :tag "On")))
 
 
 (defcustom auto-completion-backward-delete-delay 0.1
-  "*Number of seconds to wait before activating completion mechanisms
-after deleting backwards in auto-completion mode."
-  :group 'completion-ui
+  "Number of seconds to wait before activating completion mechanisms
+after deleting backwards in `auto-completion-mode'."
+  :group 'auto-completion-mode
   :type 'float)
 
 
-(defcustom auto-completion-syntax-alist '(reject . word)
-  "*Associates character syntax with completion behaviour.
+(completion-ui-defcustom-per-source auto-completion-syntax-alist
+  '(reject . word)
+  "Associates character syntax with completion behaviour.
 Used by the `auto-completion-self-insert' function to decide what
 to do based on a typed character's syntax.
 
-The predefined choices can be used to set two syntax-dependent
-completion behaviours: how the prefix is chosen when characters
-are typed, and how provisional completions are accepted. These
-are specified by a cons cell, whose cdr is either \"type
-normally\" or \"punctuation accepts\", and controls how
-completions are accepted, and whose car is either \"word\" or
+When customizing this variable, predefined choices can be used to
+configure two separate syntax-dependent completion behaviours:
+how provisional completions are accepted, and how the prefix is
+chosen when characters are typed. The first choice is between
+\"type normally\" or \"punctuation accepts\", and controls how
+completions are accepted. The second is between \"word\" or
 \"string\", and controls how the prefix is chosen.
 
-If the car is set to \"type normally\", the provisional
-completions that appear as you type are only accepted if you call
+If \"type normally\" is selected, the provisional completions
+that appear as you type are only accepted if you call
 `completion-accept' manually. You are free to ignore them
-entirely and type normally. If the car is instead set to
-\"punctuation accepts\", the provisional completions are
-automatically accepted whenever you type any punctuation or
-whitespace character (as defined by the buffers' syntax
-table). For example, hitting SPC will usually accept the current
-provisional completion and insert a space after it. Once your
-fingers get used to it, this can allow you to type faster as you
-can quickly accept a completion and move onto the next
-word. However, you can no longer entirely ignore the completions
-and type normally, since you may accidentally accept a completion
-you didn't want.
+entirely and type normally. If \"punctuation accepts\" is
+selected, the provisional completions are automatically accepted
+whenever you type any punctuation or whitespace character (as
+defined by the buffers' syntax table). For example, hitting SPC
+will usually accept the current provisional completion and insert
+a space after it. Once your fingers get used to it, this can
+allow you to type faster as you can quickly accept a completion
+and move onto the next word. However, you can no longer entirely
+ignore the completions and type normally, since you may
+accidentally accept a completion you didn't want.
 
-If the cdr is set to \"word\", typing a word-constituent
-character (as defined by the buffers' syntax table) will cause
-the part of the word before point to be completed. That is, the
-completion prefix will be all those characters in the word at
-point that come before the point (`completion-word-thing'
-determines which characters form the word). If the cdr is instead
-set to \"string\", typing a word-constituent character will
-complete the current string that has been built up by typing
-characters. That is, the prefix will consist of the characters
-you've typed sequentially in the buffer. The two behaviours
-usually only differ if you insert characters in the middle or at
-the end of an existing word.
+If \"word\" is selected, typing a word-constituent character (as
+defined by a buffer's syntax table) will cause the part of the
+word before point to be completed. That is,
+`auto-completion-mode' will first find the word at or next to the
+point, and then complete that part of it that comes before the
+point (`completion-word-thing' usually determines which
+characters form part of a word, though individual completion
+sources can override this). If \"string\" is selected, typing a
+word-constituent character will complete the string that has been
+built up by typing consecutive characters. That is, the prefix
+will consist of all the characters you've typed in the buffer
+since the last time you did something other than typing a
+word-constituent character.
+
+Although they sound quite different, the two behaviours usually
+only differ if you move the point to the middle or end of an
+existing word and type a character. The \"word\" setting will
+delete the part of the word after point, add the new character to
+the part of the word before point, and complete the result. The
+\"string\" setting will simply insert the new character and
+complete it.
 
 
 Customizing the behaviour for each syntax individually gives more
@@ -489,26 +486,36 @@ behaviour. In this case, the value of
 syntax descriptors (characters) with behaviours (two-element
 lists).
 
-The first element of the list must be one of symbols 'accept,
-'reject or 'add. The first two again have the same meaning as in
-the predefined behaviours, whereas 'add causes characters with
-that syntax to be added to the current completion prefix.
+The first element of the behaviour list must be one of symbols
+'accept, 'reject or 'add. The first two have the same meaning as
+the predefined behaviours \"punctuation accepts\" and \"type
+normally\", though they now apply only to one syntax
+descriptor. 'add causes characters with that syntax to be added
+to the current completion prefix (this is the usual setting for
+word-constutuent characters).
 
 The second element of the list must be one of the symbols 'word,
-'string or 'none. 'word and 'string have the same meaning as in
-the predefined behaviours, though they now apply only to one
-syntax class, whereas 'none prevents characters with that syntax
+'string or 'none. 'word and 'string have the same meaning as the
+predefined behaviours, though they now apply only to one syntax
+descriptor, whereas 'none prevents characters with that syntax
 from invoking auto-completion.
 
 
 When `auto-completion-syntax-alist' is set from Lisp code, in
-addition to the symbol values described above the list entries
-can also be functions which return one of those symbols. The list
-can also have an additional third entry, which determines whether
-the typed character is inserted or not: the character is inserted
-if it is non-nil, not if it is nil. Again if the third entry is a
-function, its return value determines the insertion behaviour."
-  :group 'completion-ui
+addition to the symbol values described above the behaviour list
+entries can also be functions which return one of those
+symbols. The list can also have an additional third element,
+which determines whether or not the typed character is inserted
+into the buffer: the character is inserted if it is non-nil, not
+if it is nil. (Note that, perhaps confusingly, a non-existent
+third element is equivalent to setting the third element to
+t). If the third element of the list is a function, its return
+value again determines the insertion behaviour. This allows a
+function to take over the job of inserting characters (e.g. in
+order to make sure parentheses are inserted in pairs), and is
+probably the only time it makes sense to use/return a null third
+element."
+  :group 'auto-completion-mode
   :type '(choice
           (cons :tag "Predefined"
                 (choice :tag "Acceptance behaviour"
@@ -518,7 +525,7 @@ function, its return value determines the insertion behaviour."
                         (const word)
                         (const string)))
           (alist :tag "Custom"
-                 :key-type character
+                 :key-type (character :tag "Syntax descriptor")
                  :value-type (list
                               (choice (const accept)
                                       (const reject)
@@ -528,7 +535,7 @@ function, its return value determines the insertion behaviour."
                                       (const none))))))
 
 
-(defcustom auto-completion-override-syntax-alist
+(completion-ui-defcustom-per-source auto-completion-override-syntax-alist
   '((?0 . (reject none))
     (?1 . (reject none))
     (?2 . (reject none))
@@ -538,13 +545,14 @@ function, its return value determines the insertion behaviour."
     (?6 . (reject none))
     (?7 . (reject none))
     (?8 . (reject none))
-    (?9 . (reject none)))
-  "*Alist associating characters with completion behaviour.
+    (?9 . (reject none))
+    (?' . (add word)))
+  "Alist associating characters with completion behaviour.
 Overrides the default behaviour defined by the character's syntax
 in `auto-completion-syntax-alist'. The format is the same as for
-`completion-dynamic-synax-alist', except that the alist keys are
+`auto-completion-synax-alist', except that the alist keys are
 characters rather than syntax descriptors."
-  :group 'completion-ui
+  :group 'auto-completion-mode
   :type '(alist :key-type (choice character (const :tag "default" t))
                 :value-type (list (choice (const :tag "accept" accept)
                                           (const :tag "reject" reject)
@@ -555,244 +563,9 @@ characters rather than syntax descriptors."
 
 
 
-;;; ===== Dynamic completion customizations =====
-
-(defcustom completion-use-dynamic t
-  "*Enable dynamic completion.
-Dynamic completion directly inserts the first completion into the
-buffer without further action required by the user. It is still a
-provisional completion, so until it is accepted all the usual
-mechanisms for selecting completions are still available."
-  :group 'completion-ui
-  :type 'boolean)
-
-
-(defcustom completion-dynamic-highlight-common-prefix t
-  "*Highlight longest common prefix in dynamic completion."
-  :group 'completion-ui
-  :type 'boolean)
-
-
-(defface completion-dynamic-face
-  '((((class color) (background dark))
-     (:background "blue" :foreground "white"))
-    (((class color) (background light))
-     (:background "orange" :foreground "black")))
-  "*Face used for provisional completions during dynamic completion.
-Also used to highlight selected completions in tooltips and
-pop-up frames."
-  :group 'completion-ui)
-
-
-(defface completion-dynamic-common-prefix-face
-  '((((class color) (background dark))
-     (:background "dodger blue" :foreground "white"))
-    (((class color) (background light))
-     (:background "gold" :foreground "black")))
-  "*Face used to highlight common prefix in dynamic completion."
-  :group 'completion-ui)
-
-
-
-;; ===== Hotkey customizations =====
-
-(defcustom completion-use-hotkeys t
-  "*Enable completion hotkeys (single-key selection of completions)."
-  :group 'completion-ui
-  :type 'boolean)
-
-
-;; not a defcustom, since setting it after loading completion-ui.el (as
-;; defcustom typically will) does not work
-(defvar completion-hotkey-list
-  '([?0] [?1] [?2] [?3] [?4] [?5] [?6] [?7] [?8] [?9])
-  "*List of keys (vectors) to use for selecting completions
-when `completion-use-hotkeys' is enabled. This variable must be
-set *before* completion-ui.el is laoded to take effect.")
-
-
-
-;;; ===== Echo-text customizations =====
-
-(defcustom completion-use-echo t
-  "*Display completions in echo area."
-  :group 'completion-ui
-  :type 'boolean)
-
-
-
-;;; ===== Tooltip customizations =====
-
-(defcustom completion-tooltip-timeout 86400
-  "*Number of seconds for wihch to display completion tooltip.
-Unfortunately, there is no way to display a tooltip indefinitely
-in Emacs. You can work around this by using a very large number."
-  :group 'completion-ui
-  :type 'integer)
-
-
-(defcustom completion-tooltip-offset '(0 . 0)
-  "Pixel offset for tooltip.
-This sometimes needs to be tweaked manually to get tooltip in
-correct position on different window systems."
-  :group 'completion-ui
-  :type '(cons (integer :tag "x") (integer :tag "y")))
-
-
-(defface completion-tooltip-face
-  `((t . (:background ,(or (face-attribute 'menu :background) "white")
-                      :foreground ,(or (face-attribute 'menu :foreground) "black"))))
-  "*Face used in tooltip. Only foreground and background attributes are\
- used."
-  :group 'completion-ui)
-
-
-
-;;; ===== Completion menu customizations =====
-
-(defcustom completion-menu-offset '(0 . 0)
-  "*Pixel offset for completion menus.
-This sometimes needs to be tweaked manually to get completion
-menus in correct position on different window systems."
-  :group 'completion-ui
-  :type '(cons (integer :tag "x") (integer :tag "y")))
-
-
-(defcustom completion-browser-max-items 25
-  "*Maximum number of completions to display
-in a completion browser submenu."
-  :group 'predictive
-  :type 'integer)
-
-
-(defcustom completion-browser-buckets 'balance
-  "*Policy for choosing number of buckets in completion browser:
-
-balance:  balance number of buckets and size of content
-maximize: maximize number of buckets, minimize size of contents
-mininize: minimize number of buckets, maximize size of contents"
-  :group 'predictive
-  :type '(choice (const :tag "balance" balance)
-                 (const :tag "maximize" max)
-                 (const :tag "minimize" min)))
-
-
-
-;;; ===== Pop-up frame customizations =====
-
-(defcustom completion-auto-popup-frame t
-  "*Display completion pop-up frame automatically."
-  :group 'completion-ui
-  :type 'boolean)
-
-
-(defcustom completion-popup-frame-max-height 20
-  "*Maximum height of a popup frame"
-  :group 'completion-ui
-  :type 'integer)
-
-
-(defcustom completion-popup-frame-offset '(0 . 0)
-  "Pixel offset for pop-up frame.
-This sometimes needs to be tweaked manually to get the pop-up
-frame in correct position on different window systems."
-  :group 'completion-ui
-  :type '(cons (integer :tag "x") (integer :tag "y")))
-
-
-
-
+
 ;;; ============================================================
-;;;                 Other configuration variables
-
-(defvar completion-function nil
-  "Function that accepts two arguments, PREFIX and MAXNUM,
-and returns a list of at most MAXNUM completion candidates for
-the PREFIX string. If MAXNUM is nil, it should return all
-completion candidates for PREFIX.")
-(make-variable-buffer-local 'completion-function)
-(set-default 'completion-function nil)  ; ensure "global" value is nil
-
-
-(defvar completion-prefix-function 'completion-prefix
-  "Function that finds a prefix to complete at point.
-It should return the prefix as a string.")
-(make-variable-buffer-local 'completion-prefix-function)
-
-
-(defvar completion-includes-prefix t
-  "If nil, the strings returned by calls to `completion-function'
-do *not* include the prefix. If t, then they do. Ignored if
-`completion-replaces-prefix' is non-nil.")
-(make-variable-buffer-local 'completion-includes-prefix)
-
-
-(defvar completion-replaces-prefix nil
-  "If non-nil, completions replace the \"prefix\"
-that was completed. The characters that were being completed (as
-returned by `completion-prefix-function') will be deleted from
-the buffer when a completion is accepted.
-
-Setting this to non-nil allows completion-UI to support things
-other than simple prefix-completion.")
-(make-variable-buffer-local 'completion-replaces-prefix)
-
-
-(defvar completion-word-thing 'word
-  "Symbol used to determine what is considered a word.
-
-Used by `complete-word-at-point' and `completion-backward-delete'
-in calls to `thing-at-point'. See `thing-at-point' for more
-details.
-
-More precisely, it is used by the default
-`completion-prefix-function', `completion-prefix', which is
-called by the above functions to determine the prefix at
-point. So it may be ignored if `completion-prefix-function' is
-set to some other non-default function.")
-(make-variable-buffer-local 'completion-word-thing)
-
-
-(defvar completion-tooltip-function 'completion-construct-tooltip-text
-  "Function to call to construct the tooltip text.
-
-The function is called with three arguments, the prefix,
-completions, and index of the currently active completion. It
-should return a string containing the text to be displayed in the
-tooltip.
-
-Note: this can be overridden by an \"overlay local\" binding (see
-`auto-overlay-local-binding').")
-
-
-(defvar completion-menu 'completion-construct-menu
-  "The completion menu keymap, or a function to call
-to get a completion menu keymap.
-
-If a function, that function is called with two arguments, prefix
-and completions, and should return a menu keymap. Note: this can
-be overridden by an \"overlay local\" binding (see
-`auto-overlay-local-binding').")
-
-
-(defvar completion-browser-menu-function 'completion-construct-browser-menu
-  "Function to call to get a browser menu keymap.
-
-The function is called with two arguments, prefix and
-completions, and should return a menu keymap. Note: this can be
-overridden by an \"overlay local\" binding (see
-`auto-overlay-local-binding').")
-
-
-(defvar completion-popup-frame-function 'completion-construct-popup-frame-text
-  "Function to call to construct pop-up frame text.
-
-The function is called with two arguments, the prefix and
-completions. It should return a list of strings, which are used
-\(in order\) as the lines of text in the pop-up frame. Note: this
-can be overridden by an \"overlay local\" binding (see
-`auto-overlay-local-binding').")
-
+;;;               Other configuration variables
 
 (defvar completion-accept-functions nil
   "Hook run after a completion is accepted.
@@ -800,9 +573,9 @@ can be overridden by an \"overlay local\" binding (see
 Completions are accepted by calling `completion-accept',
 selecting one with a hotkey, or selecting one from a
 menu. Functions are passed three arguments: the prefix, the
-complete string that was accepted \(the concatenation of the
-prefix and the accepted completion string\), and any prefix
-argument supplied to and interactive accept command.")
+complete string that was accepted (including the prefix), and any
+prefix argument supplied by the user if the accept command was
+called interactively.")
 
 
 (defvar completion-reject-functions nil
@@ -810,75 +583,71 @@ argument supplied to and interactive accept command.")
 
 Completions are rejected by calling
 `completion-reject'. Functions are passed three arguments: the
-prefix, the complete string that was rejected \(the concatenation
-of the prefix and the rejected completion string\), and any
-prefix argument supplied to an interactive rejection command.")
+prefix, the complete string that was rejected \(including the
+prefix\), and any prefix argument supplied by the user if the
+reject command was called interactively.")
 
 
-;; (defvar completion-tab-complete-functions nil
-;;   "Hook run after tab-completion.
-;; Functions are passed two arguments: the complete string that has
-;; been inserted so far \(prefix and tab-completion combined\).")
 
+(defvar completion-overlay-map nil
+  "Keymap active in a completion overlay.")
+
+(defvar auto-completion-overlay-map nil
+  "Keymap active in a completion overlay when
+`auto-completion-mode' is enabled.")
+
+(defvar completion-auto-update-overlay-map nil
+  "Keymap active in a completion overlay when
+`completion-auto-update' is enabled.")
 
 (defvar completion-map nil
-  "Keymap active when a completion-function is defined.")
-
-(defvar completion-hotkey-map nil
-  "Keymap used for hotkey completion (single-key selection of
-  completions).
-
-  Do NOT bind keys in this keymap directly. The keymap is
-  constructed automatically from `completion-hotkey-list'. You
-  should modify that instead, before `completion-ui.el' is
-  loaded.")
-
-
-(defvar completion-dynamic-map nil
-  "Keymap active in a dynamic completion overlay.")
-
+  "Keymap active when a Completion-UI is loaded.")
 
 (defvar auto-completion-map nil
-  "Keymap active when auto-completion-mode is enabled.")
-
-
-(defvar auto-completion-dynamic-map nil
-  "Keymap active in a dynamic completion overlay when
-  auto-completion-mode is enabled.")
-
-
-(defvar completion-tooltip-map nil
-  "Keymap used when a tooltip is displayed.")
-
-(defvar completion-popup-frame-mode-map nil
-  "Keymap used by completion pop-up frames.")
+  "Keymap active when `auto-completion-mode' is enabled.")
 
 
 
-
+
 ;;; ============================================================
 ;;;                     Internal variables
 
-(defvar completion-overlay-list nil
+(defvar completion-ui--activated nil
+  "Non-nil when Completion-UI is activated in a buffer.
+
+This variable enables the global `completion-map' keymap, which
+contains hacks to work-around poor overlay keymap support in
+older versions of Emacs.
+
+It should only ever be disabled when debugging Completion-UI and
+the `completion-map' bindings are causing problems.")
+
+(make-variable-buffer-local 'completion-ui--activated)
+
+
+(defvar completion--overlay-list nil
   "List of overlays used during completion")
-(make-variable-buffer-local 'completion-overlay-list)
+(make-variable-buffer-local 'completion--overlay-list)
 
 
-(defvar completion-auto-timer (timer-create)
-  "Timer used to postpone auto-completion or auto-display
-of tooltip/menu/pop-up frame until there's a pause in typing.")
+(defvar completion--auto-timer (timer-create)
+  "Timer used to postpone auto-completion or auto-show
+until there's a pause in typing.")
 
 
-(defvar completion-tooltip-active nil
-  "Used to enable `completion-tooltip-map' when a tooltip is displayed.")
-
-(defvar completion-backward-delete-timer nil
+(defvar completion--backward-delete-timer nil
   "Timer used to postpone completion until finished deleting.")
 
 
-(defvar completion-trap-recursion nil
-  "Used to trap recursive calls to certain completion functions")
+(defvar completion--trap-recursion nil
+  "Used to trap infinite recursion errors
+in calls to certain completion functions, for which infinite
+recursion can result from incorrectly configured key bindings set
+by the Emacs user.")
 
+
+;; dummy keyboard event used to force keybinding refresh
+(defconst completion--dummy-event 'completion-dummy-event)
 
 
 
@@ -894,499 +663,25 @@ of tooltip/menu/pop-up frame until there's a pause in typing.")
 
 
 
-
-;;; =================================================================
-;;;                     Setup default keymaps
-
-;; Set the default keymap if it hasn't been defined already (most likely
-;; in an init file). This keymap is active whenever `completion-function'
-;; is non-nil.
-(unless completion-map
-  ;; If the current Emacs version doesn't support overlay keybindings
-  ;; half decently and doesn't support command remapping, we're going to
-  ;; have to bind all printable characters in this keymap, so we might as
-  ;; well create a full keymap
-  (if (and (<= emacs-major-version 21)
-           (not (fboundp 'command-remapping)))
-      (setq completion-map (make-keymap))
-    (setq completion-map (make-sparse-keymap)))
-
-  ;; M-<tab> and M-/ cycle or complete word at point
-  (define-key completion-map [?\M-\t]
-    (lambda ()
-      "Cycle through available completions if there are any,\
- otherwise complete the word at point."
-      (interactive)
-      (if (completion-overlay-at-point)
-          (completion-cycle)
-        (complete-word-at-point))))
-  (define-key completion-map "\M-/"
-    (lambda ()
-      "Cycle through available completions if there are any,\
- otherwise complete the word at point."
-      (interactive)
-      (if (completion-overlay-at-point)
-          (completion-cycle)
-        (complete-word-at-point))))
-
-  ;; M-<shift>-<tab> and M-? (usually M-<shift>-/) cycle backwards
-  (define-key completion-map [(meta shift iso-lefttab)]
-    (lambda ()
-      "Cycle backwards through completions if there are any,\
- otherwise complete the word at point."
-      (interactive)
-      (if (completion-overlay-at-point)
-          (completion-cycle -1)
-        (complete-word-at-point))))
-  (define-key completion-map "\M-?"
-    (lambda ()
-      "Cycle backwards through completions if there are any,\
- otherwise complete the word at point."
-      (interactive)
-      (if (completion-overlay-at-point)
-          (completion-cycle -1)
-        (complete-word-at-point))))
-
-  ;; RET deals with any pending completion candidate, then runs
-  ;; whatever is usually bound to RET.
-  ;; Note: although this uses `completion-run-if-within-overlay', it is
-  ;;       not a hack to work-around poor overlay keybinding
-  ;;       support. Rather, we are using it to run
-  ;;       `completion-resolve-current' and then run the normal RET
-  ;;       keybinding. We bind it here instead of in the overlay keymap
-  ;;       because it's easier to disable this keymap.
-  (define-key completion-map "\r"
-    (lambda () "Resolve current completion, then run whatever\
- would normally be bound to RET."
-      (interactive)
-      (completion-run-if-within-overlay
-       (lambda () (interactive) (completion-resolve-current nil ?\r ? ))
-       'completion-function 'before)))
-
-  ;; if command remapping is supported, remap delete commands
-  (if (fboundp 'command-remapping)
-      (progn
-        (define-key completion-map [remap delete-char]
-          'completion-delete-char)
-        (define-key completion-map [remap backward-delete-char]
-          'completion-backward-delete-char)
-        (define-key completion-map [remap delete-backward-char]
-          'completion-backward-delete-char)
-        (define-key completion-map [remap backward-delete-char-untabify]
-          'completion-backward-delete-char-untabify)
-        (define-key completion-map [remap kill-word]
-          'completion-kill-word)
-        (define-key completion-map [remap backward-kill-word]
-          'completion-backward-kill-word)
-        (define-key completion-map [remap kill-sentenve]
-          'completion-kill-sentenve)
-        (define-key completion-map [remap backward-kill-sentenve]
-          'completion-backward-kill-sentenve)
-        (define-key completion-map [remap kill-sexp]
-          'completion-kill-sexp)
-        (define-key completion-map [remap backward-kill-sexp]
-          'completion-backward-kill-sexp)
-        (define-key completion-map [remap kill-paragraphs]
-          'completion-kill-paragraph)
-        (define-key completion-map [remap backward-kill-paragraph]
-          'completion-backward-kill-paragraph))
-
-    ;; otherwise, can't do better than define bindings for the keys
-    ;; that are currently bound to them
-    (dolist (key '([delete] [deletechar] [backspace] "\d"
-                   [(control delete)] [(control deletechar)]
-                   [(meta delete)] [(meta deletechar)]
-                   [(control backspace)] [(meta backspace)] "\M-\d"))
-      (catch 'rebound
-        (dolist (binding '((delete-char . completion-delete-char)
-                           (kill-word . completion-kill-word)
-                           (kill-sentence . completion-kill-sentence)
-                           (kill-sexp . completion-kill-sexp)
-                           (kill-paragraph . completion-kill-paragraph)
-                           (backward-delete-char
-                            . completion-backward-delete-char)
-                           (delete-backward-char
-                            . completion-backward-delete-char)
-                           (backward-delete-char-untabify
-                            . completion-backward-delete-char-untabify)
-                           (backward-kill-word
-                            . completion-backward-kill-word)
-                           (backward-kill-sentence
-                            . completion-backward-kill-sentence)
-                           (backward-kill-sexp
-                            . completion-backward-kill-sexp)
-                           (backward-kill-paragraph
-                            . completion-backward-kill-paragraph)))
-          (when (eq (key-binding key) (car binding))
-            (define-key completion-map key (cdr binding))
-            (throw 'rebound t)))))
-    )
-
-
-  ;; ----- Simulated overlay keybindings -----
-
-  ;; Note: could remove this and leave it up to the call to the
-  ;;       `completion-simulate-overlay-keybindings' function at the very end
-  ;;       of this file, if only that function could deal with remappings
-
-  ;; If the current Emacs version doesn't support overlay keybindings
-  ;; half decently, have to simulate them using the
-  ;; `completion-run-if-within-overlay' hack.
-  (when (<= emacs-major-version 21)
-    ;; if we can remap commands, remap `self-insert-command' to
-    ;; `completion-self-insert'
-    (if (fboundp 'command-remapping)
-        (define-key completion-map [remap self-insert-command]
-          'completion-self-insert)
-      ;; otherwise, rebind all printable characters to
-      ;; `completion-self-insert' manually
-      (completion-bind-printable-chars completion-map
-                                       'completion-self-insert))
-
-;;;     ;; C-RET accepts, C-DEL rejects
-;;;     (define-key completion-map [(control return)]
-;;;       'completion-accept-if-within-overlay)
-;;;     (define-key completion-map [(control backspace)]
-;;;       'completion-reject-if-within-overlay)
-
-;;;     ;; <tab> does traditional tab-completion
-;;;     (define-key completion-map "\t"
-;;;       'completion-tab-complete-if-within-overlay)
-
-;;;     ;; C-<tab> scoots ahead
-;;;     (define-key completion-map [(control tab)]
-;;;       'completion-scoot-ahead-if-within-overlay)
-
-;;;     ;; C-<space> abandons
-;;;     (define-key completion-map [?\C- ]
-;;;       'completion-reject-if-within-overlay)
-
-;;;     ;; S-<down>, M-<down> and C-<down> display the compltion tooltip,
-;;;     ;; menu, and pop-up frame
-;;;     (define-key completion-map [S-down]
-;;;       'completion-show-tooltip-if-within-overlay)
-;;;     (define-key completion-map [M-down]
-;;;       'completion-show-menu-if-within-overlay)
-;;;     (define-key completion-map [C-down]
-;;;       'completion-popup-frame-if-within-overlay)
-    )
-  )
-
-
-;; make sure completion-map is associated with `completion-function' in
-;; the minor-mode-keymap-alist, so that the bindings are enabled whenever
-;; a completion function is defined
-(let ((existing (assq 'completion-function minor-mode-map-alist)))
-  (if existing
-      (setcdr existing completion-map)
-    (push (cons 'completion-function completion-map)
-          minor-mode-map-alist)))
-
-
-
-
-;; Set the default bindings for the keymap assigned to the completion
-;; overlays created when dynamic completion is enabled, if it hasn't been
-;; defined already (most likely in an init file).
-(unless completion-dynamic-map
-  ;; Note: rebinding printable characters here is redundant if
-  ;;       `auto-completion-mode' is enabled, since they are also bound
-  ;;       in `auto-completion-map', but we still need to ensure that the
-  ;;       provisional completion is correctly dealt with even if
-  ;;       `auto-completion-mode' is disabled.
-
-  ;; if we can remap commands, remap `self-insert-command' to
-  ;; `completion-self-insert'
-  (if (fboundp 'command-remapping)
-      (progn
-        (setq completion-dynamic-map (make-sparse-keymap))
-        (define-key completion-dynamic-map [remap self-insert-command]
-          'completion-self-insert))
-    ;; otherwise, create a great big keymap and rebind all printable
-    ;; characters to `completion-self-insert' manually
-    (setq completion-dynamic-map (make-keymap))
-    (completion-bind-printable-chars completion-dynamic-map
-                                     'completion-self-insert))
-
-  ;; C-RET accepts, C-DEL rejects
-  (define-key completion-dynamic-map [(control return)] 'completion-accept)
-  (define-key completion-dynamic-map [(control backspace)] 'completion-reject)
-
-  ;; <tab> does traditional tab-completion
-  (define-key completion-dynamic-map "\t" 'completion-tab-complete)
-
-  ;; C-<tab> scoots ahead
-  (define-key completion-dynamic-map [(control tab)]
-    'completion-scoot-ahead)
-
-  ;; C-<space> abandons
-  (define-key completion-dynamic-map [?\C- ] 'completion-reject)
-
-  ;; S-<down>, M-<down> and C-<down> display the completion tooltip,
-  ;; menu, or pop-up frame
-  (define-key completion-dynamic-map [S-down] 'completion-show-tooltip)
-  (define-key completion-dynamic-map [M-down] 'completion-show-menu)
-  (define-key completion-dynamic-map [C-down] 'completion-popup-frame)
-
-  ;; clicking on a completion displays the completion menu
-  (define-key completion-dynamic-map [mouse-2] 'completion-show-menu)
-  )
-
-
-
-;; Set the default auto-completion-mode keymap if it hasn't been defined
-;; already (most likely in an init file). This keymap is active when
-;; `auto-completion-mode' is enabled.
-(unless auto-completion-map
-  ;; if we can remap commands, remap `self-insert-command'
-  (if (fboundp 'command-remapping)
-      (progn
-        (setq auto-completion-map (make-sparse-keymap))
-        (define-key auto-completion-map [remap self-insert-command]
-          'auto-completion-self-insert))
-    ;; otherwise, create a great big keymap where all printable characters run
-    ;; `auto-completion-self-insert', which decides what to do based on the
-    ;; character's syntax
-    (setq auto-completion-map (make-keymap))
-    (completion-bind-printable-chars auto-completion-map
-                                     'auto-completion-self-insert))
-
-
-;;;   ;; ----- Simulated overlay keybindings -----
-
-;;;   ;; C-<space> abandons
-;;;   (define-key auto-completion-map [?\C- ]
-;;;     (lambda ()
-;;;       "Reject current provisional completion if any, otherwise
-;;; run whatever would normally be bound to \"C-<SPC>\"."
-;;;       (interactive)
-;;;       (completion-run-if-within-overlay
-;;;        'completion-reject 'auto-completion-mode)))
-
-;;;   ;; M-<space> abandons and inserts a space
-;;;   (define-key auto-completion-map "\M- "
-;;;     (lambda (&optional arg)
-;;;       "Reject any current provisional completion if any and insert a space,
-;;; otherwise run whatever would normally be bound to \"M-<SPC>\"."
-;;;       (interactive "P")
-;;;       (completion-run-if-within-overlay
-;;;        (lambda () (interactive) (completion-reject arg) (insert " "))
-;;;        'auto-completion-mode)))
-
-;;;   ;; M-S-<space> inserts a space as a word-constituent
-;;;   (define-key auto-completion-map [?\M-\S- ]
-;;;     (lambda ()
-;;;       "Insert a space as though it were a word-constituent if
-;;; there's a provisional completion at point, otherwise run whatever
-;;; would normally be bound to \"M-S\\ \"."
-;;;       (interactive)
-;;;       (completion-run-if-within-overlay
-;;;        (lambda () (interactive) (auto-completion-self-insert ?\  ?w t))
-;;;        'auto-completion-mode)))
-
-
-;;;   ;; M-. inserts "." as a word-constituent
-;;;   (define-key auto-completion-map "\M-."
-;;;     (lambda ()
-;;;       "Insert \".\" as though it were a word-constituent if
-;;; there's a provisional completion at point, otherwise run whatever
-;;; would normally be bound to \"M-.\"."
-;;;       (interactive)
-;;;       (completion-run-if-within-overlay
-;;;        (lambda () (interactive) (auto-completion-self-insert ?. ?w t))
-;;;        'auto-completion-mode)))
-
-;;;   ;; M-- inserts "-" as a word-constituent
-;;;   (define-key auto-completion-map "\M--"
-;;;     (lambda ()
-;;;       "Insert \"-\" as though it were a word-constituent if
-;;; there's a provisional completion at point, otherwise run whatever
-;;; would normally be bounds to \"M--\"."
-;;;       (interactive)
-;;;       (completion-run-if-within-overlay
-;;;        (lambda () (interactive) (auto-completion-self-insert ?- ?w t))
-;;;        'auto-completion-mode)))
-
-;;;   ;; M-/ inserts "/" as a word-constituent
-;;;   (define-key auto-completion-map "\M-/"
-;;;     (lambda ()
-;;;       "Insert \"/\" as though it were a word-constituent if
-;;; there's a provisional completion at point, otherwise run whatever
-;;; would normally be bound to \"M-/\"."
-;;;       (interactive)
-;;;       (completion-run-if-within-overlay
-;;;        (lambda () (interactive)
-;;;           (auto-completion-self-insert ?/ ?w t))
-;;;        'auto-completion-mode)))
-  )
-
-
-
-;; Set the default bindings for the keymap assigned to the completion overlays
-;; created when dynamic completion and auto-completion are enabled, if it
-;; hasn't been defined already (most likely in an init file).
-(unless auto-completion-dynamic-map
-  ;; inherit all keybindings from completion-dynamic-map, then add
-  ;; auto-completion specific ones below
-  (setq auto-completion-dynamic-map (make-sparse-keymap))
-  (set-keymap-parent auto-completion-dynamic-map completion-dynamic-map)
-
-  ;; M-<space> abandons and inserts a space
-  (define-key auto-completion-dynamic-map "\M- "
-    (lambda (&optional arg)
-      "Reject any current provisional completion and insert a space."
-      (interactive "P")
-      (completion-reject arg)
-      (insert " ")))
-
-  ;; M-S-<space> inserts a space as a word-constituent
-  (define-key auto-completion-dynamic-map [?\M-\S- ]
-    (lambda ()
-      "Insert a space as though it were a word-constituent."
-      (interactive)
-      (auto-completion-self-insert ?\  ?w t)))
-
-  ;; M-. inserts "." as a word-constituent
-  (define-key auto-completion-dynamic-map "\M-."
-    (lambda ()
-      "Insert \".\" as though it were a word-constituent."
-      (interactive)
-      (auto-completion-self-insert ?. ?w t)))
-
-  ;; M-- inserts "-" as a word-constituent
-  (define-key auto-completion-dynamic-map "\M--"
-    (lambda ()
-      "Insert \"-\" as though it were a word-constituent."
-      (interactive)
-      (auto-completion-self-insert ?- ?w t)))
-
-;;;   ;; M-/ inserts "/" as a word-constituent
-;;;   (define-key auto-completion-dynamic-map "\M-/"
-;;;     (lambda ()
-;;;       "Insert \"/\" as though it were a word-constituent."
-;;;       (interactive)
-;;;       (auto-completion-self-insert ?/ ?w t)))
-  )
-
-
-
-
-;; Construct the keymap used for hotkey selection from
-;; `completion-hotkey-list'. This keymap is active if
-;; `completion-use-hotkeys' is enabled.
-(setq completion-hotkey-map (make-sparse-keymap))
-(dolist (key completion-hotkey-list)
-  (define-key completion-hotkey-map key
-    'completion-select-if-within-overlay))
-
-;; make sure completion-hotkey-map is in minor-mode-keymap-alist
-(let ((existing (assq 'completion-use-hotkeys minor-mode-map-alist)))
-  (if existing
-      (setcdr existing completion-hotkey-map)
-    (push (cons 'completion-use-hotkeys completion-hotkey-map)
-          minor-mode-map-alist)))
-
-
-
-;; Note: `completion-tooltip-active' is reset by `pre-command-hook' (see
-;;       end of file), so the keymap below is disabled before every
-;;       command is executed. However, the key bindings are looked up
-;;       before `pre-command-hook' runs, so the first key sequence after
-;;       displaying a tooltip has a chance of running something from
-;;       here. This is exactly what we want, since Emacs hides tooltips
-;;       after every command and we only want this keymap to be active if
-;;       a tooltip is visible.
-;;
-;;       The cycling commands bound below re-display the completion
-;;       tooltip, which causes `completion-tooltip-active' to be set to t
-;;       again. So after they've run, the keymap is left active again for
-;;       the next key sequence.
-
-;; Set default key bindings for the keymap used when a completion tooltip
-;; is displayed, unless it's already been set (most likely in an init
-;; file). This keymap is active when `completion-tooltip-active' is
-;; non-nil.
-(unless completion-tooltip-map
-  (let ((map (make-sparse-keymap)))
-    ;; <up> and <down> cycle completions, which appears to move selection
-    ;; up and down tooltip entries
-    (define-key map [down] 'completion-tooltip-cycle)
-    (define-key map [up]
-      (lambda () (interactive) (completion-tooltip-cycle -1)))
-    (setq completion-tooltip-map map))
-  )
-
-
-;; make sure completion-tooltip-map is in minor-mode-keymap-alist
-(let ((existing (assq 'completion-tooltip-active minor-mode-map-alist)))
-  (if existing
-      (setcdr existing completion-tooltip-map)
-    (push (cons 'completion-tooltip-active completion-tooltip-map)
-          minor-mode-map-alist)))
-
-
-
-;; Set default keybindings for the keymap used in completion pop-up
-;; frames (actually, used by the completion-popup-frame major mode),
-;; unless it's already been set (most likely in an init file).
-(unless completion-popup-frame-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map "\M-n" (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'next-line arg)))
-    (define-key map "\C-n" (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'next-line arg)))
-    (define-key map [down] (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'next-line arg)))
-    (define-key map "\M-p" (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'previous-line arg)))
-    (define-key map "\C-p" (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'previous-line arg)))
-    (define-key map [up] (lambda (&optional arg) (interactive)
-                           (completion-popup-frame-motion
-                            'previous-line arg)))
-    (define-key map "\C-v" (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'scroll-up arg)))
-    (define-key map [next] (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'scroll-up arg)))
-    (define-key map "\M-v" (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'scroll-down arg)))
-    (define-key map [prior] (lambda (&optional arg) (interactive)
-                              (completion-popup-frame-motion
-                               'scroll-down arg)))
-    (define-key map [home] (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'beginning-of-buffer arg)))
-    (define-key map "\M-<" (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'beginning-of-buffer arg)))
-    (define-key map [end] (lambda (&optional arg) (interactive)
-                            (completion-popup-frame-motion
-                             'end-of-buffer arg)))
-    (define-key map "\M->" (lambda (&optional arg) (interactive)
-                             (completion-popup-frame-motion
-                              'end-of-buffer arg)))
-    (define-key map "\C-u" 'universal-argument)
-    (define-key map [?\C--] 'negative-argument)
-    (define-key map [C-up] 'completion-popup-frame-dismiss)
-    (define-key map [M-up] 'completion-popup-frame-dismiss)
-    (define-key map [?\M-\t] 'completion-popup-frame-toggle-show-all)
-    (define-key map "\M-/" 'completion-popup-frame-toggle-show-all)
-    (define-key map [t] 'completion-popup-frame-unread-key)
-    (setq completion-popup-frame-mode-map map)))
-
-
-
-
+
 ;;; ===============================================================
 ;;;                  Keybinding functions
+
+(defun completion-activate-overlay-keys (overlay keymap)
+  "Enable KEYMAP key bindings in OVERLAY."
+  (map-keymap
+   (lambda (key binding)
+     (define-key (overlay-get overlay 'keymap) (vector key) binding))
+   keymap))
+
+
+(defun completion-deactivate-overlay-keys (overlay keymap)
+  "Disable KEYMAP key bindings in OVERLAY."
+  (map-keymap
+   (lambda (key binding)
+     (define-key (overlay-get overlay 'keymap) (vector key) nil))
+   keymap))
+
 
 (defun completion-define-word-constituent-binding
   (key char &optional syntax no-syntax-override)
@@ -1404,8 +699,8 @@ SYNTAX."
   (let ((doc (concat "Insert \"" (string char) "\" as though it were a\
  word-constituent.")))
 
-    ;; create `auto-completion-dynamic-map' binding
-    (define-key auto-completion-dynamic-map key
+    ;; create `auto-completion-overlay-map' binding
+    (define-key auto-completion-overlay-map key
       `(lambda () ,doc
          (interactive)
          (auto-completion-self-insert ,char ,syntax
@@ -1413,21 +708,85 @@ SYNTAX."
 
     ;; if emacs version doesn't support overlay keymaps properly, create
     ;; binding in `completion-map' to simulate it via
-    ;; `completion-run-if-within-overlay' hack
+    ;; `completion--run-if-within-overlay' hack
     (when (<= emacs-major-version 21)
       (define-key completion-map key
         `(lambda () ,doc
            (interactive)
-           (completion-run-if-within-overlay
+           (completion--run-if-within-overlay
             (lambda () (interactive)
-              (auto-completion-self-insert ,char ,syntax
-                                           ,no-syntax-override))
-            'completion-function)))))
-  )
+              (auto-completion-self-insert ,char ,syntax ,no-syntax-override))
+            'completion-ui--activated))))))
+
+
+(defun completion--remap-delete-commands (map)
+  "Remap deletion commands to completion-UI versions
+\(or substitute existing bindings, if remapping is not supported\)."
+
+  ;; If command remapping is supported, remap delete commands
+  (if (fboundp 'command-remapping)
+      (progn
+        (define-key map [remap delete-char]
+          'completion-delete-char)
+        (define-key map [remap backward-delete-char]
+          'completion-backward-delete-char)
+        (define-key map [remap delete-backward-char]
+          'completion-backward-delete-char)
+        (define-key map [remap backward-delete-char-untabify]
+          'completion-backward-delete-char-untabify)
+        (define-key map [remap kill-word]
+          'completion-kill-word)
+        (define-key map [remap backward-kill-word]
+          'completion-backward-kill-word)
+        (define-key map [remap kill-sentence]
+          'completion-kill-sentence)
+        (define-key map [remap backward-kill-sentence]
+          'completion-backward-kill-sentence)
+        (define-key map [remap kill-sexp]
+          'completion-kill-sexp)
+        (define-key map [remap backward-kill-sexp]
+          'completion-backward-kill-sexp)
+        (define-key map [remap kill-line]
+          'completion-kill-line)
+        (define-key map [remap kill-paragraphs]
+          'completion-kill-paragraph)
+        (define-key map [remap backward-kill-paragraph]
+          'completion-backward-kill-paragraph))
+
+    ;; Otherwise, can't do better than define bindings for the keys
+    ;; that are currently bound to them
+    (dolist (key '([delete] [deletechar] [backspace] "\d"
+                   [(control delete)] [(control deletechar)]
+                   [(meta delete)] [(meta deletechar)]
+                   [(control backspace)] [(meta backspace)] "\M-\d"))
+      (catch 'rebound
+        (dolist (binding '((delete-char . completion-delete-char)
+                           (kill-word . completion-kill-word)
+                           (kill-sentence . completion-kill-sentence)
+                           (kill-sexp . completion-kill-sexp)
+			   (kill-line . completion-kill-line)
+                           (kill-paragraph . completion-kill-paragraph)
+                           (backward-delete-char
+                            . completion-backward-delete-char)
+                           (delete-backward-char
+                            . completion-backward-delete-char)
+                           (backward-delete-char-untabify
+                            . completion-backward-delete-char-untabify)
+                           (backward-kill-word
+                            . completion-backward-kill-word)
+                           (backward-kill-sentence
+                            . completion-backward-kill-sentence)
+                           (backward-kill-sexp
+                            . completion-backward-kill-sexp)
+                           (backward-kill-paragraph
+                            . completion-backward-kill-paragraph)))
+          (when (eq (key-binding key) (car binding))
+            (define-key map key (cdr binding))
+            (throw 'rebound t)))))))
 
 
 
-(defun completion-bind-printable-chars (map command)
+(defun completion--bind-printable-chars (map command)
   "Manually bind printable characters to COMMAND.
 Command remapping is a far better way to do this, so it should only be
 used if the current Emacs version lacks command remapping support."
@@ -1525,15 +884,14 @@ used if the current Emacs version lacks command remapping support."
   (define-key map "]" command)
   (define-key map "|" command)
   (define-key map "\\" command)
-  (define-key map "/" command)
-  )
+  (define-key map "/" command))
 
 
 
-(defun completion-simulate-overlay-bindings (source dest variable
-                                                    &optional no-parent)
+(defun completion--simulate-overlay-bindings
+  (source dest variable &optional no-parent)
   ;; Simulate SOURCE overlay keybindings in DEST using the
-  ;; `completion-run-if-within-overlay' hack. DEST should be a symbol whose
+  ;; `completion--run-if-within-overlay' hack. DEST should be a symbol whose
   ;; value is a keymap, SOURCE should be a keymap.
   ;;
   ;; VARIABLE should be a symbol that deactivates DEST when its value is
@@ -1559,15 +917,14 @@ used if the current Emacs version lacks command remapping support."
        (unless (stringp key) (setq key (vector key)))
        ;; bind key in DEST to simulated overlay keymap binding
        (define-key dest key
-         (completion-construct-simulated-overlay-binding binding variable))))
-   source)
-  )
+         (completion--construct-simulated-overlay-binding binding variable))))
+   source))
 
 
 
-(defun completion-construct-simulated-overlay-binding (binding variable)
+(defun completion--construct-simulated-overlay-binding (binding variable)
   ;; Return a binding that simulates assigning BINDING to KEY in an overlay
-  ;; keymap, using the `completion-run-if-within-overlay' hack.
+  ;; keymap, using the `completion--run-if-within-overlay' hack.
   ;;
   ;; VARIABLE should be a symbol that deactivates BINDING when its value is
   ;; (temporarily) set to nil. Typically, BINDING will be bound in a
@@ -1583,7 +940,6 @@ used if the current Emacs version lacks command remapping support."
    ((or (eq binding 'remap) (stringp binding))
     nil)
 
-
    ;; if BINDING is a keymap, call ourselves recursively to construct a keymap
    ;; filled with bindings that simulate an overlay keymap
    ((keymapp binding)
@@ -1593,32 +949,29 @@ used if the current Emacs version lacks command remapping support."
          ;; usually need to wrap key in an array for define-key
          (unless (stringp key) (setq key (vector key)))
          (define-key map key
-           (completion-construct-simulated-overlay-binding bind variable)))
+           (completion--construct-simulated-overlay-binding bind variable)))
        binding)
       map))
-
 
    ;; if BINDING is a command, construct an anonymous command that simulates
    ;; binding that command in an overlay keymap
    ((or (commandp binding) (and (symbolp binding) (symbol-function binding)))
     (let (funcdef arglist docstring interactive args)
-
       ;; get function definition of command
       (cond
        ((symbolp binding) (setq funcdef (symbol-function binding)))
        ((functionp binding) (setq funcdef binding)))
-
       ;; extract argument list
       (cond
        ;; compiled function
-       ((byte-code-function-p funcdef) (setq arglist (aref funcdef 0)))
+       ((byte-code-function-p funcdef)
+	(setq arglist (aref funcdef 0)))
        ;; uncompiled function
-       ((listp funcdef) (setq arglist (nth 1 funcdef))))
-
+       ((and (listp funcdef) (eq (car funcdef) 'lambda))
+	(setq arglist (nth 1 funcdef))))
       ;; extract docstring and interactive definition
       (setq docstring (documentation binding))
       (setq interactive (interactive-form binding))
-
       ;; construct docstring for new binding
       (setq docstring
             (concat "Do different things depending on whether point is "
@@ -1630,7 +983,6 @@ used if the current Emacs version lacks command remapping support."
                     "If point is not within a provisional completion,\n"
                     "run whatever would normally be bound to "
                     "this key sequence."))
-
       ;; construct list of argument variable names, removing &optional and
       ;; &rest
       (setq args '(list))
@@ -1638,12 +990,11 @@ used if the current Emacs version lacks command remapping support."
               (unless (or (eq a '&optional) (eq a '&rest))
                 (setq args (append args (list a)))))
             arglist)
-
       ;; construct and return command to simulate overlay keymap binding
       `(lambda ,(copy-sequence arglist)
-         ""                             ;,docstring
+         "" ;,docstring
          ,(copy-sequence interactive)
-         (completion-run-if-within-overlay
+         (completion--run-if-within-overlay
           (lambda ,(copy-sequence arglist) ,(copy-sequence interactive)
             (apply ',binding ,args))
           ',variable))
@@ -1651,14 +1002,280 @@ used if the current Emacs version lacks command remapping support."
 
    ;; anything else is an error
    (t (error (concat "Unexpected binding in "
-                     "`completion-construct-simulated-overlay-binding': %s")
-             binding))
-   )
+                     "`completion--construct-simulated-overlay-binding': %s")
+             binding))))
+
+
+
+
+;;; =================================================================
+;;;                     Setup default keymaps
+
+;; Set the default bindings for the keymap assigned to the completion
+;; overlays, if it hasn't been defined already (most likely in an init file).
+(unless completion-overlay-map
+  ;; Note: rebinding printable characters here is redundant if
+  ;;       `auto-completion-mode' is enabled, since they are also bound in
+  ;;       `auto-completion-map', but we still need to ensure that provisional
+  ;;       completions are correctly dealt with even if `auto-completion-mode'
+  ;;       is disabled.
+
+  ;; if we can remap commands, remap `self-insert-command' to
+  ;; `completion-self-insert'
+  (if (fboundp 'command-remapping)
+      (progn
+        (setq completion-overlay-map (make-sparse-keymap))
+        (define-key completion-overlay-map [remap self-insert-command]
+          'completion-self-insert))
+    ;; otherwise, create a great big keymap and rebind all printable
+    ;; characters to `completion-self-insert' manually
+    (setq completion-overlay-map (make-keymap))
+    (completion--bind-printable-chars completion-overlay-map
+				     'completion-self-insert))
+
+  ;; M-<tab> and M-/ cycle word at point
+  (define-key completion-overlay-map [?\M-\t] 'completion-cycle)
+  (define-key completion-overlay-map "\M-/" 'completion-cycle)
+  ;; M-<shift>-<tab> and M-? (usually M-<shift>-/) cycle backwards
+  (define-key completion-overlay-map "\M-?" 'completion-cycle-backwards)
+  (define-key completion-overlay-map [(meta shift iso-lefttab)]
+    'completion-cycle-backwards)
+  ;; C-RET accepts, C-DEL rejects
+  (define-key completion-overlay-map [(control return)] 'completion-accept)
+  (define-key completion-overlay-map [(control backspace)] 'completion-reject)
+  ;; <tab> does traditional tab-completion
+  (define-key completion-overlay-map "\t" 'completion-tab-complete)
+  ;; C-<tab> scoots ahead
+  (define-key completion-overlay-map [(control tab)]
+    'completion-extend-prefix)
+  ;; C-<space> abandons (C-<space> produces C-@ in terminals)
+  (define-key completion-overlay-map [?\C- ] 'completion-reject)
+  (define-key completion-overlay-map "\C-@" 'completion-reject)
+  ;; ;; remap the deletion commands
+  (completion--remap-delete-commands completion-overlay-map)
+  )
+
+
+;; Set the default bindings for the keymap assigned to the completion overlays
+;; in `auto-completion-mode', if it hasn't been defined already (most likely
+;; in an init file).
+(unless auto-completion-overlay-map
+  ;; inherit all keybindings from completion-overlay-map, then add
+  ;; auto-completion specific ones below
+  (setq auto-completion-overlay-map (make-sparse-keymap))
+  (set-keymap-parent auto-completion-overlay-map completion-overlay-map)
+
+  ;; M-<space> abandons and inserts a space
+  (define-key auto-completion-overlay-map "\M- "
+    (lambda (&optional arg)
+      "Reject any current provisional completion and insert a space."
+      (interactive "P")
+      (completion-reject arg)
+      (insert " ")))
+
+  ;; Note: the only reason we don't use
+  ;;       `completion-define-word-constituent-binding' here is that the
+  ;;       lambda expressions it creates wouldn't be byte-compiled. Anywhere
+  ;;       else, `completion-define-word-constituent-binding' should be used.
+
+  ;; M-S-<space> inserts a space as a word-constituent
+  (define-key auto-completion-overlay-map [?\M-\S- ]
+    (lambda ()
+      "Insert a space as though it were a word-constituent."
+      (interactive)
+      (auto-completion-self-insert ?\  ?w t)))
+
+  ;; M-. inserts "." as a word-constituent
+  (define-key auto-completion-overlay-map "\M-."
+    (lambda ()
+      "Insert \".\" as though it were a word-constituent."
+      (interactive)
+      (auto-completion-self-insert ?. ?w t)))
+
+  ;; M-- inserts "-" as a word-constituent
+  (define-key auto-completion-overlay-map "\M--"
+    (lambda ()
+      "Insert \"-\" as though it were a word-constituent."
+      (interactive)
+      (auto-completion-self-insert ?- ?w t)))
+
+  ;; M-\ inserts "\" as a word-constituent
+  (define-key auto-completion-overlay-map "\M-\\"
+    (lambda ()
+      "Insert \"\\\" as though it were a word-constituent."
+      (interactive)
+      (auto-completion-self-insert ?\\ ?w t)))
+
+;;;   ;; M-/ inserts "/" as a word-constituent
+;;;   (define-key auto-completion-overlay-map "\M-/"
+;;;     (lambda ()
+;;;       "Insert \"/\" as though it were a word-constituent."
+;;;       (interactive)
+;;;       (auto-completion-self-insert ?/ ?w t)))
+
+  ;; M-( inserts "(" as a word-constituent
+  (define-key auto-completion-overlay-map "\M-("
+    (lambda ()
+      "Insert \"(\" as though it were a word-constituent."
+      (interactive)
+      (auto-completion-self-insert ?\( ?w t)))
+
+  ;; M-( inserts ")" as a word-constituent
+  (define-key auto-completion-overlay-map "\M-)"
+    (lambda ()
+      "Insert \")\" as though it were a word-constituent."
+      (interactive)
+      (auto-completion-self-insert ?\) ?w t)))
+
+  ;; M-{ inserts "{" as a word-constituent
+  (define-key auto-completion-overlay-map "\M-{"
+    (lambda ()
+      "Insert \"{\" as though it were a word-constituent."
+      (interactive)
+      (auto-completion-self-insert ?{ ?w t)))
+
+  ;; M-} inserts "}" as a word-constituent
+  (define-key auto-completion-overlay-map "\M-("
+    (lambda ()
+      "Insert \"}\" as though it were a word-constituent."
+      (interactive)
+      (auto-completion-self-insert ?} ?w t)))
+
+  ;; if we can remap commands, remap `self-insert-command'
+  (if (fboundp 'command-remapping)
+      (define-key auto-completion-overlay-map
+	[remap self-insert-command]
+	'auto-completion-self-insert)
+    ;; otherwise, rebind all printable characters to
+    ;; `auto-completion-self-insert' manually
+    (completion--bind-printable-chars
+     auto-completion-overlay-map
+     'auto-completion-self-insert))
   )
 
 
 
+;; Set the default bindings for the keymap assigned to the completion overlays
+(unless completion-auto-update-overlay-map
+  ;; inherit all keybindings from completion-overlay-map, then add
+  ;; completion-auto-update specific ones below
+  (setq completion-auto-update-overlay-map (make-sparse-keymap))
+  (set-keymap-parent completion-auto-update-overlay-map
+		     completion-overlay-map)
+  ;; if we can remap commands, remap `self-insert-command'
+  (if (fboundp 'command-remapping)
+      (define-key completion-auto-update-overlay-map
+	[remap self-insert-command]
+	'completion-auto-update-self-insert)
+    ;; otherwise, rebind all printable characters to
+    ;; `auto-completion-self-insert' manually
+    (completion--bind-printable-chars
+     completion-auto-update-overlay-map
+     'completion-auto-update-self-insert)))
 
+
+
+;; Set the default keymap if it hasn't been defined already (most likely in an
+;; init file). This keymap is active whenever `completion-ui--activated' is
+;; non-nil.
+(unless completion-map
+  ;; If the current Emacs version doesn't support overlay keybindings
+  ;; half decently and doesn't support command remapping, we're going to
+  ;; have to bind all printable characters in this keymap, so we might as
+  ;; well create a full keymap
+  (if (and (<= emacs-major-version 21)
+           (not (fboundp 'command-remapping)))
+      (setq completion-map (make-keymap))
+    (setq completion-map (make-sparse-keymap)))
+
+  ;; ;; M-<tab> and M-/ cycle or complete word at point
+  ;; (define-key completion-map [?\M-\t] 'complete-or-cycle-word-at-point)
+  ;; (define-key completion-map "\M-/" 'complete-or-cycle-word-at-point)
+  ;; ;; M-<shift>-<tab> and M-? (usually M-<shift>-/) cycle backwards
+  ;; (define-key completion-map [(meta shift iso-lefttab)]
+  ;;   'complete-or-cycle-backwards-word-at-point)
+  ;; (define-key completion-map "\M-?"
+  ;;   'complete-or-cycle-backwards-word-at-point)
+
+  ;; RET deals with any pending completion candidate, then runs
+  ;; whatever is usually bound to RET.
+  ;; Note: although this uses `completion--run-if-within-overlay', it is
+  ;;       not a hack to work-around poor overlay keybinding
+  ;;       support. Rather, we are using it to run
+  ;;       `completion--resolve-current' and then run the normal RET
+  ;;       keybinding. We bind it here instead of in the overlay keymap
+  ;;       because it's easier to disable this keymap.
+  (dolist (key '("\r" "\n" [return]))
+    (define-key completion-map key 'completion-resolve-then-run-command))
+
+  ;; remap the deletion commands
+  (completion--remap-delete-commands completion-map)
+
+  ;; remap `fill-paragraph', or rebind M-q if we can't remap
+  (if (fboundp 'command-remapping)
+      (define-key completion-map [remap fill-paragraph]
+	'completion-fill-paragraph)
+    (define-key completion-map "\M-q" 'completion-fill-paragraph))
+
+  ;; if we can remap commands, remap `self-insert-command' to
+  ;; `completion-self-insert'
+  (if (fboundp 'command-remapping)
+      (define-key completion-map [remap self-insert-command]
+	'completion-self-insert)
+    ;; otherwise, rebind all printable characters to
+    ;; `completion-self-insert' manually
+    (completion--bind-printable-chars completion-map 'completion-self-insert))
+  )
+
+
+;; make sure completion-map is associated with `completion-ui--activated' in
+;; the minor-mode-keymap-alist, so that the bindings are enabled whenever
+;; Completion-UI is loaded
+(let ((existing (assq 'completion-ui--activated minor-mode-map-alist)))
+  (if existing
+      (setcdr existing completion-map)
+    (push (cons 'completion-ui--activated completion-map)
+          minor-mode-map-alist)))
+
+
+
+;; Set the default auto-completion-mode keymap if it hasn't been defined
+;; already (most likely in an init file). This keymap is active when
+;; `auto-completion-mode' is enabled.
+(unless auto-completion-map
+  ;; if we can remap commands, remap `self-insert-command' and
+  ;; `mouse-yank-at-click'
+  (if (fboundp 'command-remapping)
+      (progn
+        (setq auto-completion-map (make-sparse-keymap))
+        (define-key auto-completion-map [remap self-insert-command]
+          'auto-completion-self-insert)
+	(define-key auto-completion-map [remap mouse-yank-at-click]
+	  'auto-completion-mouse-yank-at-click))
+    ;; otherwise, create a great big keymap where all printable characters run
+    ;; `auto-completion-self-insert', which decides what to do based on the
+    ;; character's syntax
+    (setq auto-completion-map (make-keymap))
+    (completion--bind-printable-chars auto-completion-map
+                                     'auto-completion-self-insert)
+    (define-key auto-completion-map [mouse-2]
+      'auto-completion-mouse-yank-at-click)
+    (define-key auto-completion-map [left-fringe mouse-2]
+      'auto-completion-mouse-yank-at-click)
+    (define-key auto-completion-map [right-fringe mouse-2]
+      'auto-completion-mouse-yank-at-click))
+  ;; remap the deletion commands
+  (completion--remap-delete-commands auto-completion-map)
+  ;; remap `fill-paragraph', or rebind M-q if we can't remap
+  (if (fboundp 'command-remapping)
+      (define-key auto-completion-map [remap fill-paragraph]
+	'completion-fill-paragraph)
+    (define-key auto-completion-map "\M-q" 'completion-fill-paragraph))
+  )
+
+
+
+
 ;;; ================================================================
 ;;;                Replacements for CL functions
 
@@ -1673,121 +1290,52 @@ If START or END is negative, it counts from the end."
       (setq end (or len (setq len (length list)))))
     (when (< start 0)
       (setq start (+ start (or len (length list)))))
-
     ;; construct sub-list
     (let (res)
       (while (< start end)
         (push (nth start list) res)
         (setq start (1+ start)))
-      (nreverse res)))
-  )
-
+      (nreverse res))))
 
 
 (defun completion--position (item list)
   "Find the first occurrence of ITEM in LIST.
 Return the index of the matching item, or nil of not found.
 Comparison is done with 'equal."
-  (let (el (i 0))
+  (let ((i 0))
     (catch 'found
-      (while (setq el (nth i list))
-        (when (equal item el) (throw 'found i))
-        (setq i (1+ i))
-        nil)))
-  )
+      (while (progn
+	       (when (equal item (car list)) (throw 'found i))
+	       (setq i (1+ i))
+	       (setq list (cdr list))))
+      nil)))
 
 
-;;; ================================================================
-;;;                Interface abstraction macros
-
-(defun completion-lookup-behaviour (&optional char syntax)
-  "Return syntax-dependent behaviour
-of character CHAR and/or syntax-class SYNTAX. At least one of
-these must be supplied. If both are supplied, SYNTAX overrides the
-syntax-class of CHAR."
-
-  ;; SYNTAX defaults to syntax-class of CHAR
-  (when (and char (not syntax)) (setq syntax (char-syntax char)))
-
-  ;; get syntax alists
-  (let ((syntax-alist
-         (if (fboundp 'auto-overlay-local-binding)
-             (auto-overlay-local-binding
-              'auto-completion-syntax-alist)
-           auto-completion-syntax-alist))
-        (override-alist
-         (if (fboundp 'auto-overlay-local-binding)
-             (auto-overlay-local-binding
-              'auto-completion-override-syntax-alist)
-           auto-completion-override-syntax-alist))
-        behaviour)
-
-    ;; if `auto-completion-syntax-alist' is a predefined behaviour (a
-    ;; cons cell), convert it to an alist
-    (unless (listp (car syntax-alist))
-      (setq syntax-alist
-            `( ;; word constituents add to current completion and
-              ;; complete word or string, depending on VALUE
-              (?w . (add ,(cdr syntax-alist)))
-              ;; symbol constituents, whitespace and punctuation
-              ;; characters either accept or reject, depending on
-              ;; VALUE, and don't complete
-              (?_ .  (,(car syntax-alist) none))
-              (?  .  (,(car syntax-alist) none))
-              (?. .  (,(car syntax-alist) none))
-              (?\( . (,(car syntax-alist) none))
-              (?\) . (,(car syntax-alist) none))
-              ;; anything else rejects and does't complete
-              (t . (reject none)))
-            ))
-
-    ;; extract behaviours from syntax alists
-    (setq behaviour (or (when char (cdr (assq char override-alist)))
-                        (cdr (assq syntax syntax-alist))
-                        (cdr (assq t syntax-alist))))
-    (when (= (length behaviour) 2)
-      (setq behaviour (append behaviour '(t))))
-
-    behaviour)                          ; return behaviour
-  )
+(defun completion-ui--merge (seq1 seq2 predicate)
+  "Destructively merge two lists to produce a new list.
+SEQ1 and SEQ2 are the two argument lists, and PREDICATE is a
+`less-than' predicate on the elements.
+\n(fn SEQ1 SEQ2 PREDICATE)"
+  (or (listp seq1) (setq seq1 (append seq1 nil)))
+  (or (listp seq2) (setq seq2 (append seq2 nil)))
+  (let ((res nil))
+    (while (and seq1 seq2)
+      (if (funcall predicate (car seq2) (car seq1))
+	  (push (pop seq2) res)
+	  (push (pop seq1) res)))
+    (nconc (nreverse res) seq1 seq2)))
 
 
 
-(defmacro completion-get-resolve-behaviour (behaviour)
-  "Extract syntax-dependent resolve behaviour from BEHAVIOUR.
-BEHAVIOUR should be the return value of a call to
-`completion-lookup-behaviour'."
-  `(nth 0 ,behaviour))
+;;; =======================================================
+;;;         Compatibility functions and aliases
 
-
-(defmacro completion-get-completion-behaviour (behaviour)
-  "Extract syntax-dependent completion behaviour from BEHAVIOUR.
-BEHAVIOUR should be the return value of a call to
-`completion-lookup-behaviour'."
-  `(nth 1 ,behaviour))
-
-
-(defmacro completion-get-insertion-behaviour (behaviour)
-  "Extract syntax-dependent insertion behaviour from BEHAVIOUR.
-BEHAVIOUR should be the return value of a call to
-`completion-lookup-behaviour'."
-  `(nth 2 ,behaviour))
+(unless (fboundp 'characterp)
+  (defalias 'characterp 'char-valid-p))
 
 
 
-;;; ======================================================
-;;;                    Other macros
-
-(defmacro completion-call-completion-function (f p &optional n)
-  ;; call function F to get N (all if N is null) completions of prefix P,
-  ;; stripping P from the returned strings if `completion-includes-prefix' is
-  ;; non-nil
-  `(if (and completion-includes-prefix (not completion-replaces-prefix))
-       (mapcar (lambda (c) (substring c (length ,p))) (funcall ,f ,p ,n))
-     (funcall ,f ,p ,n)))
-
-
-
+
 ;;; =======================================================
 ;;;         Auto-completion minor-mode definition
 
@@ -1799,713 +1347,1848 @@ A negative prefix argument turns it off.
 
 In auto-completion-mode, Emacs will try to complete words as you
 type, using whatever completion method has been set up (either by the
-major mode, or by another minor mode)."
-  nil                                   ; init-value
-  " Complete"                           ; lighter
-  auto-completion-map                   ; keymap
-  )
+major mode, or by another minor mode).
 
+`auto-completion-source' must be set for `auto-completion-mode'
+to work."
+  nil                   ; init-value
+  " Complete"           ; lighter
+  auto-completion-map   ; keymap
+
+  (cond
+   ;; refuse to enable if no source is defined
+   ((and auto-completion-mode (null auto-completion-source))
+    (setq auto-completion-mode nil)
+    (message (concat "`auto-completion-source' is not set; "
+		     "auto-completion-mode NOT enabled")))
+
+   ;; run appropriate hook when `auto-completion-mode' is enabled/disabled
+   (auto-completion-mode
+    (add-hook 'before-change-functions 'completion-resolve-before-undo nil t)
+    (run-hooks 'auto-completion-mode-enable-hook))
+   ((not auto-completion-mode)
+    (remove-hook 'before-change-functions 'completion-resolve-before-undo t)
+    (run-hooks 'auto-completion-mode-disable-hook))))
 
 
 (defun turn-on-auto-completion-mode ()
   "Turn on auto-completion mode. Useful for adding to hooks."
-  (unless auto-completion-mode (auto-completion-mode))
-  )
+  (unless auto-completion-mode (auto-completion-mode)))
+
+
+(defvar auto-completion-mode-enable-hook nil
+  "Hook run when `auto-completion-mode' is enabled.")
+
+(defvar auto-completion-mode-disable-hook nil
+  "Hook run when `auto-completion-mode' is disabled.")
 
 
 
-
+
 ;;; =======================================================
-;;;              User-interface functions
+;;;              Modularized user interfaces
 
-(defun complete-in-buffer (&optional prefix auto pos)
-  "Complete PREFIX, or prefix at point if none specified.
+(defmacro completion-ui--interface-name (def)
+  `(car ,def))
 
-If AUTO is non-nil, assume we're auto-completing and respect
-settings of `auto-completion-min-chars' and
-`auto-completion-delay'.
+(defmacro completion-ui--interface-variable (def)
+  `(cadr ,def))
 
-If POS is non-nil, only complete if point is at POS (only used
-internally)."
+(defmacro completion-ui--interface-activate-function (def)
+  `(nth 2 ,def))
+
+(defmacro completion-ui--interface-deactivate-function (def)
+  `(nth 3 ,def))
+
+(defmacro completion-ui--interface-update-function (def)
+  `(plist-get ,def :update))
+
+(defmacro completion-ui--interface-auto-show (def)
+  `(plist-get ,def :auto-show))
+
+(defmacro completion-ui--interface-auto-show-helper (def)
+  `(plist-get ,def :auto-show-helper))
+
+
+
+(defmacro* completion-ui-register-interface
+    (name &key activate deactivate
+	  variable update auto-show auto-show-helper first)
+  "Register a Completion-UI user-interface.
+
+\(Note that none of the arguments should be quoted.\)
+
+NAME is the name (a symbol) of the new user-interface, which will
+appear in customization options.
+
+The following two keyword arguments are mandatory:
+
+:activate FUNCTION
+        The function called to activate the user-interface. It
+        should take one argument, a completion overlay, and do
+        whatever is necessary to activate the user-interface for
+        that completion. The return value is ignored.
+
+:deactivate FUNCTION
+        The function called to deactivate the user-interface. It
+        should take one argument, a completion overlay, and do
+        whatever is necessary to deactivate the user-interface
+        for that completion. The return value is ignored.
+
+
+The following optional keywords are also meaningful:
+
+:variable SYMBOL
+        The name of the customization variable used to enable the
+        interface. Defaults to `completion-ui-use-<name>'. It is
+        good practice to follow this naming convention if
+        supplying your own variable name explicitly.
+
+        A defcustom is created automatically with the default
+        variable name if no :variable argument is supplied.
+        *No* defcustom is created if a variable name is is
+        supplied.
+
+:first BOOLEAN
+        A non-nil value causes the new user-interface to be added
+        at the beginning of the list of interfaces. The default
+        is to add it at the end. Interfaces functions are called
+        in the order they appear in the list of definitions.
+
+        Note that this has no effect if a interface called NAME
+        is already defined, in which case the new definition
+        replaces the old one at the same location in the list as
+        before.
+
+
+The remaining optional keyword arguments specify functions to
+call in various circumstances that might require updating the
+user-interface. They are all passed a single argument, a
+completion overlay for the current completion.
+
+:update FUNCTION
+        A function to call to update the user-interface after a
+        change to that completion. If it is not specified, the
+        interface is updated by calling the :deactivate function,
+        updating the overlay, then calling the :activate
+        function.
+
+:auto-show FUNCTION
+        A function to call to activate a this user-interface as
+        an auto-show interface. The auto-show interface is chosen
+        by setting the `completion-auto-show' customization
+        option. Only one auto-show interface can be displayed at
+        any one time.
+
+:auto-show-helper FUNCTION
+        A function to call whenever any auto-show interface is
+        activated for a completion."
+
+  ;; remove `quote' from arguments
+  (when (and (listp name) (eq (car name) 'quote))
+    (setq name (cadr name)))
+  (when (and (listp variable) (eq (car variable) 'quote))
+    (setq variable (cadr variable)))
+  (when (and (listp activate) (eq (car activate) 'quote))
+    (setq activate (cadr activate)))
+  (when (and (listp deactivate) (eq (car deactivate) 'quote))
+    (setq deactivate (cadr deactivate)))
+  (when (and (listp update) (eq (car update) 'quote))
+    (setq update (cadr update)))
+  (when (and (listp auto-show) (eq (car auto-show) 'quote))
+    (setq auto-show (cadr auto-show)))
+  (when (and (listp auto-show-helper) (eq (car auto-show-helper) 'quote))
+    (setq auto-show-helper (cadr auto-show-helper)))
+
+  ;; sanity-check arguments
+  (unless (symbolp name)
+    (error "completion-ui-register-interface: invalid name %s" name))
+;; (unless (functionp activate)
+  ;;   (error "completion-ui-register-interface: invalid activate function %s"
+  ;; 	   activate))
+  ;; (unless (functionp activate)
+  ;;   (error "completion-ui-register-interface: invalid deactivate function %s"
+  ;; 	   deactivate))
+
+  ;; construct interface definiton
+  (let* ((var (or variable
+		  (intern (concat "completion-ui-use-" (symbol-name name)))))
+	 (interface-def
+	  (cons name (nconc
+		      (list var activate deactivate)
+		      (when update (list :update update))
+		      (when auto-show (list :auto-show auto-show))
+		      (when auto-show-helper
+			(list :auto-show-helper auto-show-helper))))))
+
+    ;; construct code to add interface definition to list (or replace existing
+    ;; definition)
+    `(progn
+       (let ((existing (assq ',name completion-ui-interface-definitions)))
+	 (if (not existing)
+	     (add-to-list 'completion-ui-interface-definitions
+			  ',interface-def ,(not first))
+	   (message ,(concat
+		      "Completion-UI interface named "
+		      (symbol-name name)
+		      " already registered - replacing existing definition"))
+	   (setcdr existing ',(cdr interface-def))))
+
+       ;; generate defcustom for variable used to enable interface
+       ,(unless variable
+	  `(completion-ui-defcustom-per-source ,var nil
+	     ,(concat "When non-nil, enable the " (symbol-name name)
+		      " Completion-UI interface.")
+	     :group 'completion-ui
+	     :type 'boolean))
+
+       ;; update choices in `completion-auto-show' defcustom
+       ,(if auto-show
+	    `(let* ((type (get 'completion-auto-show 'custom-type))
+		    (global-choices (cadr type))
+		    (source-choices (plist-get (cdaddr type) :value-type)))
+	       (unless (member '(const :tag ,(symbol-name name) ,auto-show)
+			       global-choices)
+		 (nconc global-choices
+			'((const :tag ,(symbol-name name) ,auto-show))))
+	       (unless (member '(const :tag ,(symbol-name name) ,auto-show)
+			       source-choices)
+		 (nconc source-choices
+			'((const :tag ,(symbol-name name) ,auto-show)))))
+	  `(let* ((type (get 'completion-auto-show 'custom-type))
+		  (global-choices (caadr type))
+		  (source-choices (plist-get (cdaddr type) :value-type)))
+	     (delete '(const :tag ,(symbol-name name) ,auto-show)
+		     global-choices)
+	     (delete '(const :tag ,(symbol-name name) ,auto-show)
+		   source-choices)))
+       )))
+
+
+
+(defmacro completion-ui-interface-enabled-p (interface-def source)
+  ;; Returns non-nil when interface defined by INTERFACE-def is enabled,
+  ;; nil otherwise
+  `(completion-ui-get-value-for-source
+    overlay (completion-ui--interface-variable ,interface-def)))
+
+
+(defmacro completion-ui-interface-activate (interface-def overlay)
+  ;; Activate interface defined by INTERFACE-DEF for completion OVERLAY
+  `(let ((func (completion-ui--interface-activate-function ,interface-def)))
+     (when (functionp func) (funcall func ,overlay))))
+
+
+(defmacro completion-ui-interface-deactivate (interface-def overlay)
+  ;; Activate interface defined by INTERFACE-DEF for completion OVERLAY
+  `(let ((func (completion-ui--interface-deactivate-function ,interface-def)))
+     (when (functionp func) (funcall func ,overlay))))
+
+
+(defmacro completion-ui-activate-interfaces (overlay)
+  ;; Activate all enabled user-interfaces for current completion OVERLAY
+  `(dolist (interface-def completion-ui-interface-definitions)
+     (when (completion-ui-interface-enabled-p interface-def overlay)
+       (completion-ui-interface-activate interface-def ,overlay))))
+
+
+(defmacro completion-ui-deactivate-interfaces (overlay)
+  ;; Deactivate all enabled user-interfaces for current completion OVERLAY.
+  `(dolist (interface-def completion-ui-interface-definitions)
+     (when (completion-ui-interface-enabled-p interface-def overlay)
+       (completion-ui-interface-deactivate interface-def ,overlay))))
+
+
+(defmacro completion-ui-deactivate-interfaces-pre-update (overlay)
+  ;; Deactivate all non-updatable interfaces
+  `(dolist (interface-def completion-ui-interface-definitions)
+     (when (and (completion-ui-interface-enabled-p interface-def overlay)
+		(not (completion-ui--interface-update-function
+		      interface-def)))
+       (completion-ui-interface-deactivate interface-def ,overlay))))
+
+
+(defmacro completion-ui-update-interfaces (overlay)
+  ;; Run update interfaces, falling back to activating them
+  `(let (func)
+     (dolist (interface-def completion-ui-interface-definitions)
+       (when (completion-ui-interface-enabled-p interface-def overlay)
+	 (if (setq func (completion-ui--interface-update-function
+			 interface-def))
+	     (when (functionp func) (funcall func ,overlay))
+	   (completion-ui-interface-activate interface-def ,overlay))))))
+
+
+(defmacro completion-ui-activate-auto-show-interface (overlay)
+  ;; Activate auto-show interface for current completion OVERLAY.
+  `(funcall
+    (completion-ui--interface-auto-show
+     (assq (completion-ui-get-value-for-source
+	    overlay completion-auto-show)
+	   completion-ui-interface-definitions))
+    overlay))
+
+
+(defun completion-ui-call-auto-show-interface-helpers (overlay)
+  ;; Call auto-show-helpers
+  (let (func)
+     (dolist (interface-def completion-ui-interface-definitions)
+       (when (and (completion-ui-interface-enabled-p interface-def overlay)
+		  (setq func (completion-ui--interface-auto-show-helper
+			      interface-def)))
+	 (funcall func overlay)))))
+
+
+(defmacro completion-ui-deactivate-auto-show-interface (overlay)
+  ;; Deactivate auto-show interface for current completion OVERLAY.
+  `(completion-ui-interface-deactivate
+    (assq (overlay-get ,overlay 'auto-show)
+	  completion-ui-interface-definitions))
+  `(overlay-put ,overlay 'auto-show nil))
+
+
+
+
+;;; =======================================================
+;;;           Modularized source definitions
+
+(defmacro completion-ui--source-def-name (def)
+  `(car ,def))
+
+(defmacro completion-ui--source-def-completion-function (def)
+  `(cadr ,def))
+
+(defmacro completion-ui--source-def-non-prefix-completion (def)
+  `(plist-get ,def :non-prefix-completion))
+
+(defmacro completion-ui--source-def-prefix-function (def)
+  `(plist-get ,def :prefix-function))
+
+(defmacro completion-ui--source-def-word-thing (def)
+  `(plist-get ,def :word-thing))
+
+(defmacro completion-ui--source-def-accept-functions (def)
+  `(plist-get ,def :accept-functions))
+
+(defmacro completion-ui--source-def-reject-functions (def)
+  `(plist-get ,def :reject-functions))
+
+(defmacro completion-ui--source-def-tooltip-function (def)
+  `(plist-get ,def :tooltip-function))
+
+(defmacro completion-ui--source-def-popup-tip-function (def)
+  `(plist-get ,def :popup-tip-function))
+
+(defmacro completion-ui--source-def-popup-frame-function (def)
+  `(plist-get ,def :popup-frame-function))
+
+(defmacro completion-ui--source-def-menu-function (def)
+  `(plist-get ,def :menu))
+
+(defmacro completion-ui--source-def-browser-function (def)
+  `(plist-get ,def :browser))
+
+(defmacro completion-ui--frequency-hash-table-name (name sort-by-frequency)
+  (cond
+   ((eq sort-by-frequency 'source)
+    `(concat "completion-ui--" (symbol-name ,name) "-frequency"))
+   (t "completion-ui--frequency-data")))
+
+
+(defvar completion-ui-register-source-functions nil
+  "Hook called after registering a new completion source.
+
+All arguments to the `completion-ui-register-source' call are
+passed on to the hook functions.")
+
+
+(defvar completion-ui--frequency-data (make-hash-table :test 'equal))
+
+
+(defmacro* completion-ui-register-source
+    (completion-function &rest args
+     &key name completion-args other-args
+     non-prefix-completion prefix-function word-thing
+     command-name no-command no-auto-completion
+     accept-functions reject-functions sort-by-frequency
+     tooltip-function popup-tip-function popup-frame-function menu browser
+     &allow-other-keys)
+  "Register a Completion-UI source.
+
+\(Note that none of the arguments should be quoted.\)
+
+COMPLETION-FUNCTION should be a function that takes either zero
+arguments, one argument, or one mandatory and one optional
+argument.
+
+If COMPLETION-FUNCTION takes zero arguments, it should return a
+list of completion candidates for whatever is at point. In this
+case, you will almost certainly need to supply a :prefix-function
+or :word-thing (see below).
+
+If COMPLETION-FUNCTION takes one argument, it is passed the
+prefix to complete, and should return a list of completion
+candidates for that prefix.
+
+If COMPLETION-FUNCTION takes two arguments, the second one must
+be an optional argument. It is passed the prefix to complete in
+the first argument. The second argument may be used to specify
+the maximum number of completion candidates to return. If it is
+nil, all possible candidates should be returned.
+
+The following keyword arguments are useful when using a
+COMPLETION-FUNCTION that takes additional arguments that should
+be ignored by Completion-UI.
+
+:completion-args NUMBER|LIST
+         If set to 0, 1 or 2, COMPLETION-FUNCTION will be passed
+         that many arguments, as described above, and as many
+         null values will be added to the end of the argument
+         list as necessary to fill any remaining mandatory
+         arguments (but see :other-args, below).
+
+         If set to a list of integers, it specifies *which*
+         arguments of COMPLETION-FUNCTION to use. The argument
+         list will be padded with null values as necessary to
+         fill the missing arguments and any remaining mandatory
+         arguments (but see :other-args, below).
+
+:other-args LIST
+         Can be used to pass something other than nil to the
+         other arguments of COMPLETION-FUNCTION not being used by
+         Completion-UI. The values are taken sequentially from
+         the list.
+
+
+The following keyword arguments are also meaningful:
+
+:name SYMBOL
+         Set the name (symbol) for the source, which will appear in
+         customization options. The default is to construct the
+         source name from COMPLETION-FUNCTION, removing
+         \"completion-ui-\" or \"completion-\" from the front if
+         present.
+
+:no-auto-completion BOOLEAN
+         Don't make this source available as a possible
+         `auto-completion-default-source' customization
+         choice. Default is to add the new source to the
+         available choices.
+
+:no-command BOOLEAN
+         Don't define a new interactive command for this
+         source. Default is to automatically define a new
+         interactive command called `complete-<name>' which
+         completes the prefix at point using the new source.
+         (See also :command-name keyword, below.)
+
+:command-name SYMBOL
+         Override the default interactive command
+         name (cf. :no-command keyword, above).
+
+:prefix-function FUNCTION
+         Function to call to return the prefix to complete at
+         point. Defaults to `completion-prefix', which uses
+         `thing-at-point' to find the prefix (see :word-thing
+         keyword, below).
+
+:word-thing SYMBOL
+         The `thing-at-point' \"thing\" to use when determining
+         the prefix to complete using the default
+         `completion-prefix' function (see :prefix-function
+         keyword, above). Note that we require `forward-op' to be
+         defined for :word-thing, which is *not* the case for all
+         pre-defined \"things\" in `thing-at-point'.
+
+:non-prefix-completion BOOLEAN
+        A non-nil value specified that this completion source
+        does something other than prefix completion
+        \(e.g. searching for regular expression matches\), so
+        that the \"prefix\" is instead interpreted as some kind
+        of pattern used to find matches, and the completions
+        should *replace* that prefix when selected. Completion-UI
+        will adapt the user-interface appropriately.
+
+:accept-functions FUNCTION|LIST
+        A function or list of functions to call when a completion
+        obtained using this source is accepted. The functions are
+        passed three arguments: the prefix, the completion
+        candidate that was accepted or rejected, and any prefix
+        argument supplied by the user if the accept command was
+        called interactively.
+
+:reject-functions FUNCTION|LIST
+        A function or list of functions to call when a completion
+        obtained using this source is rejected. The functions are
+        passed three arguments: the prefix, the completion
+        candidate that was rejected, and any prefix argument
+        supplied by the user if the accept command was called
+        interactively.
+
+:sort-by-frequency SYMBOL
+        A non-nil value causes completions from this source to be
+        sorted by frequency. Completion-UI will record usage
+        frequency data for this source, and automatically sort
+        its completions by frequency. If set to the symbol
+        `global', frequency data will be pooled with data from
+        other completion sources. If set to the symbol `source',
+        frequency data will be accumulated separately for this
+        source. (Any other non-nil value defaults to `source'.)
+
+
+The remaining optional keyword arguments override the default
+methods for constructing the completion tooltip, popup-tip,
+pop-up frame, menu, and browser menu.
+
+:tooltip-function FUNCTION
+        Function to call to construct the completion tooltip for
+        this source. It is passed one argument, a completion
+        overlay, and should return the text to display in the
+        tooltip as a string.
+
+:popup-tip-function  FUNCTION
+        As for :tooltip-function, but used to construct the
+        popup-tip.
+
+:popup-frame-function FUNCTION
+        Function to call to construct the completion tooltip for
+        this source. It is passed one argument, a completion
+        overlay, and should return a list of strings, each a line
+        of text for the pop-up frame.
+
+:menu KEYMAP|FUNCTION
+        Either a fixed menu keymap, or a function to call to
+        construct the completion menu for this source. The
+        function is passed one argument, a completion overlay,
+        and should return a menu keymap.
+
+:browser KEYMAP|FUNCTION
+        As for :menu, but used to construct the completion
+        browser.
+
+
+The special hook `completion-ui-register-source-functions' is
+called after registering the completion source.
+
+Arbitrary additional keyword arguments can be passed in the
+argument list. These have no effect in
+`completion-ui-register-source', but they are passed on to the
+functions called from the
+`completion-ui-register-source-functions' hook."
+
+  ;; make ACCEPT-FUNCTIONS and REJECT-FUNCTIONS into lists
+  (when accept-functions
+    (unless (and (listp accept-functions)
+		 (not (eq (car accept-functions) 'lambda))
+		 (not (eq (car accept-functions) 'function)))
+      (setq accept-functions (list accept-functions))))
+  (when reject-functions
+    (unless (and (listp reject-functions)
+		 (not (eq (car reject-functions) 'lambda))
+		 (not (eq (car reject-functions) 'function)))
+      (setq reject-functions (list reject-functions))))
+
+
+  ;; construct source name from completion-function if not defined explicitly
+  (unless name
+    (setq name (symbol-name completion-function))
+    (if (string-match "^completion-ui-+" name)
+	(setq name (substring name (match-end 0)))
+      (when (string-match "^completion-+" name)
+	(setq name (substring name (match-end 0)))))
+    (setq name (intern name)))
+  ;; construct command name from source name if not defined explicitly
+  (unless command-name
+    (setq command-name (intern (concat "complete-" (symbol-name name)))))
+
+  ;; sort out COMPLETION-ARGS
+  (cond
+   ;; no COMPLETION-ARGS: infer arguments from function definition
+   ((null completion-args)
+    (let* ((funcdef (cond
+		     ((symbolp completion-function)
+		      (symbol-function completion-function))
+		     ((functionp completion-function)
+		      completion-function)))
+ 	   (arglist (cond
+ 		     ;; compiled function
+ 		     ((byte-code-function-p funcdef)
+ 		      (aref funcdef 0))
+ 		     ;; uncompiled function
+ 		     ((and (listp funcdef) (eq (car funcdef) 'lambda))
+ 		      (nth 1 funcdef))
+ 		     (t (error "completion-ui-register-source:\
+ missing :completion-args or invalid completion function, %s"
+ 			       completion-function)))))
+      (cond
+       ((= (length arglist) 0) (setq completion-args '()))
+       ((= (length arglist) 1) (setq completion-args '(0)))
+       ((and (= (length arglist) 3) (eq (nth 1 arglist) '&optional))
+ 	(setq completion-args '(0 1)))
+       (t (error "completion-ui-register-source: missing :completion-args\
+ or invalid completion function, %s" completion-function)))))
+   ;; numerical COMPLETION-ARGS: convert to list
+   ((numberp completion-args)
+    (cond
+     ((= completion-args 0) (setq completion-args '()))
+     ((= completion-args 1) (setq completion-args '(0)))
+     ((= completion-args 2) (setq completion-args '(0 1)))))
+   ;; COMPLETION-ARGS list: sanity check
+   ((and (listp completion-args)
+ 	 (>= (length completion-args) 0)
+ 	 (<= (length completion-args) 2)))
+   ;; anything else: we're too confused to carry on!
+   (t (error "completion-ui-register-source: invalid :completion-args, %s"
+ 	     completion-args)))
+
+  ;; construct argument list for COMPLETION-FUNCTION
+  (let ((argnames '(prefix maxnum))
+  	(cmplstack completion-args)
+  	(otherstack other-args)
+  	(arg 0) arglist)
+    (while cmplstack
+      (dotimes (i (- (car cmplstack) arg 1))
+  	(push (when otherstack (pop otherstack)) arglist))
+      (push (pop argnames) arglist)
+      (setq arg (pop cmplstack)))
+    (while otherstack (push (pop otherstack) arglist))
+    (setq arglist (nreverse arglist))
+
+    ;; if we're NOT recording and sorting by frequency data...
+    (if (null sort-by-frequency)
+	;; construct wrapper around COMPLETION-FUNCTION if necessary
+	(cond
+	 ;; no maxnum argument
+	 ((or (= (length completion-args) 0)
+	      (= (length completion-args) 1))
+	  (setq completion-function
+		`(lambda (prefix &optional maxnum)
+		   (let ((completions (,completion-function ,@arglist)))
+		     (if maxnum
+			 (butlast completions (- (length completions) maxnum))
+		       completions)))))
+	 ;; maxnum argument present, additional args required
+	 ((and (= (length completion-args) 2)
+	       (or other-args (not (= (nth 1 completion-args) 1))))
+	  (setq completion-function
+		`(lambda (prefix &optional maxnum)
+		   (,completion-function ,@arglist))))
+	 ;; maxnum argument present, no additional args required - leave
+	 ;; COMPLETION-FUNCTION as is
+	 )
+
+      ;; if we ARE recording and sorting by frequency data...
+      (let ((hash-table-name
+	     (intern (completion-ui--frequency-hash-table-name
+		      name sort-by-frequency))))
+	;; construct wrapper around COMPLETION-FUNCTION
+	(cond
+	 ;; no maxnum argument
+	 ((or (= (length completion-args) 0)
+	      (= (length completion-args) 1))
+	  (setq completion-function
+		`(lambda (prefix &optional maxnum)
+		   (let ((completions
+			  (sort (,completion-function ,@arglist)
+				(lambda (a b)
+				  (> (gethash a ,hash-table-name 0)
+				     (gethash b ,hash-table-name 0))))))
+		     (if maxnum
+			 (butlast completions (- (length completions) maxnum))
+		       completions)))))
+	 ;; maxnum argument present (with or without additional args)
+	 (t
+	  (setq completion-function
+		`(lambda (prefix &optional maxnum)
+		   (sort (,completion-function ,@arglist)
+			 (lambda (a b)
+			   (> (gethash a ,hash-table-name 0)
+			      (gethash b ,hash-table-name 0))))))))
+	;; add an accept function that increments the frequency
+	(push `(lambda (prefix completion arg)
+		 (puthash completion
+			  (1+ (gethash completion ,hash-table-name 0))
+			  ,hash-table-name))
+	      accept-functions)
+	)))
+
+
+  ;; construct interface definiton
+  (let ((source-def
+	 (cons name
+	       (append
+		(list completion-function)
+		(when non-prefix-completion
+		  (list :non-prefix-completion non-prefix-completion))
+		(when prefix-function
+		  (list :prefix-function prefix-function))
+		(when word-thing
+		  (list :word-thing word-thing))
+		(when accept-functions
+		  (list :accept-functions accept-functions))
+		(when reject-functions
+		  (list :reject-functions reject-functions))
+		(when tooltip-function
+		  (list :tooltip-function tooltip-function))
+		(when popup-tip-function
+		  (list :popup-tip-function tooltip-function))
+		(when popup-frame-function
+		  (list :popup-frame-function popup-frame-function))
+		(when menu (list :menu menu))
+		(when browser (list :browser browser))))))
+
+    `(progn
+       ;; construct code to add source definition to list (or replace existing
+       ;; definition)
+       (let ((existing (assq ',name completion-ui-source-definitions)))
+	 (if (not existing)
+	     (push ',source-def completion-ui-source-definitions)
+	   (message "Completion-UI source `%s' already registered\
+ - replacing existing definition" ',name)
+	   (setcdr existing ',(cdr source-def))))
+
+       ;; if gathering separate frequency data for this source, create hash
+       ;; table to store frequency data
+       ,(when (eq sort-by-frequency 'source)
+	  (let ((hash-table-name
+		 (intern (completion-ui--frequency-hash-table-name
+			  name sort-by-frequency))))
+	    `(defvar ,hash-table-name (make-hash-table :test 'equal))))
+
+       ;; construct code to define completion command
+       ,(unless no-command
+	  `(defun ,command-name
+	     (&optional n)
+	     ,(concat "Complete or cycle word at point using "
+		      (symbol-name name) " source.")
+	     (interactive "p")
+	     (complete-or-cycle-word-at-point ',name n)))
+
+       ;; update list of choices in `auto-completion-source' defcustom
+       ,(if no-auto-completion
+	    `(delete '(const ,name)
+		     (get 'auto-completion-source 'custom-type))
+	  `(let ((choices (get 'auto-completion-source 'custom-type)))
+	     (unless (member '(const ,name) choices)
+	       (nconc (cdr choices) '((const ,name))))))
+
+       ;; update list of choices in other per-source defcustoms
+       (completion-ui-update-per-source-defcustoms ',name)
+
+       ;; run hooks
+       ,(progn
+	  (setq args (plist-put args :name name))
+	  (let ((elt args))
+	    (while (cadr elt)
+	      (setf (cadr elt) `(quote ,(cadr elt))
+		    elt (cddr elt))))
+	  `(run-hook-with-args 'completion-ui-register-source-functions
+			       ',completion-function ,@args))
+       )))
+
+
+
+
+(defmacro completion-ui-completion-source (source &optional overlay)
+  ;; return SOURCE or completion-source for OVERLAY at point
+  `(or ,(when overlay
+  	  `(and ,overlay (overlay-get ,overlay 'completion-source)))
+       ,(when source
+  	  `(and (fboundp 'auto-overlay-local-binding)
+  		(let ((completion-source ,source))
+  		  (auto-overlay-local-binding 'completion-source))))
+       ,source))
+
+
+(defmacro completion-ui-source-completion-function
+  (source &optional overlay)
+  ;; return completion-function for SOURCE or OVERLAY at point
+  `(completion-ui--source-def-completion-function
+    (assq (completion-ui-completion-source ,source ,overlay)
+  	  completion-ui-source-definitions)))
+
+
+(defun completion-ui-source-prefix-function (source &optional overlay)
+  ;; return prefix-function for SOURCE or OVERLAY at point
+  (or (and overlay (overlay-get overlay 'completion-prefix-function))
+      (and source
+	   (let (prefix-function)
+	     ;; get overlay-local binding, falling back to SOURCE definition
+	     (if (fboundp 'auto-overlay-local-binding)
+		 (let ((completion-prefix-function
+			(completion-ui--source-def-prefix-function
+			 (assq (completion-ui-completion-source source)
+			       completion-ui-source-definitions))))
+		   (setq prefix-function
+			 (auto-overlay-local-binding
+			  'completion-prefix-function)))
+	       (setq prefix-function
+		     (completion-ui--source-def-prefix-function
+		      (assq (completion-ui-completion-source source)
+			    completion-ui-source-definitions))))
+	     ;; evaluate result until we get a function
+	     (while (and prefix-function
+			 (not (functionp prefix-function))
+			 (boundp prefix-function))
+	       (setq prefix-function (symbol-value prefix-function)))
+	     prefix-function))
+      ;; default fall-back
+      'completion-prefix))
+
+
+(defun completion-ui-source-word-thing
+  (source &optional overlay)
+  ;; return word-thing for SOURCE or OVERLAY at point
+  (or (and overlay (overlay-get overlay 'completion-word-thing))
+      (and source
+	   (let (word-thing)
+	     ;; get overlay-local binding, falling back to SOURCE definition
+	     (if (fboundp 'auto-overlay-local-binding)
+		 (let ((completion-word-thing
+			(completion-ui--source-def-word-thing
+			 (assq (completion-ui-completion-source source)
+			       completion-ui-source-definitions))))
+		   (setq word-thing (auto-overlay-local-binding
+				     'completion-word-thing)))
+	       (setq word-thing
+		     (completion-ui--source-def-word-thing
+		      (assq (completion-ui-completion-source source)
+			    completion-ui-source-definitions))))
+	     ;; evaluate result until we get a thing-at-point symbol
+	     (while (and word-thing
+			 (not (or (get word-thing 'forward-op)
+				  (fboundp
+				   (intern-soft
+				    (format "forward-%s" word-thing)))))
+			 (boundp word-thing))
+	       (setq word-thing (symbol-value word-thing)))
+	     word-thing))
+      ;; default fall-back
+      'word))
+
+
+(defun completion-ui-source-non-prefix-completion
+  (source &optional overlay)
+  ;; return non-prefix-completion setting for SOURCE or OVERLAY at point
+  (or (and overlay (overlay-get overlay 'completion-non-prefix-completion))
+      (and source
+	   (or (and (fboundp 'auto-overlay-local-binding)
+		    (let ((completion-non-prefix-completion
+			   (completion-ui--source-def-non-prefix-completion
+			    (assq (completion-ui-completion-source source)
+				  completion-ui-source-definitions))))
+		      (auto-overlay-local-binding
+		       'completion-non-prefix-completion)))
+	       (completion-ui--source-def-non-prefix-completion
+		(assq (completion-ui-completion-source source)
+		      completion-ui-source-definitions))))
+      nil))  ; default fall-back
+
+
+(defmacro completion-ui-source-accept-functions
+  (source &optional overlay)
+  ;; return accept-functions for SOURCE or OVERLAY
+  `(completion-ui--source-def-accept-functions
+    (assq (completion-ui-completion-source ,source ,overlay)
+  	  completion-ui-source-definitions)))
+
+
+(defmacro completion-ui-source-reject-functions
+  (source &optional overlay)
+  ;; return reject-functions for SOURCE or OVERLAY
+  `(completion-ui--source-def-reject-functions
+    (assq (completion-ui-completion-source ,source ,overlay)
+  	  completion-ui-source-definitions)))
+
+
+(defun completion-ui-source-popup-frame-function
+  (source &optional overlay)
+  ;; return popup-frame-function for SOURCE of OVERLAY at point
+  (or (let (popup-frame-function)
+	;; get overlay-local binding, falling back to SOURCE definition
+	(if (fboundp 'auto-overlay-local-binding)
+	    (let ((completion-popup-frame-function
+  		   (completion-ui--source-def-popup-frame-function
+  		    (assq (completion-ui-completion-source source overlay)
+  			  completion-ui-source-definitions))))
+  	      (setq popup-frame-function
+		    (auto-overlay-local-binding
+		     'completion-popup-frame-function)))
+	  (setq popup-frame-function
+		(completion-ui--source-def-popup-frame-function
+		 (assq (completion-ui-completion-source source overlay)
+		       completion-ui-source-definitions))))
+	;; evaluate result until we get a function
+	(while (and popup-frame-function
+		    (not (functionp popup-frame-function))
+		    (boundp popup-frame-function))
+	  (setq popup-frame-function (symbol-value popup-frame-function)))
+	popup-frame-function)
+      ;; default fall-back
+      'completion-construct-popup-frame-text))
+
+
+(defun completion-ui-source-tooltip-function
+  (source &optional overlay)
+  ;; return tooltip-function for SOURCE of OVERLAY at point
+  (or (let (tooltip-function)
+	;; get overlay-local binding, falling back to SOURCE definition
+	(if (fboundp 'auto-overlay-local-binding)
+	    (let ((completion-tooltip-function
+		   (completion-ui--source-def-tooltip-function
+		    (assq (completion-ui-completion-source source overlay)
+			  completion-ui-source-definitions))))
+	      (setq tooltip-function
+		    (auto-overlay-local-binding
+		     'completion-tooltip-function)))
+	  (setq tooltip-function
+		(completion-ui--source-def-tooltip-function
+		 (assq (completion-ui-completion-source source overlay)
+		       completion-ui-source-definitions))))
+	;; evaluate result until we get a function
+	(while (and tooltip-function
+		    (not (functionp tooltip-function))
+		    (boundp tooltip-function))
+	  (setq tooltip-function (symbol-value tooltip-function)))
+	tooltip-function)
+      ;; default fall-back
+      'completion-construct-tooltip-text))
+
+
+(defun completion-ui-source-popup-tip-function
+  (source &optional overlay)
+  ;; return popup-tip-function for SOURCE of OVERLAY at point
+  (or (let (popup-tip-function)
+	;; get overlay-local binding, falling back to SOURCE definition
+	(if (fboundp 'auto-overlay-local-binding)
+	    (let ((completion-popup-tip-function
+		   (completion-ui--source-def-popup-tip-function
+		    (assq (completion-ui-completion-source source overlay)
+			  completion-ui-source-definitions))))
+	      (setq popup-tip-function
+		    (auto-overlay-local-binding
+		     'completion-popup-tip-function)))
+	  (setq popup-tip-function
+		(completion-ui--source-def-popup-tip-function
+		 (assq (completion-ui-completion-source source overlay)
+		       completion-ui-source-definitions))))
+	;; evaluate result until we get a function
+	(while (and popup-tip-function
+		    (not (functionp popup-tip-function))
+		    (boundp popup-tip-function))
+	  (setq popup-tip-function (symbol-value popup-tip-function)))
+	popup-tip-function)
+      ;; default fall-back
+      'completion-construct-tooltip-text))
+
+
+(defun completion-ui-source-menu
+  (source &optional overlay)
+  ;; return menu for SOURCE of OVERLAY at point
+  (or (let (menu-function)
+	;; get overlay-local binding, falling back to SOURCE definition
+	(if (fboundp 'auto-overlay-local-binding)
+  	    (let ((completion-menu-function
+  		   (completion-ui--source-def-menu-function
+  		    (assq (completion-ui-completion-source source overlay)
+  			  completion-ui-source-definitions))))
+  	      (setq menu-function
+		    (auto-overlay-local-binding 'completion-menu-function)))
+	  (setq menu-function
+		(completion-ui--source-def-menu-function
+		 (assq (completion-ui-completion-source source overlay)
+		       completion-ui-source-definitions))))
+	;; evaluate result until we get a function
+	(while (and menu-function
+		    (not (functionp menu-function))
+		    (boundp menu-function))
+	  (setq menu-function (symbol-value menu-function)))
+	menu-function)
+      ;; default fall-back
+      'completion-construct-menu))
+
+
+(defun completion-ui-source-browser
+  (source &optional overlay)
+  ;; return browser for SOURCE of OVERLAY at point
+  (or (let (browser-function)
+	;; get overlay-local binding, falling back to SOURCE definition
+	(if (fboundp 'auto-overlay-local-binding)
+  	    (let ((completion-browser-function
+  		   (completion-ui--source-def-browser-function
+  		    (assq (completion-ui-completion-source source overlay)
+  			  completion-ui-source-definitions))))
+  	      (setq browser-function
+		    (auto-overlay-local-binding
+		     'completion-browser-function)))
+	  (setq browser-function
+		(completion-ui--source-def-browser-function
+		 (assq (completion-ui-completion-source source overlay)
+		       completion-ui-source-definitions))))
+	;; evaluate result until we get a function
+	(while (and browser-function
+		    (not (functionp browser-function))
+		    (boundp browser-function))
+	  (setq browser-function (symbol-value browser-function)))
+	browser-function)
+      ;; default fall-back
+      'completion-construct-browser-menu))
+
+
+
+(defmacro completion-ui-source-run-accept-functions
+  (overlay prefix completion &optional arg)
+  ;; run accept functions for completion OVERLAY, passing the accepted
+  ;; COMPLETION of PREFIX and any user-supplied ARG
+  `(let ((funcs (completion-ui-source-accept-functions
+		 (overlay-get ,overlay 'completion-source)
+		 overlay)))
+     (run-hook-with-args 'funcs ,prefix ,completion ,arg)))
+
+
+(defmacro completion-ui-source-run-reject-functions
+  (overlay prefix completion &optional arg)
+  ;; run reject functions for completion OVERLAY, passing the rejected
+  ;; COMPLETION of PREFIX and any user-supplied ARG
+  `(let ((funcs (completion-ui-source-reject-functions
+		 (overlay-get ,overlay 'completion-source)
+		 overlay)))
+     (run-hook-with-args 'funcs ,prefix ,completion ,arg)))
+
+
+
+(defun completion-combine-sources (source-spec prefix &optional maxnum)
+  "Return a combined list of all completions
+from sources in SOURCE-SPEC.
+
+SOURCE-SPEC should be a list specifying how the completion
+sources are to be combined. Each element can be either a
+completion source (a symbol) in which case the source is always
+used, or a cons cell of the form
+
+  (SOURCE . TEST)
+
+where SOURCE is a completion source (a symbol), and TEST
+specifies a test used to determine whether SOURCE is used. TEST
+must be one of the following:
+
+function
+  called with no arguments
+  source is used if it returns non-nil
+
+regexp
+  `re-search-backward' to beginning of line
+  source is used if regexp matches
+
+sexp
+  `eval'ed
+  source is used if it evals to non-nil."
+  (let (completions)
+    (dolist (s source-spec)
+      (when (cond
+	     ((symbolp s) t)
+	     ((functionp (cdr s))
+	      (funcall (cdr s)))
+	     ((stringp (cdr s))
+	      (save-excursion
+		(re-search-backward (cdr s) (line-beginning-position) t)))
+	     (t (eval (cdr s))))
+	(setq completions
+	      (nconc
+	       completions
+	       (funcall (completion-ui--source-def-completion-function
+			 (assq (car s) completion-ui-source-definitions))
+			prefix maxnum)))))
+    (if maxnum
+	(butlast completions (- (length completions) maxnum))
+      completions)))
+
+
+
+;;; =======================================================
+;;;             The core completion functions
+
+(defun* complete-in-buffer
+    (completion-source
+     &optional prefix-function (non-prefix-completion nil s-npcmpl)
+     auto update pos)
+  "Complete in-buffer using COMPLETION-SOURCE.
+
+COMPLETION-SOURCE must either be a function, or the name of a
+registered Completion-UI source (a symbol; see
+`completion-ui-register-source'). If a function, it must take one
+mandatory and one optional argument, the first being the prefix
+to complete, the second specifying the maximum number of
+completion candidates to return. Note that a completion source
+whose name is the same as that of a function will take precedence
+over that function.
+
+If no other arguments are supplied, the remaining settings are
+determined automatically from the Completion-UI source definition
+corresponding to COMPLETION-SOURCE (see
+`completion-ui-register-source'), falling back to default values
+if the COMPLETION-SOURCE isn't a registered Completion-UI
+source. The remaining optional arguments can be used to override
+these defaults.
+
+PREFIX-FUNCTION can either be a function that takes zero
+arguments (called to find the prefix at the point), a
+`thing-at-point' symbol (used to find the prefix at point), a
+string (complete that string), or nil (complete the word at or
+next to the point). Note that in the case of a `thing-at-point'
+symbol, we require `forward-op' to be defined for the \"thing\",
+which is *not* the case for all pre-defined \"things\" in
+`thing-at-point'.
+
+If NON-PREFIX-COMPLETION is non-null, it indicates that
+COMPLETION-SOURCE does something other than prefix completion,
+and instead treats the PREFIX as a pattern to search for, which
+should be replaced by the completion.
+
+The remaining arguments are for internal use only."
+
+  ;; If AUTO is non-nil, assume we're auto-completing and respect settings of
+  ;; `auto-completion-min-chars' and (unless AUTO is 'timer)
+  ;; `auto-completion-delay'. If UPDATE is an overlay, update the
+  ;; user-interfaces for that overlay rather than activating them from
+  ;; scratch. If POS is non-nil, only complete if point is at POS. To specify
+  ;; any of these without setting NON-PRFIX-COMPLETION, use any value for the
+  ;; latter that is neither null nor t.
 
   ;; cancel any timer so that we don't have two running at once
-  (cancel-timer completion-auto-timer)
+  (cancel-timer completion--auto-timer)
 
   ;; only complete if point is at POS (only used when called from timer)
   (unless (and pos (/= (point) pos))
 
-    ;; if we're auto-completing and `auto-completion-delay' is set,
-    ;; delay completing by setting a timer to call ourselves later
-    (if (and auto auto-completion-delay)
-        (setq completion-auto-timer
-              (run-with-idle-timer auto-completion-delay nil
-                                   'complete-in-buffer
-                                   prefix nil (point)))
-
-      ;; otherwise...
-      (let ((overlay (completion-overlay-at-point))
-            prefix-fun completions)
-        ;; resolve any provisional completions
-        (completion-resolve-old overlay)
-
-        ;; get prefix
-        (setq prefix-fun
-              (or (and (fboundp 'auto-overlay-local-binding)
-                       (auto-overlay-local-binding 'completion-prefix))
-                  completion-prefix-function))
-        (setq prefix (or prefix (funcall prefix-fun)))
-
-        ;; if auto-completing, only complete prefix if it has requisite
-        ;; number of characters
-        (unless (and auto auto-completion-min-chars
-                     (< (length prefix) auto-completion-min-chars))
-          ;; get completions
-          (setq completions
-                (completion-call-completion-function
-                 completion-function prefix completion-max-candidates))
-
-          ;; setup completion overlay
-          (setq overlay (completion-setup-overlay prefix completions
-                                                  nil overlay))
-          (move-overlay overlay (point) (point))
-
-          ;; activate dynamic completion
-          (when completion-use-dynamic (complete-dynamic overlay))
-
-          ;; display completion echo text
-          (when completion-use-echo (complete-echo overlay))
-
-          ;; no need to do anything for hotkeys, it's all done when the
-          ;; `completion-select' command is called
-
-          ;; if a pop-up frame is already displayed, update it
-          (if (overlay-get overlay 'popup-frame)
-              (completion-popup-frame overlay)
-            ;; otherwise, activate display of tooltip/menu/pop-up frame
-            (when (and completion-auto-show completions)
-              (completion-auto-show overlay)))
-          ))))
-  )
+    (let (completion-function word-thing prefix completions)
+      ;; resolve any provisional completions
+      (completion-ui-resolve-old update)
 
 
+      ;; --- get completion properties ---
 
-(defun complete-dynamic (overlay)
-  "Insert dynamic completion and update completion OVERLAY
-accordingly. The point had better be within OVERLAY or
-cauliflower will start growing out of your ears."
+      ;; if updating a completion overlay, use it's properties
+      (if update
+	  (setq completion-function
+		  (completion-ui-source-completion-function nil update)
+		prefix
+		  (overlay-get update 'prefix)
+		non-prefix-completion
+		  (overlay-get update 'non-prefix-completion))
 
-  ;; For some unknown reason, the delete-region or insert (below) can
-  ;; sometimes delete or move the completion overlay, so we mark its
-  ;; start position before doing anything else, in order to move the
-  ;; completion overlay into the correct new position later.
-  (let ((pos (make-marker)))
-    (move-marker pos (overlay-start overlay))
+	;; otherwise, sort out arguments...
+	;; get completion-function
+	(setq completion-function
+	      (completion-ui-source-completion-function completion-source))
+	;; literal PREFIX-FUNCTION takes precedence
+	(if (stringp prefix-function)
+	    (setq prefix prefix-function)
+	  ;; sort out PREFIX-FUNCTION and word-thing
+	  (cond
+	   ((functionp prefix-function))  ; PREFIX-FUNCTION is function
+	   ((symbolp prefix-function)     ; PREFIX-FUNCTION is word-thing
+	    (setq word-thing prefix-function
+		  prefix-function nil)))
+	  ;; get prefix function unless already specified in arguments
+	  (unless prefix-function
+	    (setq prefix-function
+		  (completion-ui-source-prefix-function completion-source)))
+	  ;; get prefix word-thing unless specified in arguments
+	  (unless word-thing
+	    (setq word-thing
+		  (completion-ui-source-word-thing completion-source)))
+	  ;; --- get prefix ---
+	  (let ((completion-word-thing word-thing))
+	    (setq prefix (funcall prefix-function))))
 
-    ;; delete old completion
-    (delete-region (overlay-start overlay) (overlay-end overlay))
-    ;; FIXME: for some reason, the delete-region sometimes deletes the
-    ;; overlay, and even moving it back fails, so we work around this by
-    ;; re-creating it.
-    (unless (overlay-buffer overlay)
-      (setq completion-overlay-list
-            (delq overlay completion-overlay-list))
-      (setq overlay
-            (completion-setup-overlay
-             (overlay-get overlay 'prefix)
-             (overlay-get overlay 'completions))))
-
-    ;; insert new completion, if any
-    (let ((completions (overlay-get overlay 'completions)))
-      (when completions
-        ;; delete prefix if `completion-replaces-prefix' is non-nil and
-        ;; `auto-completion-mode' is disabled
-        (when (and completion-replaces-prefix (not auto-completion-mode)
-                   (not (overlay-get overlay 'prefix-replaced)))
-          (delete-region (- pos (length (overlay-get overlay 'prefix))) pos)
-          (overlay-put overlay 'prefix-replaced t))
-        ;; insert new completion
-        (let ((overwrite-mode nil)) (insert (car completions)))
-        (move-overlay overlay pos (+ pos (length (car completions))))
-        (overlay-put overlay 'completion-num 0)
-        ;; highlight common prefix, if enabled
-        (when completion-dynamic-highlight-common-prefix
-          (let ((str (try-completion "" (overlay-get overlay 'completions))))
-            ;; (try-completion returns t if there's only one completion)
-            (when (eq str t) (setq str (car completions)))
-            (move-overlay (overlay-get overlay 'common-prefix)
-                          pos (+ pos (length str))))))
-      ;; move point to appropriate position (start of overlay, unless
-      ;; we're not auto-completing but are accepting or leaving old
-      ;; completions)
-      (if (or auto-completion-mode (eq completion-resolve-behaviour 'reject))
-          (goto-char (overlay-start overlay))
-        (goto-char (overlay-end overlay))))
-
-    ;; delete temporary marker
-    (set-marker pos nil))
-  )
+	;; get non-prefix-completion unless specified in arguments
+	(unless (and s-npcmpl
+		     (or (null non-prefix-completion)
+			 (eq non-prefix-completion t)))
+	  (setq non-prefix-completion
+		(completion-ui-source-non-prefix-completion
+		 completion-source))))
 
 
+      ;; create/update completion overlay (need create overlay regardless of
+      ;; `auto-completion-min-chars' and `auto-completion-delay', to mark end
+      ;; of prefix in case point is immediately before a word)
+      (let* ((overlay
+	      (move-overlay (completion-ui-setup-overlay
+			     prefix 'unchanged nil nil
+			     completion-source prefix-function
+			     non-prefix-completion update)
+			    (point) (point)))
+	     (min-chars (completion-ui-get-value-for-source
+			 overlay auto-completion-min-chars))
+	     (delay (completion-ui-get-value-for-source
+		     overlay auto-completion-delay)))
 
-(defun completion-auto-show (&optional overlay point)
-  "Display list of completions for OVERLAY in tooltip/menu/pop-up frame.
+	;; if auto-completing, only do so if prefix if it has requisite number
+	;; of characters
+	(if (and auto min-chars (< (length prefix) min-chars))
+	    (if update (completion-ui-deactivate-interfaces update))
+
+	  ;; if we're auto-completing and `auto-completion-delay' is set,
+	  ;; delay completing by setting a timer to call ourselves later
+	  (if (and auto delay (not (eq auto 'timer)))
+	      (setq completion--auto-timer
+		    (run-with-idle-timer
+		     delay nil 'complete-in-buffer
+		     completion-source prefix-function
+		     (if s-npcmpl non-prefix-completion 'not-set)
+		     'timer update (point)))
+
+	    ;; otherwise, get completions
+	    (setq completions
+		  (funcall completion-function
+			   prefix (completion-ui-get-value-for-source
+				   completion-source
+				   completion-max-candidates)))
+	    (completion-ui-setup-overlay prefix 'unchanged completions)
+
+	    ;; if running from an `auto-completion-delay' or
+	    ;; `completion-backward-delete' timer, generate dummy keyboard
+	    ;; event to force keymap update, and bind that event a function
+	    ;; that activates the interfaces
+	    ;; (Note: hack to work around limitation that Emacs already
+	    ;;        computed the set of active keymaps before overlay
+	    ;;        existed, so overlay keymap gets ignored)
+	    (if (or (eq auto 'timer) (eq auto 'backward-delete))
+		(progn
+		  ;; dummy binding used to force keymap refresh
+		  (define-key auto-completion-map
+		    (vector completion--dummy-event)
+		    (if update
+			(lambda ()
+			  (interactive)
+			  (let ((overlay (completion-ui-overlay-at-point)))
+			    (completion-ui-update-interfaces overlay)
+			    (when (completion-ui-get-value-for-source
+				   overlay completion-auto-show)
+			      (completion-ui-auto-show overlay))))
+		      (lambda ()
+			(interactive)
+			(let ((overlay (completion-ui-overlay-at-point)))
+			  (completion-ui-activate-interfaces overlay)
+			  (when (completion-ui-get-value-for-source
+				 overlay completion-auto-show)
+			    (completion-ui-auto-show overlay))))))
+		  (push completion--dummy-event unread-command-events))
+
+	      ;; --- activate completion user-interfaces ---
+	      (if update
+		  (completion-ui-update-interfaces overlay)
+		(completion-ui-activate-interfaces overlay))
+	      (when (completion-ui-get-value-for-source
+		     overlay completion-auto-show)
+		(completion-ui-auto-show overlay))))
+
+	  ;; set `completion-ui--activated' (buffer-locally) to enable
+	  ;; `completion-map' work-around hacks
+	  (setq completion-ui--activated t))
+	))))
+
+
+
+(defun completion-ui-auto-show (&optional overlay point)
+  "Display list of completions for OVERLAY in auto-show interface.
 The point had better be within OVERLAY or your hair will fall
 out.
 
-Which one is shown depends on the setting of `completion-auto-show'. If
-`completion-auto-show-delay' is non-nil, the tooltip/menu/pop-up frame
-will only be displayed after a delay.
+Which one is shown depends on the setting of
+`completion-auto-show'. If `completion-auto-show-delay' is
+non-nil, the auto-show interface will only be displayed after a
+delay.
 
-If OVERLAY is not supplies, tries to find one at point.
+If OVERLAY is not supplied, tries to find one at point.
 
-If POINT is supplied, the tooltip/menu/pop-up frame will be displayed
-immediately, but only if point is at POINT (used internally when called
-from timer)."
+If POINT is supplied, the auto-show interface will be displayed
+immediately, but only if point is at POINT (used internally when
+called from timer)."
   (interactive)
 
   ;; if no overlay supplied, try to find one at point
-  (unless overlay (setq overlay (completion-overlay-at-point)))
-
+  (unless overlay (setq overlay (completion-ui-overlay-at-point)))
   ;; cancel any running timer so we don't end up being called twice
-  (cancel-timer completion-auto-timer)
+  (cancel-timer completion--auto-timer)
 
   ;; make sure things are still in a sensible state (might not be if
   ;; displaying after a delay)
-  (when (and overlay
-             (overlay-buffer overlay)
-             (or (null point) (= (point) point)))
-    ;; if delaying, setup timer to call ourselves later
-    (if (and completion-auto-show-delay (null point))
-        (setq completion-auto-timer
-              (run-with-idle-timer completion-auto-show-delay nil
-                                   'completion-auto-show
-                                   overlay (point)))
-
-      ;; otherwise, display whatever we're displaying
+  (let (auto-show auto-show-delay)
+    (when (and overlay
+	       (setq auto-show
+		     (completion-ui-get-value-for-source
+		      overlay completion-auto-show))
+	       (overlay-buffer overlay)
+	       (or (null point) (= (point) point)))
+      (setq auto-show-delay (completion-ui-get-value-for-source
+			     overlay completion-auto-show-delay))
       (cond
-       ((eq completion-auto-show 'tooltip)
-        (completion-show-tooltip overlay))
-       ((eq completion-auto-show 'menu)
-        (completion-show-menu overlay))
-       ((eq completion-auto-show 'pop-up)
-        (completion-popup-frame overlay)))
-      ))
-  )
+       ;; ;; if auto-show interface is already active for overlay, update it
+       ;; ((overlay-get overlay 'auto-show)
+       ;;  (completion-ui-call-auto-show-interface-helpers overlay)
+       ;;  (funcall (overlay-get overlay 'auto-show) overlay))
+
+       ;; if delaying, setup timer to call ourselves later
+       ((and auto-show-delay (null point))
+	(setq completion--auto-timer
+	      (run-with-timer auto-show-delay nil
+			      'completion-ui-auto-show
+			      overlay (point))))
+
+       ;; otherwise, display whatever we're displaying
+       (t
+	(overlay-put overlay 'auto-show auto-show)
+	(completion-ui-call-auto-show-interface-helpers overlay)
+	(funcall auto-show overlay))))))
 
 
 
-(defun complete-echo (overlay)
-  "Display completion candidates in the echo-area."
-  (let ((message-log-max nil))
-    (message (completion-construct-echo-text overlay)))
-  )
+(defmacro completion-ui-cancel-auto-show ()
+  "Cancel any pending auto-show."
+  `(when (timerp completion--auto-timer)
+     (cancel-timer completion--auto-timer)))
 
 
 
-(defun completion-show-tooltip (&optional overlay point)
-  "Show completion tooltip for completion OVERLAY.
-The point had better be within OVERLAY or you'll have bad luck
-in all your flower-arranging endevours for fourteen years.
+
+;;; ============================================================
+;;;                  Interactive commands
 
-If OVERLAY is not supplied, try to find one at point.
+(defun* complete-word-at-point
+  (&optional completion-source prefix-function
+	     (non-prefix-completion nil s-npcmpl))
+  "Complete the word at or next to point.
 
-If POINT is supplied, a tooltip will only be displayed if
-point is at POINT."
+COMPLETION-SOURCE, PREFIX-FUNCTION, and NON-PREFIX-COMPLETION are
+passed to `complete-in-buffer' (which see)."
   (interactive)
 
-  ;; if no overlay was supplied, try to find one at point
-  (unless overlay (setq overlay (completion-overlay-at-point)))
+  ;; get completion overlay at point
+  (let* ((overlay (completion-ui-overlay-at-point))
+	 (word-thing
+	  (or (and overlay (overlay-get overlay 'prefix-word-thing))
+	      (and (fboundp 'auto-overlay-local-binding)
+		   (let ((completion-word-thing
+			  (and (symbolp prefix-function)
+			       (not (functionp prefix-function))
+			       prefix-function)))
+		     (auto-overlay-local-binding 'completion-word-thing)))
+	      (and (symbolp prefix-function) (not (functionp prefix-function))
+		   prefix-function)
+	      'word)))
 
-  (when (and overlay
-             window-system (fboundp 'x-show-tip)
-             (or (null point) (= (point) point)))
+    ;; if point is at start of an existing overlay, delete old completion
+    ;; before completing, preserving overlay so its prefix can be reused
+    (if (and overlay (= (point) (overlay-start overlay)))
+        (delete-region (overlay-start overlay) (overlay-end overlay))
 
-    (let ((mouse-pos (mouse-pixel-position))
-          (pos (save-excursion
-                 (goto-char (overlay-start overlay))
-                 (completion-frame-posn-at-point)))
-          (fg (face-attribute 'completion-tooltip-face :foreground))
-          (bg (face-attribute 'completion-tooltip-face :background))
-          (ft (face-attribute 'completion-tooltip-face :family))
-          params text text-func)
+      ;; if there's a completion at point but point is not at start,
+      ;; delete overlay (effectively accepting old completion) and behave
+      ;; as if no completion was in progress
+      (when overlay
+	(completion-ui-delete-overlay overlay)
+	(setq overlay nil))
 
-      ;; construct the tooltip text using the "overlay-local" binding
-      ;; of 'tooltip-function, or `completion-tooltip-function' if
-      ;; there is none, or failing that
-      ;; `completion-construct-tooltip-text'
-      (setq text-func
-            (or (and (fboundp 'auto-overlay-local-binding)
-                     (auto-overlay-local-binding
-                      'completion-tooltip-function))
-                completion-tooltip-function))
-      (setq text (funcall text-func
-                          (overlay-get overlay 'prefix)
-                          (overlay-get overlay 'completions)
-                          (overlay-get overlay 'completion-num)))
+      ;; if point is in middle of a word and `completion-overwrite' is
+      ;; enabled, delete rest of word before completing
+      (when (and completion-overwrite (completion-within-word-p word-thing))
+	(completion-overwrite-word-at-point word-thing)
+        ;; if there is now a completion overlay at point, delete it
+        (when (setq overlay (completion-ui-overlay-at-point))
+          (completion-ui-delete-overlay overlay)
+	  (setq overlay nil))))
 
-      ;; mouse position can be nil if mouse is outside Emacs frame in
-      ;; certain window systems (e.g. windows); in this case, we move
-      ;; mouse into frame (there's no way to restore its position
-      ;; afterwards, since we can't find out its position)
-      (unless (and (numberp (cadr mouse-pos))
-                   (numberp (cddr mouse-pos)))
-        (set-mouse-position (selected-frame) 1 0)
-        (setq mouse-pos (mouse-pixel-position)))
-
-      ;; set face and frame parameters
-      (when (stringp fg)
-        (setq params
-              (tooltip-set-param params 'foreground-color fg))
-        (setq params (tooltip-set-param params 'border-color fg)))
-      (when (stringp bg)
-        (setq params
-              (tooltip-set-param params 'background-color bg)))
-      (setq params
-            (tooltip-set-param params 'internal-border-width 1))
-      (setq params
-            (tooltip-set-param params 'border-width 1))
-      (setq params
-            (tooltip-set-param params 'font ft))
-      ;;    (setq params
-      ;;          (tooltip-set-param
-      ;;           params 'left
-      ;;           (+ (car pos) completion-tooltip-x-offset)))
-      ;;    (setq params
-      ;;          (tooltip-set-param
-      ;;           params 'top
-      ;;           (+ (cdr pos) completion-tooltip-y-offset)))
-
-      ;; make sure tooltip is cancelled before displaying it, otherwise
-      ;; x-show-tip "magically" moves it to the top of the frame!
-      (completion-cancel-tooltip)
-      ;; show tooltip
-      ;; note: there's no reliable way to display a tooltip at the
-      ;; *screen* position (which is what x-show-tip requires) of
-      ;; point, so we use the kludge of calculating an offset from the
-      ;; mouse position and displaying the tooltip relative to the
-      ;; mouse
-      (x-show-tip text nil params completion-tooltip-timeout
-                  (+ (- (car pos) (cadr mouse-pos))
-                     (car completion-tooltip-offset))
-                  (+ (- (cdr pos) (cddr mouse-pos)) (frame-char-height)
-                     (cdr completion-tooltip-offset)))
-
-      ;; set flag to indicate tooltip is active at point (this enables
-      ;; tooltip-related key bindings)
-      (setq completion-tooltip-active (point))
-      ))
-  )
-
-
-;; (defun completion-show-tooltip-if-within-overlay ()
-;;   "Display completion tooltip for the current completion, if any,
-;; otherwise run whatever command would normally be bound to the key
-;; sequence used to invoke this command."
-;;   (interactive)
-;;   (completion-run-if-within-overlay 'completion-show-tooltip
-;;                  'completion-function)
-;; )
+    ;; do completion
+    (complete-in-buffer completion-source prefix-function
+			(if s-npcmpl non-prefix-completion 'not-set)
+			nil overlay)))
 
 
 
-(defun completion-show-menu (&optional overlay menu)
-  "Show completion menu for completion OVERLAY.
-The point had better be within OVERLAY or you'll have a sneezing
-fit.
+(defun* complete-or-cycle-word-at-point
+  (completion-source &optional n prefix-function
+		     (non-prefix-completion nil s-npcmpl))
+  "Cycle through available completions if there are any,
+otherwise complete the word at point.
 
-If no OVERLAY is supplied, one is found at point (this only
-happens when this function is called interactively).
+When completing, COMPLETION-SOURCE, PREFIX-FUNCTION, and
+NON-PREFIX-COMPLETION are passed to `complete-in-buffer' (which
+see)."
+  (interactive "p")
+  (if (completion-ui-overlay-at-point)
+      (completion-cycle n)
+    (complete-word-at-point
+     completion-source prefix-function
+     (if s-npcmpl non-prefix-completion 'not-set))))
 
-If MENU is supplied, use that to construct the menu, unless an
-overlay overrides it. Defaults to the \"overlay local\" binding
-of 'completion-menu, or `completion-menu' if
-there is none."
-  (interactive)
-  (completion-cancel-tooltip)
 
-  (unless overlay (setq overlay (completion-overlay-at-point)))
+(defun* complete-or-cycle-backwards-word-at-point
+  (completion-source &optional n prefix-function
+		     (non-prefix-completion nil s-npcmpl))
+  "Cycle backwards through available completions if there are any,
+otherwise complete the word at point.
 
-  (setq menu (or menu
-                 (and (fboundp 'auto-overlay-local-binding)
-                      (auto-overlay-local-binding
-                       'completion-menu))
-                 completion-menu))
+When completing, COMPLETION-SOURCE, PREFIX-FUNCTION, and
+NON-PREFIX-COMPLETION are passed to `complete-in-buffer' (which
+see)."
+  (interactive "p")
+  (if (completion-ui-overlay-at-point)
+      (completion-cycle (- n))
+    (complete-word-at-point
+     completion-source prefix-function
+     (if s-npcmpl non-prefix-completion 'not-set))))
 
+
+
+(defun completion-accept (&optional arg overlay)
+  "Accept current provisional completion.
+
+The value of ARG is passed as the third argument to any functions
+called from the `completion-accept-functions' hook or from the
+completion source's own accept-functions. Interactively, ARG is
+the prefix argument.
+
+If optional argument OVERLAY is supplied, it is used instead of
+looking for an overlay at the point. The point had better be
+within OVERLAY or else your hair will fall out.
+
+If a completion was accepted, returns a cons cell containing the
+prefix and the entire accepted completion \(the concatenation of
+the prefix and the completion string\). Otherwise returns nil."
+  (interactive "P")
+
+  ;; if we haven't been passed one, get completion overlay at point
+  (unless overlay (setq overlay (completion-ui-overlay-at-point)))
+
+  ;; ;; resolve any other old provisional completions
+  ;; (completion-ui-resolve-old overlay)
+
+  ;; if we ain't found an overlay, can't accept nuffink!
   (when overlay
-    (let (keymap result)
-      (cond
-       ;; if `menu' is a function, evaluate it to get menu
-       ((functionp menu)
-        (setq keymap (funcall menu (overlay-get overlay 'prefix)
-                              (overlay-get overlay 'completions)))
-        ;; throw error if return value has wrong type
-        (unless (or (null keymap) (keymapp keymap))
-          (error "`completion-menu' returned wrong type:null or\
- keymapp, %s"
-                 (prin1-to-string keymap))))
+    (let ((prefix (overlay-get overlay 'prefix))
+	  cmpl)
+      ;; if there's no selected completion, then we're effectively accepting
+      ;; the prefix as a completion
+      (if (null (overlay-get overlay 'completion-num))
+	  (progn
+	    ;; delete the overlay, effectively accepting the prefix
+	    (completion-ui-delete-overlay overlay)
+	    (completion-ui-deactivate-interfaces overlay)
+	    ;; run accept hooks
+	    (completion-ui-source-run-accept-functions
+	     overlay prefix prefix arg)
+	    (run-hook-with-args
+	     'completion-accept-functions prefix prefix arg)
+	    ;; return prefix and accepted completion (the prefix itself)
+	    (cons prefix prefix))
 
-       ;; if `menu' is a keymap, use that
-       ((keymapp menu) (setq keymap menu))
-
-       ;; otherwise, throw an error
-       (t (error "Wrong type in `completion-menu': functionp or\
- keymapp, %s" (prin1-to-string menu))))
-
-
-      ;; if we've constructed a menu, display it
-      (when keymap
-        (setq result
-              (x-popup-menu (save-excursion
-                              (goto-char (overlay-start overlay))
-                              (completion-posn-at-point-as-event
-                               nil nil
-                               (car completion-menu-offset)
-                               (+ (frame-char-height) 3
-                                  (cdr completion-menu-offset))))
-                            keymap))
-
-        ;; if they ain't selected nuffin', don't do nuffin'!
-        (when result
-          ;; convert result to a vector for key lookup
-          (setq result (apply 'vector result))
-
-          (cond
-           ;; if they selected a completion from the menu...
-           ((string-match "^completion-insert"
-                          (symbol-name (aref result (1- (length result)))))
-            ;; run accept hooks
-            (run-hook-with-args
-             'completion-accept-functions
-             (overlay-get overlay 'prefix)
-             (concat (if completion-replaces-prefix
-                         "" (overlay-get overlay 'prefix))
-                     (buffer-substring-no-properties
-                      (overlay-start overlay)
-                      (overlay-end overlay))))
-            ;; delete old provisional completion, including prefix if
-            ;; `completion-replaces-prefix' is non-nil
-            (delete-region (- (overlay-start overlay)
-                              (if (and completion-replaces-prefix
-                                       (not (overlay-get overlay
-                                                         'prefix-replaced)))
-                                  (length (overlay-get overlay 'prefix))
-                                0))
-                           (overlay-end overlay))
-            (completion-delete-overlay overlay)
-            ;; insert selected completion
-            (let ((overwrite-mode nil))
-              (funcall (lookup-key keymap result))))
-
-           ;; otherwise, run whatever they did select
-           (t (funcall (lookup-key keymap result))))
-          ))))
-  )
-
-
-;; (defun completion-show-menu-if-within-overlay ()
-;;   "Display completion menu for current completion
-;; if there is one, otherwise run whatever command would normally be
-;; bound to the key sequence used to invoke this command."
-;;   (interactive)
-;;   (completion-run-if-within-overlay 'completion-show-menu
-;;                  'completion-function)
-;; )
+	;; otherwise, deactivate the interfaces and accept the completion
+	;; deactivate the interfaces
+	(setq cmpl (nth (overlay-get overlay 'completion-num)
+			(overlay-get overlay 'completions)))
+	(unless (stringp cmpl) (setq cmpl (car cmpl)))
+	(completion-ui-deactivate-interfaces overlay)
+	;; delete the original prefix and insert the completion
+	(delete-region (- (point) (length prefix)) (point))
+	(let ((overwrite-mode nil)) (insert cmpl))
+	;; run accept hooks
+	(completion-ui-source-run-accept-functions overlay prefix cmpl arg)
+	(run-hook-with-args 'completion-accept-functions prefix cmpl arg)
+	;; delete overlay
+	(completion-ui-delete-overlay overlay)
+	;; return prefix and accepted completion
+	(cons prefix cmpl)))))
 
 
 
-(defun completion-show-browser-menu (&optional overlay menu)
-  "Show completion browser menu for completion OVERLAY.
-The point had better be within OVERLAY or you'll get hives.
+(defun completion-reject (&optional arg overlay)
+  "Reject current provisional completion.
 
-If no OVERLAY is supplied, one is found at point (this only
-happens when this function is called interactively).
+The value of ARG is passed as the third argument to any functions
+called from the `completion-reject-functions' hook. Interactively,
+ARG is the prefix argument.
 
-If MENU is supplied, use that to construct the menu, unless an
-overlay overrides it. Defaults to the \"overlay local\" binding
-of 'completion-browser-menu-function, or
-`completion-browser-menu-function' if there is none."
+If optional argument OVERLAY is supplied, it is used instead of
+looking for an overlay at the point. The point had better be
+within OVERLAY or else your hair will fall out.
+
+If a completion was rejected, returns a cons cell containing the
+prefix and the entire rejected completion \(the concatenation of
+the prefix and the completion string\). Otherwise returns nil."
+  (interactive "P")
+
+  ;; if we haven't been passed one, get completion overlay at point
+  (unless overlay (setq overlay (completion-ui-overlay-at-point)))
+
+  ;; ;; resolve any other old provisional completions
+  ;; (completion-ui-resolve-old overlay)
+
+  ;; if we ain't found no overlay, we can't reject nuffink!
+  (unless (or (null overlay)
+	      (and (null (overlay-get overlay 'completion-num))
+		   (progn (completion-ui-delete-overlay overlay) t)))
+    ;; otherwise, deactivate the interfaces and reject the completion
+    (let ((prefix (overlay-get overlay 'prefix))
+	  (cmpl (nth (overlay-get overlay 'completion-num)
+		     (overlay-get overlay 'completions))))
+      ;; deactivate the interfaces
+      (completion-ui-deactivate-interfaces overlay)
+      ;; run reject hooks
+      (completion-ui-source-run-reject-functions overlay prefix cmpl arg)
+      (run-hook-with-args 'completion-reject-functions prefix cmpl arg)
+      ;; delete overlay
+      (completion-ui-delete-overlay overlay)
+      ;; return prefix and rejected completion
+      (cons prefix cmpl))))
+
+
+
+(defun completion-resolve-then-run-command ()
+ "Resolve current completion, then run command
+that would normally be bound to this key."
+ (interactive)
+ (completion--run-if-within-overlay
+  (lambda () (interactive) (completion--resolve-current nil nil ? ))
+  'completion-ui--activated 'before))
+
+
+
+(defun completion-select (n &optional overlay)
+  "Select N'th completion candidate for current completion.
+
+Interactively, N is the prefix argument.
+
+If OVERLAY is supplied, use that instead of finding one at
+point. The point had better be within OVERLAY or a meteorite will
+crash through your ceiling."
+  (interactive "P")
+
+  ;; resolve any other old provisional completions
+  (completion-ui-resolve-old overlay)
+  ;; if we haven't been passed one, get completion overlay at point
+  (unless overlay (setq overlay (completion-ui-overlay-at-point)))
+
+  ;; if we ain't found an overlay, can't select nuffink!
+  ;; if we ain't found an overlay, can't accept nuffink!
+  (if (null overlay)
+      (message "No completion to select")
+
+    (let ((completions (overlay-get overlay 'completions))
+	  (non-prefix-completion
+	   (overlay-get overlay 'non-prefix-completion))
+	  prefix cmpl len)
+
+      ;; if there are too few completions, display message
+      (if (>= n (length completions))
+	  (progn
+	    (beep)
+	    (if (= (length completions) 1)
+		(message "Only 1 completion available")
+	      (message "Only %d completions available" (length completions))))
+
+	;; otherwise, deactivate interfaces and select completion
+	(setq prefix (overlay-get overlay 'prefix)
+	      cmpl (nth n (overlay-get overlay 'completions))
+	      len (length (overlay-get overlay 'prefix)))
+	(unless (stringp cmpl) (setq cmpl (car cmpl)))
+	;; deactivate the interfaces
+	(completion-ui-deactivate-interfaces overlay)
+	;; delete the original prefix and insert the completion
+	(delete-region (- (point) len) (point))
+	(let ((overwrite-mode nil)) (insert cmpl))
+	;; run accept hooks
+	(completion-ui-source-run-accept-functions overlay prefix cmpl)
+	(run-hook-with-args 'completion-accept-functions prefix cmpl)
+	;; delete overlay
+	(completion-ui-delete-overlay overlay)
+	;; return prefix and accepted completion
+	(cons prefix cmpl)))))
+
+
+
+(defun completion-extend-prefix (&optional n overlay)
+  "Extend the current prefix by N characters from the current completion,
+and recomplete the resulting string.
+
+If N is null, extend the prefix to the entire current
+completion. If N is negative, remove that many characters from
+the current prefix, and recomplete the resulting string.
+
+When called from Lisp programs, OVERLAY is used if supplied
+instead of finding one. The point had better be within OVERLAY or
+the oceans will boil away."
+  (interactive "P")
+
+  ;; look for completion overlay at point if none was specified
+  (unless overlay (setq overlay (completion-ui-overlay-at-point)))
+
+  ;; if there are no characters to accept, do nothing
+  (if (or (null overlay) (null (overlay-get overlay 'completion-num)))
+      (message "No characters with which to extend prefix")
+
+    ;; otherwise
+    (let ((prefix (overlay-get overlay 'prefix))
+	  (len (overlay-get overlay 'prefix-length))
+	  (cmpl (nth (overlay-get overlay 'completion-num)
+		     (overlay-get overlay 'completions)))
+	  str)
+      (unless (stringp cmpl) (setq cmpl (car cmpl)))
+      (setq str (if (and n (< (+ len n) (length cmpl)) (> (+ len n) 0))
+		    (substring cmpl 0 (+ len n))
+		  cmpl))
+      ;; deactivate interfaces pending update
+      (completion-ui-deactivate-interfaces-pre-update overlay)
+      ;; delete the original prefix
+      (delete-region (- (point) (length prefix)) (point))
+
+      ;; if prefix has been contracted down to nothing, stop completing
+      (if (and n (<= (+ len n) 0))
+	  (progn
+	    (completion-ui-delete-overlay overlay)
+	    (completion-ui-deactivate-interfaces overlay))
+	;; otherwise, insert the characters, update the overlay, and
+	;; recomplete
+	(let ((overwrite-mode nil)) (insert str))
+	(move-overlay overlay (point) (point))
+	(completion-ui-setup-overlay str nil nil nil nil nil nil overlay)
+	(complete-in-buffer nil nil 'not-set nil overlay)
+	;; reposition point at start of completion, so that user can continue
+	;; extending or contracting the prefix
+	(goto-char (overlay-start overlay))))))
+
+
+
+(defun completion-cycle (&optional n overlay)
+  "Cycle through available completions.
+
+Optional argument N specifies the number of completions to cycle
+forwards \(backwards if negative\). Default is 1. Interactively,
+N is the prefix argument.
+
+If OVERLAY is supplied, use that instead of finding one. The
+point had better be within OVERLAY or you'll be struck by
+lightening."
+  (interactive "p")
+  (unless (numberp n) (setq n 1))
+
+  ;; if we haven't been passed one, get completion overlay at point
+  (unless overlay (setq overlay (completion-ui-overlay-at-point)))
+
+  ;; if there are no completions, can't cycle
+  (if (or (null overlay) (null (overlay-get overlay 'completions)))
+      (message "No completions to cycle")
+
+    ;; otherwise, cycle away!
+    (let* ((completions (overlay-get overlay 'completions))
+	   (prefix (overlay-get overlay 'prefix))
+	   (non-prefix-completion
+	    (overlay-get overlay 'non-prefix-completion))
+	   (i (mod (+ (or (overlay-get overlay 'completion-num) -1) n)
+		   (length completions)))
+	   (cmpl (nth i completions))
+	   (len (if (stringp cmpl)
+		    (length prefix)
+		  (prog1 (cdr cmpl) (setq cmpl (car cmpl))))))
+      ;; run pre-cycle interface functions
+      (completion-ui-deactivate-interfaces-pre-update overlay)
+      ;; update overlay properties
+      (overlay-put overlay 'prefix-length len)
+      (overlay-put overlay 'completion-num i)
+      ;; run post-cycle interface functions
+      (completion-ui-update-interfaces overlay))))
+
+
+
+(defun completion-cycle-backwards (&optional n)
+  "Cycle backwards through available completions.
+
+Optional argument N specifies the number of completions to cycle
+backwards \(forwards if negative\). Default is 1. Interactively,
+N is the prefix argument."
+  (interactive "p")
+  (completion-cycle (- n)))
+
+
+
+(defun completion-tab-complete (&optional overlay)
+  "Tab-complete completion at point
+\(i.e. insert longest common prefix of all the completions\).
+
+If OVERLAY is supplied, use that instead of finding one. The
+point had better be within OVERLAY or your teeth will turn bright
+green over night."
   (interactive)
 
-  ;; this function is really just a call to `completion-show-menu' with
-  ;; a different default for the menu argument
-  (setq menu (or menu
-                 (and (fboundp 'auto-overlay-local-binding)
-                      (auto-overlay-local-binding
-                       'completion-browser-menu-function))
-                 completion-browser-menu-function))
-  (completion-show-menu overlay menu)
-  )
+  ;; look for completion overlay at point if none was specified
+  (unless overlay (setq overlay (completion-ui-overlay-at-point)))
+
+  ;; if within a completion overlay
+  (when overlay
+    (let* ((prefix (overlay-get overlay 'prefix))
+	   (completions (overlay-get overlay 'completions))
+	   (str (try-completion
+		 "" (mapcar
+		     (lambda (cmpl)
+		       (if (stringp cmpl)
+			   (substring cmpl (length prefix))
+			 (substring (car cmpl) (cdr cmpl))))
+		     completions))))
+      ;; try-completion returns t if there's only one completion
+      (when (eq str t)
+	(setq str (car (overlay-get overlay 'completions)))
+	(if (stringp str)
+	    (setq str (substring str (length prefix)))
+	  (setq str (substring (car str) (cdr str)))))
+
+      ;; do tab-completion
+      (unless (or (null str) (string= str ""))
+	;; add prefix (which might have been modified) to front of
+	;; tab-completion
+	(setq str
+	      (concat (buffer-substring-no-properties
+		       (- (overlay-start overlay)
+			  (overlay-get overlay 'prefix-length))
+		       (overlay-start overlay))
+		      str))
+	;; run pre-tab-complete interface functions
+	(completion-ui-deactivate-interfaces-pre-update overlay)
+	;; delete the original prefix and insert the tab-completion
+	(delete-region (- (point) (length prefix)) (point))
+        (let ((overwrite-mode nil)) (insert str))
+	;; update overlay properties
+        (move-overlay overlay (point) (point))
+	(completion-ui-setup-overlay
+	 str nil nil nil nil nil 'unchanged overlay)
+        ;; when auto-completing, do so
+        (if (or (completion-ui-get-value-for-source
+		 overlay completion-auto-update)
+		(and auto-completion-mode
+		     (eq (overlay-get overlay 'completion-source)
+			 auto-completion-source)))
+            (complete-in-buffer
+	     (overlay-get overlay 'completion-source)
+	     nil 'not-set 'auto overlay)
+          ;; otherwise, update completion interfaces
+	  (completion-ui-update-interfaces overlay))))))
 
 
 
-
+
 ;;; ===============================================================
-;;;                   Completion pop-up frames
+;;;                   Self-insert functions
 
-(defvar completion-popup-frame-parent-frame nil
-  "Stores the parent frame of a popup frame.")
-(make-variable-buffer-local 'completion-popup-frame-parent-frame)
+(defun auto-completion-lookup-behaviour
+  (&optional char syntax source no-overlay-local)
+  "Return syntax-dependent behaviour
+of character CHAR and/or syntax-class SYNTAX.
 
+At least one of these must be supplied. If both are supplied,
+SYNTAX overrides the syntax-class of CHAR.
 
-(defvar completion-popup-frame-parent-overlay nil
-  "Stores the parent completion overlay of a popup frame.")
-(make-variable-buffer-local 'completion-popup-frame-parent-overlay)
+If SOURCE is supplied, return the behaviour for the specified
+completion source. Otherwise, return the default behaviour.
 
+Returns a three-element list:
 
-(defvar completion-popup-frame-overlay nil
-  "Stores pop-up frame overlay used to highlight selected completion.")
-(make-variable-buffer-local 'completion-popup-frame-overlay)
+  (RESOLVE COMPLETE INSERT)
 
+containing the resolve-behaviour, completion-behaviour and
+insert-behaviour.
 
-(defvar completion-popup-frame-show-all nil
-  "Non-nil when all completions are shown in a pop-up frame.")
-(make-variable-buffer-local 'completion-popup-frame-show-all)
+If any \"overlay-local\" bindings of `auto-completion-syntax-alist'
+and `auto-completion-override-syntax-alist' exist at point, any
+behaviour they specify for CHAR and SYNTAX takes precedence over
+those variables, unless NO-OVERLAY-LOCAL is non-nil."
 
+  ;; SYNTAX defaults to syntax-class of CHAR, SOURCE to t (default value)
+  (when (and char (not syntax)) (setq syntax (char-syntax char)))
+  (unless source (setq source t))
 
-(defun completion-popup-frame (&optional overlay)
-  "Pop up a frame at point displaying the completions for OVERLAY.
-The point had better be within OVERLAY or your aubergines will be
-cursed for a hundred years \(that's eggplant for any Americans
-out there\).
+  ;; get syntax alists
+  (let ((syntax-alist
+         (or (and (fboundp 'auto-overlay-local-binding)
+		  (not no-overlay-local)
+		  (auto-overlay-local-binding
+		   'auto-completion-syntax-alist nil t))
+	     (completion-ui-get-value-for-source
+	      source auto-completion-syntax-alist)))
+        (override-alist
+         (or (and (fboundp 'auto-overlay-local-binding)
+		  (not no-overlay-local)
+		  (auto-overlay-local-binding
+		   'auto-completion-override-syntax-alist nil t))
+	     (completion-ui-get-value-for-source
+	      source auto-completion-override-syntax-alist)))
+	(global-syntax-alist (completion-ui-get-value-for-source
+			      source auto-completion-syntax-alist))
+	(global-override-alist (completion-ui-get-value-for-source
+				source auto-completion-override-syntax-alist))
+	behaviour)
 
-If no OVERLAY is supplied, tried to find one at point."
-  (interactive)
-  (completion-cancel-tooltip)
+    ;; if `auto-completion-syntax-alist' is a predefined behaviour (a
+    ;; cons cell), convert it to an alist
+    (dolist (alist '(syntax-alist global-syntax-alist))
+      (unless (listp (car (symbol-value alist)))
+	(set alist
+	     `(;; word constituents add to current completion and complete
+	       ;; word or string, depending on VALUE
+	       (?w . (add ,(cdr (symbol-value alist))))
+	       ;; symbol constituents, whitespace and punctuation characters
+	       ;; either accept or reject, depending on VALUE, and don't
+	       ;; complete
+	       (?_ .  (,(car (symbol-value alist)) none))
+	       (?  .  (,(car (symbol-value alist)) none))
+	       (?. .  (,(car (symbol-value alist)) none))
+	       (?\( . (,(car (symbol-value alist)) none))
+	       (?\) . (,(car (symbol-value alist)) none))
+	       ;; anything else rejects and does't complete
+	       (t . (reject none)))
+	     )))
 
-  ;; if none was supplied, find overlay at point
-  (unless overlay (setq overlay (completion-overlay-at-point)))
-
-  (when (and overlay window-system)
-    (let* ((parent-frame (selected-frame))
-           (prefix (overlay-get overlay 'prefix))
-           (completions (overlay-get overlay 'completions))
-           (num (overlay-get overlay 'completion-num))
-           (popup-fun (if (fboundp 'auto-overlay-local-binding)
-                          (auto-overlay-local-binding
-                           'completion-popup-frame-function)
-                        completion-popup-frame-function))
-           (lines (funcall popup-fun prefix completions))
-           (maxlen (if (null lines)
-                       0 (apply 'max (mapcar 'length lines))))
-           (pos (save-excursion
-                  (goto-char (overlay-start overlay))
-                  (completion-frame-posn-at-point)))
-           ;; get or create pop-up frame
-           (frame
-            (or (overlay-get overlay 'popup-frame)
-                (make-frame
-                 `((user-size . t)
-                   (user-position . t)
-                   (minibuffer . nil)
-                   (left-fringe . 0)
-                   (right-fringe . 0)
-                   (menu-bar-lines . nil)
-                   (tool-bar-lines . nil)
-                   (unsplittable . t)
-                   (cursor-type . nil)
-                   (border-width . 0))))))
-
-      ;; initialise pop-up frame
-      (overlay-put overlay 'popup-frame frame)
-      (set-frame-position
-       frame
-       (+ (car pos) (car completion-popup-frame-offset))
-       (+ (cdr pos) (cdr completion-popup-frame-offset)))
-      (set-frame-size
-       frame
-       (1+ maxlen)
-       (1+ (min (length completions)
-                completion-popup-frame-max-height)))
-      (select-frame-set-input-focus frame)
-      (switch-to-buffer " *completion-ui*")
-      (completion-popup-frame-mode)
-      (setq completion-popup-frame-parent-frame parent-frame)
-      (setq completion-popup-frame-parent-overlay overlay)
-
-      ;; insert completions
-      (erase-buffer)
-      (mapc (lambda (str) (insert str "\n")) lines)
-      (backward-delete-char 1)
-
-      ;; highlight current completion
-      (goto-char (point-min))
-      (when num (forward-line num))
-      (let ((pos (point)))
-        (end-of-line)
-        (unless (overlayp completion-popup-frame-overlay)
-          (setq completion-popup-frame-overlay
-                (make-overlay pos (point)))
-          (overlay-put completion-popup-frame-overlay
-                       'face 'completion-dynamic-face))
-        (move-overlay completion-popup-frame-overlay pos (point)))
-      ))
-  )
-
-
-;; (defun completion-popup-frame-if-within-overlay ()
-;;   "Display completion pop-up frame for current completion
-;; if there is one, otherwise run whatever command would normally be
-;; bound to the key sequence used to invoke this command."
-;;   (interactive)
-;;   (completion-run-if-within-overlay 'completion-show-menu
-;;                  'completion-function)
-;; )
+    ;; extract behaviours from syntax alists
+    (setq behaviour
+	  (or
+	   ;; if char is specified, check override-alist
+	   (and char
+		(or (cdr (assq char override-alist))
+		    ;; fall back to global override-alist
+		    (cdr (assq char global-override-alist))))
+	   ;; check syntax-alist
+	   (cdr (assq syntax syntax-alist))
+	   (cdr (assq t syntax-alist))
+	   ;; fall back to global syntax-alist
+	   (cdr (assq syntax global-syntax-alist))
+	   (cdr (assq t global-syntax-alist))))
+    (when (= (length behaviour) 2) (setq behaviour (append behaviour '(t))))
+    ;; return behaviour
+    behaviour))
 
 
 
-;; The major mode function
-(defun completion-popup-frame-mode ()
-  "Major mode used in completion-UI pop-up frames."
-  (kill-all-local-variables)
-  (setq major-mode 'completion-popup-frame-mode)
-  (use-local-map completion-popup-frame-mode-map)
-  (setq mode-line-format nil)
-  )
-
-;; indicate mode is only appropriate in special circumstances
-(put 'completion-popup-frame-mode 'mode-class 'special)
+;; (defmacro completion-get-resolve-behaviour (behaviour)
+;;   "Extract syntax-dependent resolve behaviour from BEHAVIOUR.
+;; BEHAVIOUR should be the return value of a call to
+;; `auto-completion-lookup-behaviour'."
+;;   `(nth 0 ,behaviour))
 
 
-
-(defun completion-popup-frame-motion (command &optional arg)
-  "Call COMMAND to move point, then select completion at point,
-Selecting the completion inserts it in the pop-up frame's parent
-buffer and highlights it in the pop-up frame.
-
-If ARG is supplied, it is passed through to COMMAND."
-
-  ;; call COMMAND with ARG
-  (funcall command arg)
-
-  ;; highlight selected completion
-  (forward-line 0)
-  (let ((pos (point)))
-    (end-of-line)
-    (move-overlay completion-popup-frame-overlay pos (point)))
-
-  ;; insert selected completion in parent buffer
-  (let ((num (line-number-at-pos))
-        (overlay completion-popup-frame-parent-overlay)
-        (frame (selected-frame))
-        str)
-    (save-excursion
-      (set-buffer (overlay-buffer overlay))
-      (setq str (nth (1- num) (overlay-get overlay 'completions)))
-      (delete-region (overlay-start overlay) (overlay-end overlay))
-      (let ((overwrite-mode nil)) (insert str))
-      (move-overlay overlay (overlay-start overlay)
-                    (+ (overlay-start overlay) (length str)))
-      (overlay-put overlay 'completion-num (1- num)))
-
-    ;; move point to appropriate position in parent frame (start of overlay,
-    ;; unless we're not auto-completing but are accepting or leaving old
-    ;; completions)
-    (select-frame completion-popup-frame-parent-frame)
-    (if (or auto-completion-mode (eq completion-resolve-behaviour 'reject))
-        (goto-char (overlay-start overlay))
-      (goto-char (overlay-end overlay)))
-    (select-frame-set-input-focus frame)
-    )
-  )
+;; (defmacro completion-get-completion-behaviour (behaviour)
+;;   "Extract syntax-dependent completion behaviour from BEHAVIOUR.
+;; BEHAVIOUR should be the return value of a call to
+;; `auto-completion-lookup-behaviour'."
+;;   `(nth 1 ,behaviour))
 
 
-
-(defun completion-popup-frame-dismiss ()
-  "Delete current pop-up frame."
-  (interactive)
-  ;; reset overlay
-  (overlay-put completion-popup-frame-parent-overlay
-               'popup-frame nil)
-  ;; if showing all completions, revert to showing just the first few
-  (when completion-popup-frame-show-all
-    (let ((prefix
-           (overlay-get completion-popup-frame-parent-overlay 'prefix))
-          cmpl-fun completions)
-      (save-excursion
-        (set-buffer
-         (overlay-buffer completion-popup-frame-parent-overlay))
-        (setq cmpl-fun completion-function))
-      (setq completions (completion-call-completion-function
-                         cmpl-fun prefix completion-max-candidates))
-      (overlay-put completion-popup-frame-parent-overlay
-                   'completions completions)))
-  ;; delete pop-up frame
-  (let ((frame (selected-frame)))
-    (select-frame completion-popup-frame-parent-frame)
-    (delete-frame frame))
-  )
+;; (defmacro completion-get-insertion-behaviour (behaviour)
+;;   "Extract syntax-dependent insertion behaviour from BEHAVIOUR.
+;; BEHAVIOUR should be the return value of a call to
+;; `auto-completion-lookup-behaviour'."
+;;   `(nth 2 ,behaviour))
 
 
-
-(defun completion-popup-frame-unread-key ()
-  "Unread last key sequence, then kill popup frame.
-The focus is returned to the parent buffer, which will then
-receive the unread key sequence."
-  (interactive)
-  (setq unread-command-events (listify-key-sequence (this-command-keys)))
-  (select-frame completion-popup-frame-parent-frame)
-  )
-
-
-
-(defun completion-popup-frame-toggle-show-all ()
-  "Toggle between showing some completions and all completions.
-Initially, only the first `completion-max-candidates' completions
-are shown in a pop-up frame, as with all the other completion
-methods. Toggling will show all possible completions."
-  (interactive)
-
-  (let ((prefix (overlay-get completion-popup-frame-parent-overlay
-                             'prefix))
-        cmpl-fun completions lines maxlen)
-
-    (cond
-     ;; if we weren't showing all completions, get all completions and
-     ;; update completion overlay properties
-     ((null completion-popup-frame-show-all)
-      (message
-       "Finding all completions (C-g to cancel if taking too long)...")
-      (save-excursion
-        (set-buffer (overlay-buffer completion-popup-frame-parent-overlay))
-        (setq completions (completion-call-completion-function
-                           completion-function prefix)))
-      (overlay-put completion-popup-frame-parent-overlay
-                   'completions completions))
-
-     ;; if we were showing all completions, get list of best completions and
-     ;; update completion overlay properties
-     (completion-popup-frame-show-all
-      (save-excursion
-        (set-buffer (overlay-buffer completion-popup-frame-parent-overlay))
-        (setq completions (completion-call-completion-function
-                           completion-function prefix
-                           completion-max-candidates)))
-      (overlay-put completion-popup-frame-parent-overlay
-                   'completions completions)))
-
-    ;; reset pop-up frame properties
-    (erase-buffer)
-    (setq lines
-          (completion-construct-popup-frame-text prefix completions))
-    (setq maxlen (if (null lines) 0 (apply 'max (mapcar 'length lines))))
-    (set-frame-size (selected-frame) (1+ maxlen) (frame-height))
-    ;; insert completions in pop-up frame
-    (mapc (lambda (str) (insert str "\n")) lines)
-    (delete-backward-char 1)
-    ;; highlight first completion
-    (goto-char (point-min))
-    (let ((pos (point)))
-      (end-of-line)
-      (move-overlay completion-popup-frame-overlay pos (point)))
-    ;; toggle flag
-    (setq completion-popup-frame-show-all
-          (not completion-popup-frame-show-all)))
-  )
-
-
-
-;;; ===============================================================
-;;;                Commands for binding to keys
 
 (defun completion-self-insert ()
   "Deal with completion-related stuff, then insert last input event."
@@ -2516,15 +3199,17 @@ methods. Toggling will show all possible completions."
   ;; if we're auto-completing, hand over to `auto-completion-self-insert'
   (if auto-completion-mode
       (auto-completion-self-insert)
-    ;; otherwise, resolve current completion and insert last input event
-    (completion-resolve-current)
-    (self-insert-command 1))
-  )
+    ;; otherwise, resolve old and current completions, and insert last input
+    ;; event
+    (let ((overlay (completion-ui-overlay-at-point)))
+      (completion-ui-resolve-old overlay)
+      (completion--resolve-current overlay))
+    (self-insert-command 1)))
 
 
 
-(defun auto-completion-self-insert (&optional char syntax
-                                              no-syntax-override)
+(defun auto-completion-self-insert
+  (&optional char syntax no-syntax-override)
   "Execute a completion function based on syntax of the character
 to be inserted.
 
@@ -2549,731 +3234,442 @@ related action \(hence the name,
 you are doing, only bind `auto-completion-self-insert' to
 printable characters.
 
-The Emacs `self-insert-command' is remapped to this when
-`completion-function' is set."
+The Emacs `self-insert-command' is remapped to this in completion
+overlays."
   (interactive)
-  (completion-cancel-tooltip)
 
   ;; if CHAR or SYNTAX were supplied, use them; otherwise get character
   ;; and syntax from last input event (which relies on sensible key
   ;; bindings being used for this command)
-  (when (null char) (setq char last-input-event))
-  (when (null syntax) (setq syntax (char-syntax last-input-event)))
+  (when (null char)
+    (if (characterp last-input-event)
+	(setq char last-input-event)
+      ;; if `last-input-event' is not a character, look at
+      ;; `this-single-command-keys' instead in case we get a character after
+      ;; translation (as e.g. for "\S- ")
+      (setq char (this-single-command-keys))
+      (if (= (length char) 1) (setq char (aref char 0))
+	(error "`auto-completion-self-insert'\
+ bound to non-printable character"))))
+  (when (null syntax) (setq syntax (char-syntax char)))
 
-  (cond
-   (t ;; otherwise, lookup behaviour in syntax alists
-    (let* ((behaviour (if no-syntax-override
-                          (completion-lookup-behaviour nil syntax)
-                        (completion-lookup-behaviour char syntax)))
-           (complete-behaviour
-            (completion-get-completion-behaviour behaviour))
-           (resolve-behaviour
-            (completion-get-resolve-behaviour behaviour))
-           (insert-behaviour
-            (completion-get-insertion-behaviour behaviour))
-           (overlay (completion-overlay-at-point))
-           wordstart prefix)
+  (destructuring-bind (resolve-behaviour complete-behaviour insert-behaviour
+		       overlay word-thing wordstart prefix)
+      (append
+       (if no-syntax-override
+	   (auto-completion-lookup-behaviour
+	    nil syntax auto-completion-source)
+	 (auto-completion-lookup-behaviour
+	  char syntax auto-completion-source))
+       (list (completion-ui-overlay-at-point) nil nil nil))
+    (setq word-thing
+	  (completion-ui-source-word-thing auto-completion-source overlay))
 
-      ;; ----- resolve behaviour -----
-      ;; if behaviour alist entry is a function, call it
-      (when (functionp resolve-behaviour)
-        (setq resolve-behaviour (funcall resolve-behaviour)))
+    ;; ----- resolve behaviour -----
+    (completion-ui-resolve-old overlay)
 
-      ;; do whatever action was specified in alists
-      (cond
-       ;; no-op
-       ((null resolve-behaviour))
+    ;; if behaviour alist entry is a function, call it
+    (when (functionp resolve-behaviour)
+      (setq resolve-behaviour (funcall resolve-behaviour)))
 
-       ;; accept
-       ((eq resolve-behaviour 'accept)
-        (setq prefix (string char))
-        (setq wordstart t)
-        ;; if there is a completion at point...
-        (when overlay
-          ;; if point is not at start of overlay, delete overlay
-          ;; (effectively accepting old completion but without running
-          ;; hooks)
-          (if (/= (point) (overlay-start overlay))
-              (completion-delete-overlay overlay)
-            ;; otherwise, accept completion
-            (completion-accept nil overlay))))
+    ;; do whatever action was specified in alists
+    (cond
+     ;; no-op
+     ((null resolve-behaviour))
 
-       ;; reject
-       ((eq resolve-behaviour 'reject)
-        (setq prefix (string char))
-        (setq wordstart t)
-        ;; if there is a completion at point...
-        (when overlay
-          ;; if point is not at start of overlay, delete overlay
-          ;; (effectively accepting old completion without running hooks)
-          (if (/= (point) (overlay-start overlay))
-              (completion-delete-overlay overlay)
-            ;; otherwise, reject completion
-            (completion-reject nil overlay))))
+     ;; accept
+     ((eq resolve-behaviour 'accept)
+      ;; CHAR might not be a character if `last-input-event' included a
+      ;; modifier (e.g. S-<space>)
+      (setq prefix (string char))
+      (setq wordstart t)
+      ;; if there is a completion at point...
+      (when overlay
+	;; if point is at start of overlay, accept completion
+	(if (= (point) (overlay-start overlay))
+	    (completion-accept nil overlay)
+	  ;; otherwise, delete overlay (effectively accepting old completion
+	  ;; but without running hooks)
+	  (completion-ui-delete-overlay overlay)
+	  (completion-ui-deactivate-interfaces overlay))
+	(setq overlay nil)))
 
-       ;; add to prefix
-       ((eq resolve-behaviour 'add)
-        ;; if we're at the start of a word, prevent adjacent word from
-        ;; being deleted below if `completion-overwrite' is non-nil
-        (when (completion-beginning-of-word-p) (setq wordstart t))
-        ;; if point is within a completion overlay...
-        (when overlay
-          ;; if point is not at start of overlay, delete overlay
-          ;; (effectively accepting the old completion) and behave as if
-          ;; no completion was in progress
-          (if (/= (point) (overlay-start overlay))
-              (completion-delete-overlay overlay)
-            ;; otherwise, delete old completion and add character to
-            ;; prefix
-            (delete-region (overlay-start overlay)
-                           (overlay-end overlay))
-            (setq prefix (concat (overlay-get overlay 'prefix)
-                                 (string char)))
-            ;; prevent any adjacent word from being deleted
-            (setq wordstart t))
-          ))
+     ;; reject
+     ((eq resolve-behaviour 'reject)
+      ;; CHAR might not be a character if `last-input-event' included a
+      ;; modifier (e.g. S-<space>)
+      (setq prefix (string char))
+      (setq wordstart t)
+      ;; if there is a completion at point...
+      (when overlay
+	;; if point is at start of overlay, reject completion
+	(if (= (point) (overlay-start overlay))
+	    (completion-reject nil overlay)
+	  ;; otherwise, delete everything following point, and delete overlay
+	  (delete-region (point) (overlay-end overlay))
+	  (completion-ui-delete-overlay overlay)
+	  (completion-ui-deactivate-interfaces overlay))
+	(setq overlay nil)))
 
-       ;; error
-       (t (error "Invalid entry in `auto-completion-syntax-alist'\
-  or `auto-completion-override-syntax-alist', %s"
-                 (prin1-to-string resolve-behaviour))))
+     ;; add to prefix
+     ((eq resolve-behaviour 'add)
+      ;; if we're at the start of a word, prevent adjacent word from being
+      ;; deleted below if `completion-overwrite' is non-nil
+      (when (completion-beginning-of-word-p word-thing) (setq wordstart t))
+      ;; if point is within a completion overlay...
+      (when overlay
+	;; if point is at start of overlay, update prefix and prevent adjacent
+	;; words being deleted
+	(if (= (point) (overlay-start overlay))
+	    (progn
+	      (setq prefix (concat (overlay-get overlay 'prefix)
+				   (string char))
+		    wordstart t)
+	      (completion-ui-deactivate-interfaces-pre-update overlay)
+	      (completion-ui-setup-overlay
+	       prefix (when overlay (1+ (overlay-get overlay 'prefix-length)))
+	       nil nil nil nil nil overlay))
+	  ;; otherwise, delete overlay (effectively accepting the old
+	  ;; completion) and behave as if no completion was in progress
+	  (completion-ui-delete-overlay overlay)
+	  (completion-ui-deactivate-interfaces overlay)
+	  (setq overlay nil))))
 
-
-      ;; ----- insersion behaviour -----
-      ;; if behaviour alist entry is a function, call it
-      (when (functionp insert-behaviour)
-        (setq insert-behaviour (funcall insert-behaviour)))
-
-      ;; if we're inserting...
-      (when insert-behaviour
-        ;; use `self-insert-command' if possible, since `auto-fill-mode'
-        ;; depends on it
-        (if (eq char last-input-event)
-            (self-insert-command 1)
-          (insert char))
-        (when (and overlay (overlay-buffer overlay))
-          (move-overlay overlay (point) (point))))
-
-
-      ;; ----- completion behaviour -----
-      ;; if behaviour alist entry is a function, call it
-      (when (functionp complete-behaviour)
-        (setq complete-behaviour (funcall complete-behaviour)))
-
-      (cond
-       ;; no-op
-       ((null complete-behaviour))
-
-       ;; if not completing, clear up any overlay left lying around
-       ((eq complete-behaviour 'none)
-        (when overlay
-          (when (overlay-get overlay 'popup-frame)
-            (delete-frame (overlay-get overlay 'popup-frame)))
-          (completion-delete-overlay overlay)))
-
-       ;; if completing...
-       ((or (eq complete-behaviour 'string)
-            (eq complete-behaviour 'word))
-        ;; if point is in middle of a word, `completion-overwrite' is
-        ;; set, and overwriting hasn't been disabled, delete rest of word
-        ;; prior to completing
-        (when (and completion-overwrite (completion-within-word-p)
-                   (null wordstart))
-          (let ((pos (point))
-                (word-thing
-                 (if (fboundp 'auto-overlay-local-binding)
-                     (auto-overlay-local-binding 'completion-word-thing)
-                   completion-word-thing)))
-            (save-excursion
-              (forward-thing word-thing)
-              (delete-region pos (point)))))
-
-        (cond
-         ;; if a prefix has been set, setup overlay with the prefix, and
-         ;; do completion
-         (prefix
-          (completion-setup-overlay prefix nil nil overlay)
-          (complete-in-buffer nil 'auto))
-
-         ;; if doing basic completion, let prefix be found normally
-         ((eq complete-behaviour 'string)
-          (complete-in-buffer nil 'auto))
-
-         ;; if completing word at point, delete any overlay at point to
-         ;; ensure prefix is found anew, and do completion
-         (t
-          (when (setq overlay (completion-overlay-at-point))
-            (completion-delete-overlay overlay))
-          (complete-in-buffer nil 'auto))))
-
-       ;; error
-       (t (error "Invalid entry in `auto-completion-syntax-alist'\
+     ;; error
+     (t (error "Invalid entry in `auto-completion-syntax-alist'\
  or `auto-completion-override-syntax-alist', %s"
-                 (prin1-to-string complete-behaviour))))
-      )))
-  )
+	       (prin1-to-string resolve-behaviour))))
 
 
+    ;; ----- insersion behaviour -----
+    ;; if behaviour alist entry is a function, call it
+    (when (functionp insert-behaviour)
+      (setq insert-behaviour (funcall insert-behaviour)))
 
-(defun complete-word-at-point ()
-  "Complete the word at or next to point."
-  (interactive)
-
-  ;; get completion overlay at point
-  (let ((overlay (completion-overlay-at-point)))
-
-    ;; if point is at start of an existing overlay, delete old completion
-    ;; before completing, preserving overlay so its prefix can be reused
-    (if (and overlay (= (point) (overlay-start overlay)))
-        (delete-region (overlay-start overlay) (overlay-end overlay))
-
-      ;; if there's a completion at point but point is not at start,
-      ;; delete overlay (effectively accepting old completion) and behave
-      ;; as if no completion was in progress
-      (when overlay (completion-delete-overlay overlay))
-
-      ;; if point is in middle of a word and `completion-overwrite' is
-      ;; enabled, delete rest of word before completing
-      (when (and completion-overwrite (completion-within-word-p))
-        (let ((pos (point)))
-          (save-excursion
-            (forward-thing completion-word-thing)
-            (delete-region pos (point))))
-        ;; if there is now a completion overlay at point, delete it
-        (when (setq overlay (completion-overlay-at-point))
-          (completion-delete-overlay overlay)))))
-
-  ;; do completion
-  (complete-in-buffer)
-  )
+    ;; if we're inserting...
+    (when insert-behaviour
+      ;; use `self-insert-command' if possible, since `auto-fill-mode' depends
+      ;; on it
+      (if (eq char last-input-event)
+	  (self-insert-command 1)
+	(insert char))
+      (when overlay (move-overlay overlay (point) (point))))
 
 
+    ;; ----- completion behaviour -----
+    ;; if behaviour alist entry is a function, call it
+    (when (functionp complete-behaviour)
+      (setq complete-behaviour (funcall complete-behaviour)))
 
-(defun completion-prefix ()
-  "Return the completion prefix at point.
-The `completion-prefix-function' is set to this by default."
+    (cond
+     ;; no-op
+     ((null complete-behaviour))
 
-  (let ((word-thing (if (fboundp 'auto-overlay-local-binding)
-                        (auto-overlay-local-binding
-                         'completion-word-thing)
-                      completion-word-thing))
-        (overlay (completion-overlay-at-point))
-        (pos (point)))
+     ;; if not completing, clear up any overlay left lying around
+     ((eq complete-behaviour 'none)
+      (when overlay
+	(completion-ui-deactivate-interfaces overlay)
+	(completion-ui-delete-overlay overlay)))
 
-    ;; if point is within existing completion overlay, return its prefix
-    (if overlay
-        (overlay-get overlay 'prefix)
-      ;; otherwise, prefix is the word before point
-      (save-excursion
-        (forward-thing word-thing -1)
-        (buffer-substring-no-properties (point) pos))))
-  )
+     ;; if completing...
+     ((or (eq complete-behaviour 'word)
+	  (eq complete-behaviour 'string))
+      ;; if point is in middle of a word, `completion-overwrite' is set, and
+      ;; overwriting hasn't been disabled, delete rest of word prior to
+      ;; completing
+      (when (and completion-overwrite
+		 (completion-within-word-p word-thing)
+		 (null wordstart))
+	(completion-overwrite-word-at-point word-thing))
 
-
-
-(defun completion-select (&optional n overlay)
-  "Select completion corresponding to the last input event
-when hotkey completion is active.
-
-If integer N is supplied, insert completion corresponding to that
-instead. If OVERLAY is supplied, use that instead of finding one
-at point. The point had better be within OVERLAY or a meteorite
-will smash through your ceiling.
-
-Intended to be bound to keys in `completion-hotkey-map'."
-  (interactive)
-  (completion-cancel-tooltip)
-
-  (unless overlay (setq overlay (completion-overlay-at-point)))
-  ;; find completion index corresponding to last input event
-  (unless n
-    (let ((key (this-command-keys-vector)))
-      ;; FIXME: work around apparent bug where keys are doubled in vector
-      (when (> (length key) 1) (setq key (vector (aref key 0))))
-      (setq n (completion--position key completion-hotkey-list))))
-
-  ;; if within a completion overlay...
-  (when overlay
-    (let ((completions (overlay-get overlay 'completions)))
       (cond
-       ;; if there are no completions, run whatever would otherwise be
-       ;; bound to the key
-       ((null completions)
-        (when completion-trap-recursion
-          (error "Recursive call to `completion-select'"))
-        (setq completion-use-hotkeys nil)
-        (let ((completion-trap-recursion t))
-          (unwind-protect
-              (command-execute
-               (key-binding (this-command-keys) t))
-            (setq completion-use-hotkeys t))))
+       ;; if a prefix has been set, do completion
+       (prefix
+	(complete-in-buffer
+	 auto-completion-source nil 'not-set 'auto overlay))
 
-       ;; if there are too few completions, display message
-       ((>= n (length completions))
-        (beep)
-        (message "Only %d completions available"
-                 (length (overlay-get overlay 'completions))))
+       ;; if doing basic completion, let prefix be found normally
+       ((eq complete-behaviour 'string)
+	(complete-in-buffer
+	 auto-completion-source nil 'not-set 'auto overlay))
 
-       ;; otherwise, replace dynamic completion with selected one
+       ;; if completing word at point, delete any overlay at point to ensure
+       ;; prefix is found anew, and do completion
        (t
-        ;; delete old provisional completion, including prefix if
-        ;; `completion-replaces-prefix' is non-nil
-        (delete-region (- (overlay-start overlay)
-                          (if (and completion-replaces-prefix
-                                   (not (overlay-get overlay
-                                                     'prefix-replaced)))
-                              (length (overlay-get overlay 'prefix))
-                            0))
-                       (overlay-end overlay))
-        (let ((overwrite-mode nil)) (insert (nth n completions)))
-        ;; run accept hooks
-        (run-hook-with-args 'completion-accept-functions
-                            (overlay-get overlay 'prefix)
-                            (concat (if completion-replaces-prefix
-                                        "" (overlay-get overlay 'prefix))
-                                    (nth n completions)))
-        ;; delete overlay
-        (completion-delete-overlay overlay))
-       )))
-  )
+	(when (setq overlay (completion-ui-overlay-at-point))
+	  (completion-ui-delete-overlay overlay))
+	(complete-in-buffer
+	 auto-completion-source nil 'not-set 'auto overlay))))
+
+     ;; error
+     (t (error "Invalid entry in `auto-completion-syntax-alist'\
+ or `auto-completion-override-syntax-alist', %s"
+	       (prin1-to-string complete-behaviour))))
+    ))
 
 
-(defun completion-select-if-within-overlay ()
-  "Select a completion to insert if there is one, otherwise run
-whatever command would normally be bound to the key sequence used
-to invoke this command."
+
+(defun completion-auto-update-self-insert ()
+  "Add character to current prefix and recomplete
+based on current syntax table."
   (interactive)
-  (completion-run-if-within-overlay 'completion-select
-                                    'completion-use-hotkeys)
-  )
 
-
-
-(defun completion-accept (&optional arg overlay)
-  "Accept current provisional completion.
-
-The value of ARG is passed as the third argument to any functions
-called from the `completion-accept-functions' hook. Interactively,
-ARG is the prefix argument.
-
-If optional argument OVERLAY is supplied, it is used instead of
-looking for an overlay at the point. The point had better be
-within OVERLAY or else your hair will fall out.
-
-If a completion was accepted, returns a cons cell containing the
-prefix and the entire accepted completion \(the concatenation of
-the prefix and the completion string\). Otherwise returns nil."
-  (interactive "P")
-
-  ;; if we haven't been passed one, get completion overlay at point
-  (unless overlay (setq overlay (completion-overlay-at-point)))
-
-  (let (prefix completion frame)
-    ;; resolve any other old provisional completions
-    (completion-resolve-old overlay)
-    (completion-cancel-tooltip)
-
-    ;; if point is in a completion overlay...
+  (let ((char last-input-event)
+	(syntax (char-syntax last-input-event))
+	(overlay (completion-ui-overlay-at-point))
+	prefix dont-complete)
     (when overlay
-      (setq prefix (overlay-get overlay 'prefix))
-      (setq completion
-            (concat (if completion-replaces-prefix "" prefix)
-                    (buffer-substring-no-properties
-                     (overlay-start overlay)
-                     (overlay-end overlay))))
-      ;; delete prefix if `completion-replaces-prefix' is non-nil, there is a
-      ;; completion to accept, and prefix hasn't already been deleted
-      (when (and completion-replaces-prefix
-                 (overlay-get overlay 'completions)
-                 (not (overlay-get overlay 'prefix-replaced)))
-        (delete-region (- (overlay-start overlay)
-                          (length (overlay-get overlay 'prefix)))
-                       (overlay-start overlay)))
-      ;; accept current completion
-      (goto-char (overlay-end overlay))
-      ;; run accept hooks
-      (run-hook-with-args 'completion-accept-functions
-                          prefix completion arg)
-      ;; delete any pop-up frame
-      (when (setq frame (overlay-get overlay 'popup-frame))
-        (delete-frame frame))
-      ;; delete overlay
-      (completion-delete-overlay overlay)
-      (cons prefix completion)))
-  )
+      (cond
+
+       ;; word- or symbol-constituent: add to prefix
+       ;; note: disabled for non-prefix-completion, unless
+       ;;       `completion-accept-or-reject-by-default' is set to 'reject,
+       ;;       because otherwise the prefix being added to is hidden
+       ((and (or (eq syntax ?w) (eq syntax ?_))
+	     (or (not (overlay-get overlay 'non-prefix-completion))
+		 (eq (completion-ui-get-value-for-source
+		      overlay completion-accept-or-reject-by-default)
+		     'reject)))
+	;; add characters up to point and new character to prefix
+	(setq prefix
+	      (concat (buffer-substring-no-properties
+		       (- (overlay-start overlay)
+			  (if (overlay-get overlay 'prefix-replaced)
+			      0 (overlay-get overlay 'prefix-length)))
+		       (point))
+		      (string char)))
+	(delete-region (point) (overlay-end overlay))
+	(overlay-put overlay 'prefix-replaced nil)
+	(completion-ui-delete-overlay overlay)
+	(completion-ui-deactivate-interfaces-pre-update overlay)
+	;; insert character
+	(if (eq char last-input-event)
+	    (self-insert-command 1)
+	  (insert char))
+	;; re-complete new prefix
+	(unless dont-complete
+	  (move-overlay overlay (point) (point))
+	  (completion-ui-setup-overlay prefix nil nil nil nil nil nil overlay)
+	  (complete-in-buffer
+	   (overlay-get overlay 'completion-source)
+	   nil 'not-set 'auto overlay)))
 
 
-;; (defun completion-accept-if-within-overlay (&optional arg)
-;;   "Accept current completion if there is one,
-;; then run whatever command would normally be bound to the key
-;; sequence used to invoke this command.
-
-;; ARG is the prefix argument, which is passed as the third argument
-;; to any functions called from the `completion-accept-functions'
-;; hook."
-;;   (interactive "P")
-;;   (completion-run-if-within-overlay
-;;    (lambda () (interactive) (completion-accept arg))
-;;    'completion-function 'before)
-;; )
-
-
-
-(defun completion-reject (&optional arg overlay)
-  "Reject current provisional completion.
-
-The value of ARG is passed as the third argument to any functions
-called from the `completion-reject-functions' hook. Interactively,
-ARG is the prefix argument.
-
-If optional argument OVERLAY is supplied, it is used instead of
-looking for an overlay at the point. The point had better be
-within OVERLAY or else your hair will fall out.
-
-If a completion was rejected, returns a cons cell containing the
-prefix and the entire rejected completion \(the concatenation of
-the prefix and the completion string\). Otherwise returns nil."
-  (interactive "P")
-
-  ;; if we haven't been passed one, get completion overlay at point
-  (unless overlay (setq overlay (completion-overlay-at-point)))
-
-  (let (prefix completion frame)
-    ;; resolve any other old provisional completions
-    (completion-resolve-old overlay)
-    (completion-cancel-tooltip)
-
-    ;; if point is in a completion overlay...
-    (when overlay
-      (setq prefix (overlay-get overlay 'prefix))
-      (setq completion
-            (concat (if completion-replaces-prefix "" prefix)
-                    (buffer-substring-no-properties
-                     (overlay-start overlay)
-                     (overlay-end overlay))))
-      ;; reject current completion
-      (delete-region (overlay-start overlay) (overlay-end overlay))
-      ;; restore prefix if it was deleted
-      (when (overlay-get overlay 'prefix-replaced)
-        (insert (overlay-get overlay 'prefix)))
-      ;; run reject hooks
-      (run-hook-with-args 'completion-reject-functions
-                          prefix completion arg)
-      ;; delete any pop-up frame
-      (when (setq frame (overlay-get overlay 'popup-frame))
-        (delete-frame frame))
-      ;; delete overlay
-      (completion-delete-overlay overlay)
-      ;; return cons cell containing prefix and rejected completion
-      (cons prefix completion)))
-  )
-
-
-;; (defun completion-reject-if-within-overlay (&optional arg)
-;;   "Reject the current completion if there is one, otherwise run
-;; whatever would normally be bound to the key sequence used to
-;; invoke this command.
-
-;; ARG is the prefix argument, which is passed as the third argument
-;; to any function called from the `completion-reject-functions'
-;; hook."
-;;   (interactive "P")
-;;   (completion-run-if-within-overlay
-;;    (lambda () (interactive) (completion-reject arg))
-;;    'completion-function)
-;; )
+       ;; anything else: accept up to point, reject rest
+       (t
+	;; if point is at start of overlay, reject completion
+	(if (= (point) (overlay-start overlay))
+	    (completion-reject nil overlay)
+	  ;; otherwise, delete everything following point, and delete overlay
+	  (delete-region (point) (overlay-end overlay))
+	  (completion-ui-delete-overlay overlay)
+	  (completion-ui-deactivate-interfaces overlay))
+	;; insert character
+	(if (eq char last-input-event)
+	    (self-insert-command 1)
+	  (insert char)))))))
 
 
 
-(defun completion-scoot-ahead (&optional overlay)
-  "Accept the characters from the current completion, and recomplete
-the resulting string.
 
-When called from Lisp programs, use OVERLAY instead of finding
-one. The point had better be within OVERLAY or the oceans will
-boil away."
-  (interactive)
-  (completion-cancel-tooltip)
+
+;;; ============================================================
+;;;                          Undo
 
-  (unless overlay (setq overlay (completion-overlay-at-point)))
-
-  ;; if within a completion overlay, accept characters it contains
-  (when (and overlay (/= (point) (overlay-end overlay)))
-    (goto-char (overlay-end overlay))
-    (move-overlay overlay (point) (point))
-    (completion-setup-overlay
-     (concat (overlay-get overlay 'prefix)
-             (nth (overlay-get overlay 'completion-num)
-                  (overlay-get overlay 'completions)))
-     nil nil overlay))
-
-  ;; if auto-completing, do so
-  (if auto-completion-mode
-      (complete-in-buffer nil 'auto)
-    ;; otherwise, if a pop-up frame is being displayed, update it
-    (when (overlay-get overlay 'popup-frame)
-      (completion-popup-frame overlay)))
-  )
-
-
-;; (defun completion-scoot-ahead-if-within-overlay ()
-;;   "Accept the characters from the current completion, if there is
-;; one, and recomplete the resulting string. Otherwise, run whatever
-;; would normally be bound to the key sequence used to invoke this
-;; command."
-;;   (interactive "P")
-;;   (completion-run-if-within-overlay
-;;    (lambda () (interactive) (completion-scoot-ahead))
-;;    'completion-function)
-;; )
+(defun completion-resolve-before-undo (beg end)
+  "Resolve completions between BEG and END before undoing.
+Added to `before-change-functions' hook."
+  ;; check if current command is an undo
+  (when undo-in-progress
+    ;; replace 'leave behaviour by 'accept, since we have to get rid of the
+    ;; completion overlay before the undo
+    (let ((completion-how-to-resolve-old-completions
+	   (if (eq completion-how-to-resolve-old-completions 'leave)
+	       'accept
+	     completion-how-to-resolve-old-completions)))
+      (completion-ui-resolve-old nil beg end))))
 
 
 
-(defun completion-cycle (&optional n overlay no-auto)
-  "Cycle through available completions.
+;;; ============================================================
+;;;                      Fill commands
 
-Optional argument N specifies the number of completions to cycle
-forwards \(backwards if negative\). Default is 1. Interactively,
-N is the prefix argument.
-
-If OVERLAY is supplied, use that instead of finding one. The
-point had better be within OVERLAY or you'll be stuck by
-lightening.
-
-If NO-AUTO is non-nil, the tooltip/menu/pop-up frame will *not*
-be auto-displayed."
-  (interactive "P")
-  (when (null n) (setq n 1))
-
-  ;; if we haven't been passed one, get completion overlay at point
-  (unless overlay (setq overlay (completion-overlay-at-point)))
-
-  ;; if within a completion overlay which has completions, cycle through them
-  (when (and overlay (overlay-get overlay 'completions))
-    (let (pos i str)
-      (when (null (setq i (overlay-get overlay 'completion-num)))
-        (setq i -1))
-      (setq i (mod (+ i n) (length (overlay-get overlay 'completions))))
-      (setq str (nth i (overlay-get overlay 'completions)))
-      ;; delete old completion
-      (delete-region (overlay-start overlay) (overlay-end overlay))
-      ;; delete prefix if `completion-replaces-prefix' is non-nil
-      (when (and completion-replaces-prefix
-                 (not (overlay-get overlay 'prefix-replaced)))
-        (delete-region (- (overlay-start overlay)
-                          (length (overlay-get overlay 'prefix)))
-                       (overlay-start overlay))
-        (overlay-put overlay 'prefix-replaced t))
-      ;; insert new completion
-      (setq pos (overlay-start overlay))
-      (let ((overwrite-mode nil)) (insert str))
-      (move-overlay overlay pos (+ pos (length str)))
-      (overlay-put overlay 'completion-num i)
-      ;; highlight longest common prefix, if enabled
-      (when completion-dynamic-highlight-common-prefix
-        (setq str (try-completion "" (overlay-get overlay 'completions)))
-        ;; (try-completion returns t if there's only one completion)
-        (when (eq str t) (setq str (car (overlay-get overlay 'completions))))
-        (move-overlay (overlay-get overlay 'common-prefix)
-                      pos (+ pos (length str))))
-      ;; move point to appropriate position (start of overlay, unless
-      ;; we're not auto-completing but are accepting or leaving old
-      ;; completions)
-      (if (or auto-completion-mode (eq completion-resolve-behaviour 'reject))
-          (goto-char pos)
-        (goto-char (overlay-end overlay)))
-      ;; display echo text if using it
-      (when completion-use-echo (complete-echo overlay))
-      ;; if pop-up frame is displayed, update it
-      (if (overlay-get overlay 'popup-frame)
-          (completion-popup-frame overlay)
-        ;; otherwise, display tooltip/menu/pop-up frame if using them and
-        ;; tooltip isn't already active
-        (when (and completion-auto-show (null no-auto))
-          (completion-auto-show overlay)))
-      ))
-  )
+(defun completion-fill-paragraph (&optional justify region)
+  "Fill paragraph at or after point.
+This command first sorts out any provisional completions, before
+calling `fill-paragraph', passing any argument straight through."
+  ;; interactive spec copied from `fill-paragraph'
+  (interactive (progn
+		 (barf-if-buffer-read-only)
+		 (list (if current-prefix-arg 'full) t)))
+  (completion-ui-resolve-old)
+  (fill-paragraph justify region))
 
 
 
-(defun completion-tooltip-cycle (&optional n overlay)
-  "Cycle forwards through N completions and redisplay the tooltip.
-A negative argument cycles backwards.
+;;; ============================================================
+;;;                      Yank Commands
 
-If OVERLAY is supplied, use that instead of finding one. The
-point had better be within OVERLAY or you'll be attacked by a mad
-cow."
-  (interactive)
-  (completion-cycle n overlay t)
-  (completion-show-tooltip)
-  )
-
+(defun auto-completion-mouse-yank-at-click (click arg)
+  "Insert the last stretch of killed text at the position clicked on.
+Temporarily disables `auto-completion-mode', then calls
+`mouse-yank-at-click'."
+  (interactive "e\nP")
+  (let ((auto-completion-mode nil))
+    (mouse-yank-at-click click arg)))
 
 
-(defun completion-tab-complete (&optional overlay)
-  "Tab-complete completion at point
-\(i.e. insert longest common prefix of all the completions\).
 
-If OVERLAY is supplied, use that instead of finding one. The
-point had better be within OVERLAY or your teeth will turn bright
-green over night."
-  (interactive)
-  (completion-cancel-tooltip)
-
-  (unless overlay (setq overlay (completion-overlay-at-point)))
-
-  ;; if within a completion overlay
-  (when overlay
-    (let ((str (try-completion "" (overlay-get overlay 'completions))))
-      ;; (try-completion returns t if there's only one completion)
-      (when (eq str t) (setq str (car (overlay-get overlay 'completions))))
-
-      (unless (or (null str) (string= str ""))
-        ;; do tab-completion
-        (delete-region (overlay-start overlay) (overlay-end overlay))
-        (let ((overwrite-mode nil)) (insert str))
-        (move-overlay overlay (point) (point))
-        (overlay-put overlay 'prefix
-                     (concat (overlay-get overlay 'prefix) str))
-        (overlay-put overlay 'completions nil)
-        ;; when auto-completing, do so
-        (if auto-completion-mode
-            (complete-in-buffer nil 'auto)
-          ;; otherwise, if a pop-up frame is being displayed, update it
-          (when (overlay-get overlay 'popup-frame)
-            (completion-popup-frame overlay))))
-      ))
-  )
-
-
-;; (defun completion-tab-complete-if-within-overlay ()
-;;   "Tab-complete current completion if there is one, otherwise run
-;; whatever command would normally be bound to the key sequence used
-;; to invoke this command."
-;;   (interactive)
-;;   (completion-run-if-within-overlay 'completion-tab-complete
-;;                  'completion-function)
-;; )
-
-
+
+;;; ============================================================
+;;;                    Deletion commands
 
 (defun completion-backward-delete (command &rest args)
-  "Run backward-delete COMMAND, passing it ARGS.
+  "Call backward-delete COMMAND, passing it ARGS.
 Any provisional completion at the point is first rejected. If
-COMMAND deletes into a word and auto-completion is enabled,
-complete what remains of that word."
+COMMAND deletes into a word and `auto-completion-mode' is
+enabled, complete what remains of that word."
 
-  ;; start by cancelling any tooltip that's stil hanging around
-  (completion-cancel-tooltip)
+  (let* ((overlay (completion-ui-overlay-at-point))
+	 (accept-or-reject
+	  (completion-ui-get-value-for-source
+	   overlay completion-accept-or-reject-by-default))
+         pos)
+    ;(combine-after-change-calls
 
-  (let* ((overlay (completion-overlay-at-point))
-         (wordstart (completion-beginning-of-word-p))
-         (word-thing (if (fboundp 'auto-overlay-local-binding)
-                         (auto-overlay-local-binding
-                          'completion-word-thing)
-                       completion-word-thing))
-         (popup (when overlay (overlay-get overlay 'popup-frame)))
-         (word-pos (save-excursion
-                     (forward-thing word-thing -1) (point))))
+      ;; ----- not auto-completing -----
+      (if (and (not auto-completion-mode)
+	       (not (completion-ui-get-value-for-source
+		     overlay completion-auto-update)))
 
-                                        ;(combine-after-change-calls
+          (progn
+            ;; if within a completion...
+            (when overlay
+              (cond
+	       ;; if rejecting old completions, delete everything after the
+	       ;; point
+	       ((eq accept-or-reject 'reject)
+                (delete-region (point) (overlay-end overlay)))
 
-    ;; ----- not auto-completing -----
-    (if (not auto-completion-mode)
-        (progn
-          ;; if within a completion...
-          (when overlay
-            ;; if rejecting old completions, delete everything after
-            ;; the point
-            (when (eq completion-resolve-behaviour 'reject)
-              (delete-region (point) (overlay-end overlay)))
-            ;; delete overlay, effectively accepting (rest of) the
-            ;; completion at point
-            (completion-delete-overlay overlay))
-          ;; resolve old provisional completions and delete backwards
-          (completion-resolve-old)
-          (apply command args))
+	       ;; if accepting longest common substring...
+	       ((eq accept-or-reject 'accept-common)
+		;; find the end of the longest common substring, using
+		;; common-substring overlay if it exists, otherwise searching
+		;; for it ourselves
+		(if (overlayp (overlay-get overlay 'common-substring))
+		    (setq pos (overlay-end
+			       (overlay-get overlay 'common-substring)))
+		  (let* ((prefix (overlay-get overlay 'prefix))
+			 (completions
+			  (mapcar
+			   (lambda (c)
+			     (if (stringp c)
+				 (substring c (length prefix))
+			       (substring (car c) (cdr c))))
+			   (overlay-get overlay 'completions)))
+			 (str (try-completion "" completions)))
+		    ;; (try-completion returns t if there's only one completion)
+		    (when (eq str t) (setq str (car completions)))
+		    (setq pos (+ (overlay-start overlay) (length str)))))
+		;; if point is before end of common substring, delete
+		;; everthing after common substring, otherwise delete
+		;; everything after point
+		(delete-region (if (< (point) pos) pos (point))
+			       (overlay-end overlay))))
 
+	      ;; delete overlay, effectively accepting (rest of) the
+              ;; completion at point
+              (completion-ui-delete-overlay overlay)
+	      (completion-ui-deactivate-interfaces overlay))
 
-      ;; ----- auto-completing -----
-      ;; resolve any old provisional completions
-      (completion-resolve-old overlay)
-
-      ;; if point is in a completion...
-      (when overlay
-        ;; if point is at start of completion, delete completion but
-        ;; keep overlay
-        (if (= (point) (overlay-start overlay))
-            (delete-region (overlay-start overlay)
-                           (overlay-end overlay))
-          ;; otherwise, delete provisional completion characters after
-          ;; point, then delete the overlay, effectively accepting
-          ;; (rest of) completion, preserving pop-up frame
-          (delete-region (point) (overlay-end overlay))
-          (completion-delete-overlay overlay t)
-          (setq overlay nil)))
-
-      ;; delete backwards
-      (apply command args)
-
-      (cond
-       ;; if we're not in or at the end of a word...
-       ((and (not (completion-within-word-p))
-             (not (completion-end-of-word-p)))
-        ;; delete any overlay and pop-up frame at point
-        (when overlay (completion-delete-overlay overlay))
-        ;; cancel any timer that's been set up
-        (when (timerp completion-backward-delete-timer)
-          (cancel-timer completion-backward-delete-timer))
-        (setq completion-backward-delete-timer nil))
+            ;; resolve old provisional completions and delete backwards
+            (completion-ui-resolve-old)
+            (apply command args))
 
 
-       ;; otherwise, we're in or at the end of a word, so complete the
-       ;; word at point
-       (t
-        ;; if point was at start of completion or start of word before
-        ;; deleting, and we're now within or at end of a word...
-        (when (or overlay
-                  (and wordstart
-                       (or (completion-within-word-p)
-                           (completion-end-of-word-p))))
-          ;; delete any overlay, since prefix is wrong and we need it
-          ;; out the way so that we can get new one below
-          (when overlay
-            (completion-delete-overlay
-             overlay (not (and popup (<= (point) word-pos)))))
-          ;; setup overlay to prevent word after point being deleted
-          (let ((pos (point)) prefix prefix-fun)
-            (setq prefix-fun
-                  (or (and (fboundp 'auto-overlay-local-binding)
-                           (auto-overlay-local-binding
-                            'completion-prefix))
-                      completion-prefix-function))
-            (setq prefix (funcall prefix-fun))
-            (setq overlay
-                  (completion-setup-overlay prefix nil nil overlay))
-            (move-overlay overlay (point) (point))
-            ;; if we've not deleted beyond start of word, and a pop-up
-            ;; frame was being displayed, make sure it's updated when
-            ;; completing
-            (when (and popup (> (point) word-pos))
-              (overlay-put overlay 'popup-frame popup))))
+        ;; ----- auto-completing -----
+	(let* ((word-thing
+		(completion-ui-source-word-thing auto-completion-source))
+	       (wordstart (or overlay
+			      (completion-beginning-of-word-p word-thing))))
 
-        ;; if there's no existing timer, set one up to complete
-        ;; remainder of word after some idle time
-        (when (timerp completion-backward-delete-timer)
-          (cancel-timer completion-backward-delete-timer))
-        (if auto-completion-backward-delete-delay
-            (setq completion-backward-delete-timer
-                  (run-with-idle-timer
-                   auto-completion-backward-delete-delay nil
-                   ;; FIXME: tooltip key-bindings don't work - why?
-                   `(lambda ()
-                      (setq completion-backward-delete-timer nil)
-                      (complete-in-buffer nil 'auto ,(point)))))
-          ;; if completing with no delay, do so
-          (complete-in-buffer nil 'auto (point)))
-        ))))                            ;)
+	  ;; resolve any old provisional completions
+	  (completion-ui-resolve-old overlay)
+
+	  ;; if point is in a completion...
+	  (when overlay
+	    ;; delete provisional completion characters after point
+	    ;; FIXME: should this depend on
+	    ;;        `completion-accept-or-reject-by-default'?
+	    (delete-region (point) (overlay-end overlay))
+	    ;; store position of beginning of prefix
+	    (setq pos (- (overlay-start overlay)
+			 (overlay-get overlay 'prefix-length)))
+	    ;; delete the overlay, effectively accepting (rest of) completion
+	    (completion-ui-delete-overlay overlay)
+	    ;; deactivate the interfaces pending update
+	    (completion-ui-deactivate-interfaces-pre-update overlay))
+
+
+	  ;; delete backwards
+	  (apply command args)
+
+
+	  (cond
+	   ;; if we're not in or at the end of a word, or we're auto-updating
+	   ;; rather than auto-completing and we've deleted beyond current
+	   ;; completion, deactivate any user-interfaces and cancel any timer
+	   ;; that's been set up
+	   ((or (and (not auto-completion-mode)
+		     (or (not overlay)
+			 (<= (point)
+			    (- pos (overlay-get overlay 'prefix-length)))))
+		(and (not (completion-within-word-p word-thing))
+		     (not (completion-end-of-word-p word-thing))))
+	    (when (timerp completion--backward-delete-timer)
+	      (cancel-timer completion--backward-delete-timer))
+	    (setq completion--backward-delete-timer nil)
+	    (when overlay (completion-ui-deactivate-interfaces overlay)))
+
+
+	   ;; otherwise, we're in or at the end of a word, so complete the
+	   ;; word at point
+	   (t
+	    ;; if point was at start of completion or start of word before
+	    ;; deleting, and we're now within or at end of a word, setup
+	    ;; a new overlay to prevent word after point being deleted
+	    (when (or overlay
+		      (and wordstart
+			   (or (completion-within-word-p word-thing)
+			       (completion-end-of-word-p word-thing))))
+	      (let* ((prefix-fun
+		      (completion-ui-source-prefix-function
+		       auto-completion-source overlay))
+		     (prefix (let ((completion-word-thing word-thing))
+			       (funcall prefix-fun))))
+		(setq overlay
+		      (completion-ui-setup-overlay
+		       prefix nil nil nil auto-completion-source))
+		(move-overlay overlay (point) (point))))
+
+	    ;; if there's no existing timer, set one up to complete remainder
+	    ;; of word after some idle time
+	    (when (timerp completion--backward-delete-timer)
+	      (cancel-timer completion--backward-delete-timer))
+	    (if auto-completion-backward-delete-delay
+		(setq completion--backward-delete-timer
+		      (run-with-idle-timer
+		       auto-completion-backward-delete-delay nil
+		       (lambda (source overlay point)
+			 (setq completion--backward-delete-timer nil)
+			 (complete-in-buffer
+			  source nil 'not-set
+			  'backward-delete overlay point))
+		       auto-completion-source overlay (point)))
+	      ;; if completing with no delay, do so
+	      (complete-in-buffer auto-completion-source nil 'not-set
+				  'auto overlay (point)))
+	    )))));)
   )
 
 
@@ -3282,298 +3678,336 @@ complete what remains of that word."
   "Call forward-delete COMMAND, passing it ARGS.
 If there is a provisional completion at point after deleting, reject
 it."
-
-  ;; start by cancelling any tooltip that's stil hanging around
-  (completion-cancel-tooltip)
+  ;; delete any completion overlay at point (effectively accepting it, but
+  ;; without running any hook functions)
+  (let ((overlay (completion-ui-overlay-at-point)))
+    (when overlay
+      (completion-ui-delete-overlay overlay)
+      (completion-ui-deactivate-interfaces overlay)))
+  ;; now resolve any old completions
+  (completion-ui-resolve-old)
   ;; call the deletion command
   (apply command args)
-  ;; if there's a completion overlay at point after deleting, reject it
-  (let ((overlay (completion-overlay-at-point)))
+  ;; if there's a completion overlay at point after deleting, delete it
+  ;; (effectively rejecting it, but without calling any hook functions)
+  (let ((overlay (completion-ui-overlay-at-point)))
     (when overlay
-      (delete-region (overlay-start overlay)
-                     (overlay-end overlay))
-      (completion-delete-overlay overlay)))
-  (completion-resolve-old)
-  )
-
+      (delete-region (overlay-start overlay) (overlay-end overlay))
+      (completion-ui-delete-overlay overlay)
+      (completion-ui-deactivate-interfaces overlay))))
 
 
 (defun completion-delete-char (n &optional killflag)
   "Delete the following N characters (previous if N is negative).
-If there is a provisional completion at point after deleting,
-reject it.  \(If N is negative, behaviour is instead as for
-`completion-backward-delete-char'.\)
 
 Non-nil optional second arg KILLFLAG means kill instead (save in
 kill ring). Interactively, N is the prefix arg (default 1), and
-KILLFLAG is set if n was explicitly specified."
-  (interactive "P")
-  (when (and (interactive-p) n) (setq killflag t))
-  (setq n (prefix-numeric-value n))
+KILLFLAG is set if n was explicitly specified. \(If N is
+negative, behaviour is instead as for
+`completion-backward-delete-char'.\)
 
+If there is a provisional completion at point after deleting, it
+is rejected. "
+  (interactive "P")
+  (when (and (called-interactively-p 'any) n) (setq killflag t))
+  (setq n (prefix-numeric-value n))
   ;; if deleting backwards, call `completion-backward-delete' instead
   (if (< n 0)
-      (completion-backward-delete 'backward-delete-char n killflag)
-    (completion-delete 'delete-char n killflag))
-  )
-
+      (completion-backward-delete 'backward-delete-char (- n) killflag)
+    (completion-delete 'delete-char n killflag)))
 
 
 (defun completion-backward-delete-char (n &optional killflag)
-  "Delete the previous N characters (following if N is negative).
-Any provisional completion at point is first rejected. If
-deleting backwards into a word, and `auto-completion-mode' is
-enabled, complete what remains of that word. \(If N is negative,
-behaviour is instead as for `completion-delete-char'.\)
+  "Delete the previous N characters.
 
 Optional second arg KILLFLAG non-nil means kill instead (save in
 kill ring). Interactively, N is the prefix arg (default 1), and
-KILLFLAG is set if N was explicitly specified."
-  (interactive "P")
-  (when (and (interactive-p) n) (setq killflag t))
-  (setq n (prefix-numeric-value n))
+KILLFLAG is set if N was explicitly specified. \(If N is
+negative, behaviour is instead as for `completion-delete-char'.\)
 
+Any provisional completion at point is first rejected. If
+deleting backwards into a word, and `auto-completion-mode' is
+enabled, complete what remains of that word."
+  (interactive "P")
+  (when (and (called-interactively-p 'any) n) (setq killflag t))
+  (setq n (prefix-numeric-value n))
   ;; if deleting forwards, call `completion-delete' instead
   (if (< n 0)
-      (completion-delete 'delete-char n killflag)
-    (completion-backward-delete 'backward-delete-char n killflag))
-  )
-
+      (completion-delete 'delete-char (- n) killflag)
+    (completion-backward-delete 'backward-delete-char n killflag)))
 
 
 (defun completion-backward-delete-char-untabify (n &optional killflag)
   "Delete N characters backward, changing tabs into spaces.
-Any provisional completion at point is first rejected. If
-deleting backwards into a word, and `auto-completion-mode' is
-enabled, complete what remains of that word. \(If N is negative,
-behaviour is instead as for `completion-delete-char'.\)
 
 Optional second arg KILLFLAG non-nil means kill instead (save in
 kill ring). Interactively, N is the prefix arg (default 1), and
-KILLFLAG is set if N was explicitly specified.
+KILLFLAG is set if N was explicitly specified. \(If N is
+negative, behaviour is instead as for `completion-delete-char'.\)
 
-The exact behavior depends on `backward-delete-char-untabify-method'."
+The exact behavior depends on `backward-delete-char-untabify-method'.
+
+Any provisional completion at point is first rejected. If
+deleting backwards into a word, and `auto-completion-mode' is
+enabled, complete what remains of that word."
   (interactive "P")
-  (when (and (interactive-p) n) (setq killflag t))
+  (when (and (called-interactively-p 'any) n) (setq killflag t))
   (setq n (prefix-numeric-value n))
-
   ;; if deleting forwards, call `completion-delete' instead
   (if (< n 0)
-      (completion-delete 'delete-char n killflag)
-    (completion-backward-delete 'backward-delete-char-untabify
-                                n killflag))
-  )
-
+      (completion-delete 'delete-char (- n) killflag)
+    (completion-backward-delete 'backward-delete-char-untabify n killflag)))
 
 
 (defun completion-kill-word (&optional n)
   "Kill characters forward until encountering the end of a word.
-With argument, do this that many times. If there is a provisional
-completion at point after deleting, reject it. \(If N is
-negative, behaviour is instead as for
-`completion-backward-kill-word'.\)"
-  (interactive "p")
+With argument, do this that many times. \(If N is negative,
+behaviour is instead as for `completion-backward-kill-word'.\)
 
+If there is a provisional completion at point after deleting, it
+is rejected."
+  (interactive "p")
   ;; if deleting backwards, call `completion-backward-delete' instead
   (if (< n 0)
-      (completion-backward-delete 'backward-kill-word n)
-    (completion-delete 'kill-word n))
-  )
-
-
+      (completion-backward-delete 'backward-kill-word (- n))
+    (completion-delete 'kill-word n)))
 
 
 (defun completion-backward-kill-word (&optional n)
   "Kill characters backward until encountering the end of a word.
-With argument, do this that many times. Any provisional
-completion at point is first rejected. If deleting backwards into
-a word, and `auto-completion-mode' is enabled, complete what
-remains of that word.  \(If N is negative, behaviour is instead
-as for `completion-kill-word'.\)"
-  (interactive "p")
+With argument, do this that many times. \(If N is negative,
+behaviour is instead as for `completion-kill-word'.\)
 
+Any provisional completion at point is first rejected. If
+deleting backwards into a word, and `auto-completion-mode' is
+enabled, complete what remains of that word."
+  (interactive "p")
   ;; if deleting forwards, call `completion-delete' instead
   (if (< n 0)
-      (completion-delete 'kill-word n)
-    (completion-backward-delete 'backward-kill-word n))
-  )
-
+      (completion-delete 'kill-word (- n))
+    (completion-backward-delete 'backward-kill-word n)))
 
 
 (defun completion-kill-sentence (&optional n)
   "Kill from point to end of sentence.
-With argument, do this that many times. If there is a provisional
-completion at point after deleting, reject it. \(If N is
-negative, behaviour is instead as for
-`completion-backward-kill-sentence'.\)"
-  (interactive "p")
+With argument, do this that many times. \(If N is negative,
+behaviour is instead as for
+`completion-backward-kill-sentence'.\)
 
+If there is a provisional completion at point after deleting, it
+is rejected."
+  (interactive "p")
   ;; if deleting backwards, call `completion-backward-delete' instead
   (if (< n 0)
-      (completion-backward-delete 'backward-kill-sentence n)
-    (completion-delete 'kill-sentence n))
-  )
-
-
+      (completion-backward-delete 'backward-kill-sentence (- n))
+    (completion-delete 'kill-sentence n)))
 
 
 (defun completion-backward-kill-sentence (&optional n)
   "Kill back from point to start of sentence.
-With argument, do this that many times. Any provisional
-completion at point is first rejected. If deleting backwards into
-a word, and `auto-completion-mode' is enabled, complete what
-remains of that word.  \(If N is negative, behaviour is instead
-as for `completion-kill-sentence'.\)"
-  (interactive "p")
+With argument, do this that many times. \(If N is negative,
+behaviour is instead as for `completion-kill-sentence'.\)
 
+Any provisional completion at point is first rejected. If
+deleting backwards into a word, and `auto-completion-mode' is
+enabled, complete what remains of that word."
+  (interactive "p")
   ;; if deleting forwards, call `completion-delete' instead
   (if (< n 0)
-      (completion-delete 'kill-sentence n)
-    (completion-backward-delete 'backward-kill-sentence n))
-  )
-
+      (completion-delete 'kill-sentence (- n))
+    (completion-backward-delete 'backward-kill-sentence n)))
 
 
 (defun completion-kill-sexp (&optional n)
   "Kill the sexp (balanced expression) following point.
-With argument, do this that many times. If there is a provisional
-completion at point after deleting, reject it. \(If N is
-negative, behaviour is instead as for
-`completion-backward-kill-sexp'.\)"
-  (interactive "p")
+With argument, do this that many times. \(If N is negative,
+behaviour is instead as for `completion-backward-kill-sexp'.\)
 
+If there is a provisional completion at point after deleting, it
+is rejected."
+  (interactive "p")
   ;; if deleting backwards, call `completion-backward-delete' instead
   (if (< n 0)
-      (completion-backward-delete 'backward-kill-sexp n)
-    (completion-delete 'kill-sexp n))
-  )
-
-
+      (completion-backward-delete 'backward-kill-sexp (- n))
+    (completion-delete 'kill-sexp n)))
 
 
 (defun completion-backward-kill-sexp (&optional n)
   "Kill the sexp (balanced expression) before point.
-With argument, do this that many times. Any provisional
-completion at point is first rejected. If deleting backwards into
-a word, and `auto-completion-mode' is enabled, complete what
-remains of that word.  \(If N is negative, behaviour is instead
-as for `completion-kill-sexp'.\)"
-  (interactive "p")
+With argument, do this that many times. \(If N is negative,
+behaviour is instead as for `completion-kill-sexp'.\)
 
+Any provisional completion at point is first rejected. If
+deleting backwards into a word, and `auto-completion-mode' is
+enabled, complete what remains of that word."
+  (interactive "p")
   ;; if deleting forwards, call `completion-delete' instead
   (if (< n 0)
-      (completion-delete 'kill-sexp n)
-    (completion-backward-delete 'backward-kill-sexp n))
-  )
+      (completion-delete 'kill-sexp (- n))
+    (completion-backward-delete 'backward-kill-sexp n)))
 
+
+
+(defun completion-kill-line (&optional n)
+  "Kill the line following point.
+With argument, do this that many times. \(If N is negative,
+behaviour is instead as for `completion-backward-kill-line'.\)
+
+If there is a provisional completion at point after deleting, it
+is rejected."
+  (interactive "P")
+  ;; if deleting backwards, call `completion-backward-delete' instead
+  (if (and (integerp n) (< n 0))
+      (completion-backward-delete 'kill-line (- n))
+    (completion-delete 'kill-line n)))
+
+
+
+(defun completion-backward-kill-line (&optional n)
+  "Kill the line before point.
+With argument, do this that many times. \(If N is negative,
+behaviour is instead as for `completion-kill-line'.\)
+
+Any provisional completion at point is first rejected. If
+deleting backwards into a word, and `auto-completion-mode' is
+enabled, complete what remains of that word."
+  (interactive "p")
+  ;; if deleting forwards, call `completion-delete' instead
+  (if (< n 0)
+      (completion-delete 'kill-line (- n))
+    (completion-backward-delete 'kill-line n)))
 
 
 (defun completion-kill-paragraph (&optional n)
   "Kill forward to end of paragraph.
-With argument, do this that many times. If there is a provisional
-completion at point after deleting, reject it. \(If N is
-negative, behaviour is instead as for
-`completion-backward-kill-paragraph'.\)"
-  (interactive "p")
+With argument, do this that many times. \(If N is negative,
+behaviour is instead as for
+`completion-backward-kill-paragraph'.\)
 
+If there is a provisional completion at point after deleting,
+reject it."
+  (interactive "p")
   ;; if deleting backwards, call `completion-backward-delete' instead
   (if (< n 0)
-      (completion-backward-delete 'backward-kill-paragraph n)
-    (completion-delete 'kill-paragraph n))
-  )
-
-
+      (completion-backward-delete 'backward-kill-paragraph (- n))
+    (completion-delete 'kill-paragraph n)))
 
 
 (defun completion-backward-kill-paragraph (&optional n)
   "Kill backward to start of paragraph.
-With argument, do this that many times. Any provisional
-completion at point is first rejected. If deleting backwards into
-a word, and `auto-completion-mode' is enabled, complete what
-remains of that word.  \(If N is negative, behaviour is instead
-as for `completion-kill-paragraph'.\)"
-  (interactive "p")
+With argument, do this that many times. \(If N is negative,
+behaviour is instead as for `completion-kill-paragraph'.\)
 
+Any provisional completion at point is first rejected. If
+deleting backwards into a word, and `auto-completion-mode' is
+enabled, complete what remains of that word."
+  (interactive "p")
   ;; if deleting forwards, call `completion-delete' instead
   (if (< n 0)
-      (completion-delete 'kill-paragraph n)
-    (completion-backward-delete 'backward-kill-paragraph n))
-  )
+      (completion-delete 'kill-paragraph (- n))
+    (completion-backward-delete 'backward-kill-paragraph n)))
 
 
 
-;; (defun completion-backward-delete-if-within-overlay (&optional n)
-;;   "Delete backwards N characters.
-;; If there is a provisional completion at the point, delete it first."
-;;   (interactive "p")
-;;   (completion-run-if-within-overlay
-;;    (lambda () (interactive) (completion-backward-delete n))
-;;    'completion-function 'instead)
-;; )
-
-
-
-
-
-
+
 ;;; ==============================================================
 ;;;                    Internal functions
 
-(defun completion-setup-overlay
-  (prefix &optional completions num overlay)
-  "Get completion overlay at point, or create a new one
-if none exists, and set its properties according to PREFIX,
-COMPLETIONS and NUM. If NUM is t, the overlay's completion-num
-property is left unchanged."
+(defun completion-prefix ()
+  "Return the completion prefix at point.
+This is the default `completion-prefix-function'."
+  (declare (special completion-word-thing))
+  (let ((overlay (completion-ui-overlay-at-point))
+	(pos (point)))
+    ;; if point is within existing completion overlay, return its prefix
+    (if overlay
+        (overlay-get overlay 'prefix)
+      ;; otherwise, prefix is the word before point
+      (save-excursion
+        (forward-thing completion-word-thing -1)
+        (buffer-substring-no-properties (point) pos)))))
 
-  (unless overlay (setq overlay (completion-overlay-at-point)))
+
+
+(defun completion-ui-setup-overlay
+    (prefix &optional prefix-length completions num
+	    completion-source prefix-function
+	    non-prefix-completion overlay)
+  "Set completion overlay properties according to the arguments.
+
+If OVERLAY isn't supplied, look for one at point, and create a
+new one if none exists.
+
+If PREFIX-LENGTH is null, it defaults to the length of PREFIX. If
+NUM is null, it defaults to 1. To leave these properties
+unchanged, use any non-numeric and non-null value.
+
+The COMPLETION-SOURCE, COMPLETION-PREFIX-FUNCTION and
+NON-PREFIX-COMPLETION properties are ignored and the
+corresponding properties left unchanged if an existing overlay's
+properties (either a supplied OVERLAY or an existing overlay at
+point) are being set."
+
+  ;; look for completion overlay at point
+  (unless overlay (setq overlay (completion-ui-overlay-at-point)))
+
   ;; if overlay does not already exists, create one
   (unless overlay
     (setq overlay (make-overlay (point) (point) nil nil t))
     ;; set permanent overlay properties
     (overlay-put overlay 'completion-overlay t)
-    (overlay-put overlay 'face 'completion-dynamic-face)
-    (if auto-completion-mode
-        (overlay-put overlay 'keymap auto-completion-dynamic-map)
-      (overlay-put overlay 'keymap completion-dynamic-map))
-    (overlay-put overlay 'help-echo
-                 'completion-construct-help-echo-text)
+    (overlay-put overlay 'non-prefix-completion non-prefix-completion)
+    (overlay-put overlay 'face 'completion-highlight-face)
     (overlay-put overlay 'priority 100)
-    (when completion-dynamic-highlight-common-prefix
-      (let ((o (make-overlay (point) (point))))
-        (overlay-put overlay 'common-prefix o)
-        (overlay-put o 'face 'completion-dynamic-common-prefix-face)
-        (overlay-put o 'priority 101)))
+    (overlay-put overlay 'completion-source completion-source)
+    (overlay-put overlay 'completion-prefix-function prefix-function)
+    ;; set overlay keymap
+    (let ((map (make-sparse-keymap)))
+      (overlay-put overlay 'keymap map)
+      (set-keymap-parent
+       map
+       (cond
+	((and auto-completion-mode
+	      (eq (overlay-get overlay 'completion-source)
+		  auto-completion-source))
+	 auto-completion-overlay-map)
+	((completion-ui-get-value-for-source
+	  completion-source completion-auto-update)
+	 completion-auto-update-overlay-map)
+	(t completion-overlay-map))))
     ;; add overlay to list
-    (push overlay completion-overlay-list))
+    (push overlay completion--overlay-list))
 
   ;; update modifiable overlay properties
   (overlay-put overlay 'prefix prefix)
+  (cond
+   ((numberp prefix-length)
+    (overlay-put overlay 'prefix-length prefix-length))
+   ((and prefix-length (overlay-get overlay 'prefix-length)))
+   (t (overlay-put overlay 'prefix-length (length prefix))))
   (overlay-put overlay 'completions completions)
-  (unless (eq num t) (overlay-put overlay 'completion-num num))
+  (cond
+   ((null num) (overlay-put overlay 'completion-num (if completions 0 nil)))
+   ((numberp num) (overlay-put overlay 'completion-num num)))
 
   ;; return the new overlay
-  overlay
-  )
+  overlay)
 
 
 
-(defun completion-delete-overlay (overlay &optional keep-popup)
+(defun completion-ui-delete-overlay (overlay &optional keep-popup)
   "Delete completion overlay, and clean up after it.
 If KEEP-POPUP is non-nil, prevent deletion of any pop-up frame
 associated with OVERLAY."
-  (when (overlayp (overlay-get overlay 'common-prefix))
-    (delete-overlay (overlay-get overlay 'common-prefix)))
+  (when (overlayp (overlay-get overlay 'common-substring))
+    (delete-overlay (overlay-get overlay 'common-substring)))
   (delete-overlay overlay)
-  (setq completion-overlay-list (delq overlay completion-overlay-list))
-  (when (and (not keep-popup) (overlay-get overlay 'popup-frame))
-    (delete-frame (overlay-get overlay 'popup-frame)))
-  )
+  (setq completion--overlay-list (delq overlay completion--overlay-list)))
 
 
 
-(defun completion-overlay-at-point (&optional point)
-  "Return dynamic completion overlay overlapping point.
+(defun completion-ui-overlay-at-point (&optional point)
+  "Return completion overlay overlapping point.
 \(There should only be one; if not, one is returned at random\)"
   (setq point (or point (point)))
 
@@ -3599,14 +4033,12 @@ associated with OVERLAY."
         (when (and (overlay-get o 'completion-overlay)
                    (= (overlay-start o) point))
           (throw 'found o)))
-      ))
-  )
+      )))
 
 
 
 (defun completion-overlays-in (start end)
   "Return list of completion overlays between START and END."
-
   ;; get overlays between START and END
   (let ((o-list (overlays-in start end))
         overlay-list)
@@ -3615,121 +4047,98 @@ associated with OVERLAY."
       (when (overlay-get o 'completion-overlay)
         (push o overlay-list)))
     ;; return the overlay list
-    overlay-list)
-  )
+    overlay-list))
 
 
 
-(defun completion-resolve-old (&optional overlay)
-  "Resolve old dynamic completions according to the setting of
-`completion-reslove-method'. Any completion overlay specified by
-OVERLAY will be left alone."
+(defun completion-ui-resolve-old (&optional overlay beg end)
+  "Resolve old completions according to the setting of
+`completion-how-to-resolve-old-completions'.
 
-  ;; temporarily remove ignored overlay from list
-  (setq completion-overlay-list
-        (delq overlay completion-overlay-list))
+Any completion overlay specified by OVERLAY will be left alone,
+and completions near the point are dealt with specially, so as
+not to modify characters around the point.
 
+If BEG and END are specified, only completions between BEG and
+END are resolved. If only one of BEG or END is specified, the
+other defaults to `point-max' or `point-min', respectively."
   (cond
-   ;; leave old completions (but accept zero-length ones)
-   ((eq completion-resolve-behaviour 'leave)
-    (mapc (lambda (o)
-            (overlay-put o 'evaporate t)
-            (when (overlay-get o 'popup-frame)
-              (delete-frame (overlay-get o 'popup-frame))
-              (overlay-put overlay 'popup-frame nil))
-            ;; if overlay hasn't evaporated, reset evaporate property,
-            ;; otherwise delete it from overlay list
-            (if (overlay-buffer o)
-                (overlay-put o 'evaporate nil)
-              (setq completion-overlay-list
-                    (delq o completion-overlay-list))
-              (run-hook-with-args 'completion-accept-functions
-                                  (overlay-get o 'prefix)
-                                  (overlay-get o 'prefix))))
-          completion-overlay-list))
+   ((and beg (not end)) (setq end (point-max)))
+   ((and (not beg) end) (setq beg (point-min))))
 
-   ;; accept old completions
-   ((eq completion-resolve-behaviour 'accept)
-    (mapc (lambda (o)
-            (run-hook-with-args 'completion-accept-functions
-                                (overlay-get o 'prefix)
-                                (concat (if completion-replaces-prefix
-                                            "" (overlay-get o 'prefix))
-                                        (buffer-substring-no-properties
-                                         (overlay-start o)
-                                         (overlay-end o))))
-            ;; if `completion-replaces-prefix' is non-nil, delete prefix
-            ;; before accepting; no one in their right mind would want this
-            ;; behaviour, but we shouldn't discriminate against the insane
-            (when completion-replaces-prefix
-              (delete-region (- (overlay-start o)
-                                (length (overlay-get o 'prefix)))
-                             (overlay-start o)))
-            (completion-delete-overlay o))
-          completion-overlay-list)
-    (setq completion-overlay-list nil))
+  (let (overlay-list)
+    ;; ignore OVERLAY and any overlays not between BEG and END (if specified)
+    (if beg
+	(dolist (o completion--overlay-list)
+	  (unless (or (eq o overlay)
+		      (< (overlay-end o) beg)
+		      (> (overlay-start o) end))
+	    (push o overlay-list)))
+      (setq overlay-list (delq overlay completion--overlay-list)))
 
-   ;; reject old completions
-   ((eq completion-resolve-behaviour 'reject)
-    (mapc (lambda (o)
-            (run-hook-with-args 'completion-reject-functions
-                                (overlay-get o 'prefix)
-                                (concat (if completion-replaces-prefix
-                                            "" (overlay-get o 'prefix))
-                                        (buffer-substring-no-properties
-                                         (overlay-start o)
-                                         (overlay-end o)))
-                                nil)
-            (delete-region (overlay-start o) (overlay-end o))
-            (completion-delete-overlay o))
-          completion-overlay-list)
-    (setq completion-overlay-list nil))
 
-   ;; ask 'em
-   ((eq completion-resolve-behaviour 'ask)
     (save-excursion
-      (mapc (lambda (o)
-              (goto-char (overlay-end o))
-              ;; FIXME: remove hard-coded face
-              (overlay-put o 'face '(background-color . "red"))
-              (if (y-or-n-p "Accept completion? ")
-                  ;; accept
-                  (when completion-replaces-prefix
-                    (delete-region (- (overlay-start o)
-                                      (length (overlay-get o 'prefix)))
-                                   (overlay-start o)))
-                (run-hook-with-args
-                 'completion-accept-functions
-                 (overlay-get o 'prefix)
-                 (concat (if completion-replaces-prefix
-                             "" (overlay-get o 'prefix))
-                         (buffer-substring-no-properties
-                          (overlay-start o)
-                          (overlay-end o))))
-                ;; reject
-                (run-hook-with-args
-                 'completion-reject-functions
-                 (overlay-get o 'prefix)
-                 (concat (if completion-replaces-prefix
-                             "" (overlay-get o 'prefix))
-                         (buffer-substring-no-properties
-                          (overlay-start o)
-                          (overlay-end o)))
-                 nil)
-                (delete-region (overlay-start o) (overlay-end o)))
-              ;; delete overlay and any pop-up frame associated with it
-              (completion-delete-overlay o))
-            completion-overlay-list)
-      (setq completion-overlay-list nil)))
-   )
+      (cond
+       ;; leave old completions (but accept zero-length ones)
+       ((eq completion-how-to-resolve-old-completions 'leave)
+	(mapc (lambda (o)
+		(when (= (overlay-start o) (overlay-end o))
+		  (completion-accept nil o)))
+	      overlay-list))
 
-  ;; add ignored overlay back into the list
-  (when (overlayp overlay) (push overlay completion-overlay-list))
-  )
+       ;; accept old completions
+       ((eq completion-how-to-resolve-old-completions 'accept)
+	(mapc (lambda (o)
+		;; if completion is nowhere near point, accept it
+		(if (or (> (point) (overlay-end o))
+			(< (point)
+			   (- (overlay-start o)
+			      (if (and (overlay-get o 'non-prefix-completion)
+				       (overlay-get o 'prefix-replaced))
+				  0 (overlay-get o 'prefix-length)))))
+		    (completion-accept nil o)
+		  ;; otherwise, completion overlaps point, so just delete
+		  ;; overlay, effectively accepting whatever is there
+		  (completion-ui-delete-overlay o)
+		  (completion-ui-deactivate-interfaces o)))
+	      overlay-list))
+
+       ;; reject old completions
+       ((eq completion-how-to-resolve-old-completions 'reject)
+	(mapc (lambda (o)
+		;; if completion is nowhere near point, reject it
+		(if (or (> (point) (overlay-end o))
+			(< (point)
+			   (- (overlay-start o)
+			      (if (and (overlay-get o 'non-prefix-completion)
+				       (overlay-get o 'prefix-replaced))
+				  0 (overlay-get o 'prefix-length)))))
+		    (completion-reject nil o)
+		  ;; otherwise, completion overlaps point, so just delete
+		  ;; provisional completion characters and overlay
+		  (delete-region (overlay-start o) (overlay-end o))
+		  (completion-ui-delete-overlay o)
+		  (completion-ui-deactivate-interfaces o)))
+	      overlay-list))
+
+       ;; ask 'em
+       ((eq completion-how-to-resolve-old-completions 'ask)
+	(save-excursion
+	  (mapc (lambda (o)
+		  (goto-char (overlay-end o))
+		  ;; FIXME: remove hard-coded face
+		  (overlay-put o 'face '(background-color . "red"))
+		  (if (y-or-n-p "Accept completion? ")
+		      (completion-accept nil o)
+		    (completion-reject nil o)))
+		overlay-list))))))
+
+  (when (null completion--overlay-list)
+    (setq completion-ui--activated nil)))
 
 
 
-(defun completion-resolve-current (&optional overlay char syntax)
+(defun completion--resolve-current (&optional overlay char syntax)
   "Resolve current completion according to customization settings.
 
 If OVERLAY is supplied, use that instead of trying to find one at
@@ -3742,31 +4151,37 @@ with syntax class SYNTAX was inserted at point (without actually
 inserting anything)."
 
   ;; if no overlay was supplied, try to find one at point
-  (unless overlay (setq overlay (completion-overlay-at-point)))
+  (unless overlay (setq overlay (completion-ui-overlay-at-point)))
   ;; resolve provisional completions not at point
-  (completion-resolve-old overlay)
+  (completion-ui-resolve-old overlay)
 
   ;; if there's a completion at point...
   (when overlay
-    (let (resolve)
+    (let ((accept-or-reject
+	   (completion-ui-get-value-for-source
+	    overlay completion-accept-or-reject-by-default))
+	  resolve)
+      ;; if `auto-completion-mode' is enabled, and at least one of CHAR or
+      ;; SYNTAX was supplied, lookup behaviour for CHAR and SYNTAX
+      (if (and auto-completion-mode
+	       (eq (overlay-get overlay 'completion-source)
+		   auto-completion-source)
+	       (or char syntax))
+	  (setq resolve (car (auto-completion-lookup-behaviour
+			      char syntax
+			      (overlay-get overlay 'completion-source))))
 
-      ;; if `auto-completion-mode' is disabled, or neither CHAR nor
-      ;; SYNTAX were supplied...
-      (if (or (not auto-completion-mode) (not (or char syntax)))
-          (cond
-           ((eq completion-resolve-behaviour 'reject)
-            (setq resolve 'reject))
-           ((eq completion-resolve-behaviour 'accept)
-            (setq resolve 'accept))
-           (t (setq resolve 'other)))
-
-        ;; otherwise, if point is not at start of overlay, we want to
-        ;; effectively accept completion without running hooks
-        (if (/= (point) (overlay-start overlay))
-            (setq resolve 'other)
-          ;; otherwise, lookup behaviour for CHAR and SYNTAX
-          (setq resolve (completion-get-resolve-behaviour
-                         (completion-lookup-behaviour char syntax)))))
+	;; otherwise, `completion-accept-or-reject-by-default' determines the
+	;; behaviour
+	;; note: setting resolve to 'reject causes characters between point
+	;;       and end of overlay to be deleted, which accepts longest
+	;;       common substring in the case of 'accept-common because of
+	;;       where point is positioned
+	(cond
+	 ((or (eq accept-or-reject 'reject)
+	      (eq accept-or-reject 'accept-common))
+	  (setq resolve 'reject))
+	 (t (setq resolve 'accept))))
 
 
       (cond
@@ -3778,36 +4193,19 @@ inserting anything)."
           ;; otherwise, delete everything after point but keep whatever
           ;; comes before it
           (delete-region (point) (overlay-end overlay))
-          (completion-delete-overlay overlay)))
+          (completion-ui-delete-overlay overlay)))
 
        ;; if accepting, do so
-       ((eq resolve 'accept)
-        (completion-accept overlay))
+       ((eq resolve 'accept) (completion-accept nil overlay))
 
        ;; anything else effectively accepts the completion but without
        ;; running accept hooks
-       (t (completion-delete-overlay overlay)))
-      ))
-  )
+       (t (completion-ui-delete-overlay overlay)))
+      )))
 
 
 
-
-(defun completion-cancel-tooltip ()
-  "Hide the completion tooltip and cancel timers."
-  (interactive)
-  ;; cancel timer
-  (when (timerp completion-auto-timer)
-    (cancel-timer completion-auto-timer))
-  ;; cancel tooltip
-  (when (and completion-function window-system (fboundp 'x-show-tip))
-    (tooltip-hide)
-    (setq completion-tooltip-active nil))
-  )
-
-
-
-(defun completion-run-if-condition
+(defun completion--run-if-condition
   (command variable condition &optional when)
   "Run COMMAND if CONDITION is non-nil.
 
@@ -3824,8 +4222,8 @@ Intended to be invoked (directly or indirectly) via a key
 sequence in a keymap."
 
   ;; throw and error if executing recursively
-  (when completion-trap-recursion
-    (error "Recursive call to `completion-run-if-condition';\
+  (when completion--trap-recursion
+    (error "Recursive call to `completion--run-if-condition';\
  supplied variable probably doesn't disable keymap"))
 
   ;; run command if running before, or if running instead and CONDITION
@@ -3838,25 +4236,26 @@ sequence in a keymap."
   ;; run whatever would normally be bound to the key sequence,
   ;; unless running instead and CONDITION is non-nil
   (unless (and (or (null when) (eq when 'instead)) condition)
-    (let ((completion-trap-recursion t)
-          (restore (eval variable))
+    (let ((completion--trap-recursion t)
+          (restore (symbol-value variable))
           command)
       (set variable nil)
-      (setq command
-            (key-binding (this-command-keys) t))
+      ;; we add (this-command-keys) to `unread-command-events' and then
+      ;; re-read it in order to ensure key sequence translation takes place
+      (setq unread-command-events (listify-key-sequence (this-command-keys)))
+      (setq command (key-binding (read-key-sequence nil) t))
       (unwind-protect
           (when (commandp command)
             (command-execute command)
-            (setq last-command command)) ; doesn't work - clobbered later :(
+            (setq last-command command))  ; doesn't work - clobbered later :(
         (set variable restore))))
 
   ;; run command if running after
-  (when (eq when 'after) (command-execute command))
-  )
+  (when (eq when 'after) (command-execute command)))
 
 
 
-(defun completion-run-if-within-overlay
+(defun completion--run-if-within-overlay
   (command variable &optional when)
   "Run COMMAND if within a completion overlay.
 
@@ -3871,434 +4270,56 @@ end of this function.
 
 Intended to be (invoked directly or indirectly) via a key
 sequence in a keymap."
-  (completion-run-if-condition
-   command variable (completion-overlay-at-point) when)
-  )
+  (completion--run-if-condition
+   command variable (completion-ui-overlay-at-point) when))
 
 
 
-(defun completion-construct-tooltip-text
-  (prefix completions &optional num)
-  "Function to return completion text for a tooltip.
-Optional argument NUM specifies the number of the currently
-inserted dynamic completion."
-
-  (let* ((text "") str
-         (maxlen (if (null completions) 0
-                   (apply 'max (mapcar 'length completions)))))
-
-    (dotimes (i (length completions))
-      ;; pad all strings to same length
-      (setq str (concat (if completion-replaces-prefix "" prefix)
-                        (nth i completions)
-                        (make-string (- maxlen (length (nth i completions)))
-                                     ? )))
-      ;; if using hotkeys and one is assigned to current completion,
-      ;; show it next to completion text
-      (when (and completion-use-hotkeys
-                 (< i (length completion-hotkey-list)))
-        (setq str
-              (concat str " "
-                      (format "(%s)"
-                              (key-description
-                               (nth i completion-hotkey-list))))))
-      ;; if current completion is the inserted dynamic completion, use
-      ;; `completion-dynamic-face' to highlight it
-      (when (and num (= i num))
-        ;; setting 'face attribute to 'completion-dynamic-face
-        ;; doesn't seem to work with defface using display classes
-        (put-text-property
-         0 (length str) 'face
-         `((foreground-color . ,(face-attribute 'completion-dynamic-face
-                                                :foreground))
-           (background-color . ,(face-attribute 'completion-dynamic-face
-                                                :background)))
-         str))
-      (setq text (concat text str "\n")))
-
-    ;; return constructed text
-    text)
-  )
+(defun completion-overwrite-word-at-point (word-thing)
+  "Delete remainder of completion-word-thing at point."
+  (let ((pos (point)))
+    (save-excursion
+      (forward-thing word-thing)
+      (delete-region pos (point)))))
 
 
 
-(defun completion-construct-echo-text (overlay)
-  "Function to return completion text for echo area."
-
-  (let* ((prefix (overlay-get overlay 'prefix))
-         (completions (overlay-get overlay 'completions))
-         (text "") str)
-
-    (dotimes (i (length completions))
-      (setq str (concat (if completion-replaces-prefix "" prefix)
-                        (nth i completions)))
-      ;; if using hotkeys and one is assigned to current completion,
-      ;; show it next to completion text
-      (cond
-       ((and completion-use-hotkeys
-             (< i (length completion-hotkey-list)))
-        (setq str
-              (concat
-               (format "(%s) "
-                       (key-description
-                        (nth i completion-hotkey-list))) str)))
-       (completion-use-hotkeys
-        (setq str (concat "() " str))))
-      (setq text (concat text str "  ")))
-
-    ;; return constructed text
-    text)
-  )
-
-
-
-(defun completion-construct-help-echo-text (dummy1 overlay dummy2)
-  "Function to return text for help-echo property
-of completion overlay."
-
-  (let* ((text "") str
-         (prefix (overlay-get overlay 'prefix))
-         (completions (overlay-get overlay 'completions))
-         (num (overlay-get overlay 'completion-num)))
-
-    ;; if `tooltip-mode' is enabled, construct text for tooltip
-    (if tooltip-mode
-        (dotimes (i (length completions))
-          ;; if using hotkeys and one is assigned to current
-          ;; completion, show it next to completion text
-          (if (and completion-use-hotkeys
-                   (< i (length completion-hotkey-list)))
-              (setq str
-                    (format "(%c)"
-                            (key-description
-                             (nth i completion-hotkey-list))))
-            (setq str "    "))
-          ;; add completion to text
-          (setq str (concat str " "
-                            (if completion-replaces-prefix "" prefix)
-                            (nth i completions)))
-          (setq text (concat text str "\n")))
-
-      ;; otherwise, construct text for echo area
-      (setq text (completion-construct-echo-text overlay)))
-
-    ;; return constructed text
-    text)
-  )
-
-
-
-
-(defun completion-construct-popup-frame-text (prefix completions)
-  "Construct the list of lines for a pop-up frame."
-  (let ((maxlen (if (null completions) 0
-                  (apply 'max (mapcar 'length completions))))
-        (lines nil))
-    (dotimes (i (length completions))
-      (setq lines
-            (append lines
-                    (list
-                     (concat
-                      (if completion-replaces-prefix "" prefix)
-                      (nth i completions)
-                      ;; pad to same length
-                      (make-string
-                       (- maxlen (length (nth i completions))) ? )
-                      ;; add hotkey for current completion, if any
-                      (if (and completion-use-hotkeys
-                               (< i (length completion-hotkey-list)))
-                          (format " (%s)" (key-description
-                                           (nth i completion-hotkey-list)))
-                        ""))))))
-    lines)                              ; return pop-up frame lines
-  )
-
-
-
-
-(defun completion-construct-menu (prefix completions)
-  "Construct and return menu keymap defining the completion menu."
-
-  (let ((menu (make-sparse-keymap))
-        (num (length completions))
-        n)
-
-    ;; construct menu keymap from available completions
-    (dotimes (i num)
-      (setq n (- num i 1))
-      (define-key menu
-        (vector (intern (concat "completion-insert-"
-                                (number-to-string n))))
-        (list 'menu-item
-              (concat (if completion-replaces-prefix "" prefix)
-                      (nth n completions))
-              `(lambda () (insert ,(nth n completions)))
-              ;; if a hotkeys is associated with completion, show it
-              ;; in menu
-              :keys (when (and completion-use-hotkeys
-                               (< n (length completion-hotkey-list)))
-                      (key-description
-                       (nth n completion-hotkey-list))))))
-
-    ;; add entry to switch to completion browser
-    (define-key-after menu [separator-browser] '(menu-item "--"))
-    (define-key-after menu [completion-browser-menu-function]
-      (list 'menu-item "Browser..."
-            (lambda ()
-              (completion-show-menu
-               nil (or (and (fboundp 'auto-overlay-local-binding)
-                            (auto-overlay-local-binding
-                             'completion-browser-menu-function))))
-              )))
-
-    ;; return the menu keymap
-    menu)
-  )
-
-
-
-(defun completion-construct-browser-menu
-  (prefix completions &optional menu-item-func sub-menu-func)
-  "Construct the completion browser menu keymap
-from the supplied PREFIX (COMPLETIONS is ignored and replaced by
-all completions of PREFIX in the current dictionary).
-
-MENU-ITEM-FUNC and SUB-MENU-FUNC override the default functions
-for creating the sub-menus and menu items. Both functions are
-passed a 4-item list containing PREFIX, a list of completions of
-PREFIX, MENU-ITEM-FUNC and SUB-MENU-FUNC."
-
-  ;; inform user it's in progress (note: can't display "done" message
-  ;; since this function returns as soon as main menu is constructed,
-  ;; before all submenus have been constructed by :filter functions)
-  (message "Creating predictive completion browser\
- (C-g to cancel if taking too long)...")
-
-  ;; default menu creation functions
-  (unless menu-item-func
-    (setq menu-item-func 'completion-browser-menu-item))
-  (unless sub-menu-func
-    (setq sub-menu-func 'completion-browser-sub-menu))
-
-  ;; find all completions of prefix
-  (setq completions (completion-call-completion-function
-                     completion-function prefix))
-
-  ;; main browser menu is just a browser submenu...
-  (let ((menu (funcall sub-menu-func
-                       prefix completions
-                       menu-item-func sub-menu-func)))
-    ;; ... with an item added for switching to the basic completion
-    ;; menu
-    (define-key-after menu [separator-basic] '(menu-item "--"))
-    (define-key-after menu [completion-menu]
-      (list 'menu-item "Basic..." 'completion-show-menu))
-
-    ;; return keymap
-    menu)
-  )
-
-
-
-;; Note:
-;;
-;; I should probably use some `imenu' function to create the menu,
-;; since `imenu' already deals with "bucketising" menus (an ugly
-;; necessity which should anyway be replaced with menu scrollbars,
-;; preferably with just-in-time calculation of menu entries --
-;; heads-up Emacs devs!).
-;;
-;; My excuses are that `imenu--mouse-menu' etc. are undocumented,
-;; rolling my own was easier, and anyway I think my buckets are better
-;; (they're optimal in the information-theoretic sense that you need
-;; to make the least number of choices to get to the entry you want).
-;;
-;; One day I might patch the `imenu' "bucketising" code, and use
-;; `imenu' here instead. Don't hold your breath.
-
-(defun completion-browser-sub-menu
-  (prefix completions menu-item-func sub-menu-func)
-  "Construct a predictive completion browser sub-menu keymap."
-
-  (let* ((menu (make-sparse-keymap))
-         (num-completions (length completions)))
-
-    ;; if menu does not need to be divided into buckets, just add the
-    ;; completions themselves to the keymap
-    (if (< num-completions completion-browser-max-items)
-        (dotimes (i num-completions)
-          (define-key-after menu
-            (vector (intern (concat "completion-insert-"
-                                    (number-to-string i))))
-            (list 'menu-item
-                  (concat (if completion-replaces-prefix "" prefix)
-                          (nth i completions))
-                  ;; call function to generate menu item
-                  (funcall menu-item-func
-                           prefix (nth i completions)
-                           menu-item-func sub-menu-func))))
-
-
-      ;; if menu needs to be divided into buckets, construct a menu
-      ;; keymap containing the bucket menus
-      (let* ((num-buckets
-              (cond
-               ;; maximize number of buckets, minimize size of
-               ;; contents
-               ((eq completion-browser-buckets 'max)
-                completion-browser-max-items)
-               ;; minimuze number of buckets, maximize size of
-               ;; contents
-               ((eq completion-browser-buckets 'min)
-                (1+ (/ (1- num-completions)
-                       completion-browser-max-items)))
-               ;; balance number of buckets and size of contents
-               (t
-                (min completion-browser-max-items
-                     (round (sqrt num-completions))))))
-             (num-per-bucket (/ num-completions num-buckets))
-             (num-large-buckets (% num-completions num-buckets))
-             (num-small-buckets (- num-buckets num-large-buckets))
-             i j)
-        (dotimes (b num-buckets)
-
-          ;; if bucket has only 1 entry, don't bother with bucket
-          ;; menu, just add completion itself to keymap
-          (if (and (= 1 num-per-bucket) (< b num-small-buckets))
-              (define-key-after menu
-                (vector (intern (concat "completion-insert-"
-                                        (number-to-string b))))
-                (list 'menu-item
-                      (concat (if completion-replaces-prefix "" prefix)
-                              (nth b completions))
-                      ;; call function to generate menu item
-                      (funcall menu-item-func
-                               prefix (nth b completions)
-                               menu-item-func sub-menu-func)))
-
-            ;; if bucket has more than 1 entry...
-            ;; index of first completion in bucket
-            (setq i (+ (* (min b num-small-buckets) num-per-bucket)
-                       (* (max 0 (- b num-small-buckets))
-                          (1+ num-per-bucket))))
-            ;; index of last completion in bucket
-            (setq j (+ i num-per-bucket
-                       (if (< b num-small-buckets) 0 1)))
-            ;; add bucket menu to keymap
-            (define-key-after menu
-              (vector (intern (concat "bucket-" (number-to-string b))))
-              (list 'menu-item
-                    (concat "From \""
-                            (if completion-replaces-prefix "" prefix)
-                            (nth i completions)
-                            "\" to \""
-                            (if completion-replaces-prefix "" prefix)
-                            (nth j completions) "\"")
-                    ;; call function to generate sub-menu
-                    (funcall sub-menu-func
-                             prefix (completion--sublist completions i j)
-                             menu-item-func sub-menu-func))))
-          )))
-
-    ;; return constructed menu
-    menu)
-  )
-
-
-
-(defun completion-browser-menu-item (prefix cmpl menu-item-func sub-menu-func)
-  "Construct predictive completion browser menu item."
-
-  (let (completions)
-    ;; If `completion-replaces-prefix' is null, get completions for entry,
-    ;; dropping the empty string which corresponds to the same entry again
-    ;; (which would lead to infinite recursion). It makes no sense to get
-    ;; completions of completions (of completions of completions...) when
-    ;; doing something other than prefix-completion, so the entry is just the
-    ;; original completion itself if `completion-replaces-prefix' is non-nil.
-    (unless completion-replaces-prefix
-      (setq completions
-            (completion-call-completion-function
-             completion-function (concat prefix cmpl)))
-      (setq completions
-            (mapcar (lambda (c) (concat cmpl c)) completions))
-      (setq completions (cdr completions)))
-
-    ;; if there are no completions (other than the entry itself),
-    ;; create a selectable completion item
-    (if (null completions)
-        `(lambda () (insert ,cmpl))
-      (let ((menu (funcall sub-menu-func prefix completions
-                           menu-item-func sub-menu-func)))
-        ;; otherwise, create a sub-menu containing them
-        (define-key menu [separator-item-sub-menu] '(menu-item "--"))
-        (define-key menu [completion-insert-root]
-          (list 'menu-item
-                (concat (if completion-replaces-prefix "" prefix) cmpl)
-                `(lambda () (insert ,cmpl))))
-        ;; return the menu keymap
-        menu)))
-  )
-
-
-
-
-
-(defun completion-beginning-of-word-p (&optional point)
-  "Return non-nil if POINT is at beginning of a word
+(defun completion-beginning-of-word-p (thing &optional point)
+  "Return non-nil if POINT is at beginning of a THING.
 \(POINT defaults to the point\)."
   (unless point (setq point (point)))
   (save-excursion
     (goto-char point)
     (let (bounds)
       (and (< point (point-max))
-           (setq bounds
-                 (bounds-of-thing-at-point
-                  (if (fboundp 'auto-overlay-local-binding)
-                      (auto-overlay-local-binding
-                       'completion-word-thing)
-                    completion-word-thing)))
-           (= point (car bounds)))))
-  )
+           (setq bounds (bounds-of-thing-at-point thing))
+           (= point (car bounds))))))
 
 
 
-(defun completion-within-word-p (&optional point)
-  "Return non-nil if POINT is within or at end of a word
+(defun completion-within-word-p (thing &optional point)
+  "Return non-nil if POINT is within or at end of a THING.
 \(POINT defaults to the point\)."
   (unless point (setq point (point)))
   (save-excursion
     (goto-char point)
     (let (bounds)
-      (and (setq bounds
-                 (bounds-of-thing-at-point
-                  (if (fboundp 'auto-overlay-local-binding)
-                      (auto-overlay-local-binding
-                       'completion-word-thing)
-                    completion-word-thing)))
+      (and (setq bounds (bounds-of-thing-at-point thing))
            (> point (car bounds))
-           (< point (cdr bounds)))))
-  )
+           (< point (cdr bounds))))))
 
 
 
-(defun completion-end-of-word-p (&optional point)
-  "Return non-nil if POINT is at end of a word
+(defun completion-end-of-word-p (thing &optional point)
+  "Return non-nil if POINT is at end of a THING.
 \(POINT defaults to the point\)"
   (unless point (setq point (point)))
   (save-excursion
     (goto-char point)
     (let (bounds)
       (and (> point (point-min))
-           (setq bounds
-                 (bounds-of-thing-at-point
-                  (if (fboundp 'auto-overlay-local-binding)
-                      (auto-overlay-local-binding
-                       'completion-word-thing)
-                    completion-word-thing)))
-           (= point (cdr bounds)))))
-  )
-
+           (setq bounds (bounds-of-thing-at-point thing))
+           (= point (cdr bounds))))))
 
 
 
@@ -4316,8 +4337,6 @@ DX and DY specify optional offsets from the top left of the glyph."
 
   (unless window (setq window (selected-window)))
   (unless position (setq position (window-point window)))
-  (unless dx (setq dx 0))
-  (unless dy (setq dy 0))
 
   (let* ((pos (posn-at-point position window))
          (x-y (posn-x-y pos))
@@ -4325,17 +4344,19 @@ DX and DY specify optional offsets from the top left of the glyph."
          (win-x-y (window-pixel-edges window)))
     ;; adjust for window edges
     (setcar (nthcdr 2 pos)
-            (cons (+ (car x-y) (car  edges) (- (car win-x-y))  dx)
-                  (+ (cdr x-y) (cadr edges) (- (cadr win-x-y)) dy)))
-    (list 'mouse-1 pos))
-  )
+            (cons (+ (car x-y) (car  edges) (- (car win-x-y))  (or dx 0))
+                  (+ (cdr x-y) (cadr edges) (- (cadr win-x-y)) (or dy 0))))
+    (list 'mouse-1 pos 1)))
 
 
 
-(defun completion-window-posn-at-point (&optional position window)
+(defun completion-window-posn-at-point
+  (&optional position window dx dy)
   "Return pixel position of top left of corner glyph at POSITION,
 relative to top left corner of WINDOW. Defaults to the position
 of point in the selected window.
+
+DX and DY specify optional offsets from the top left of the glyph.
 
 See also `completion-window-inside-posn-at-point' and
 `completion-frame-posn-at-point'."
@@ -4346,32 +4367,36 @@ See also `completion-window-inside-posn-at-point' and
   (let ((x-y (posn-x-y (posn-at-point position window)))
         (edges (window-inside-pixel-edges window))
         (win-x-y (window-pixel-edges window)))
-    (cons (+ (car x-y) (car  edges) (- (car win-x-y)))
-          (+ (cdr x-y) (cadr edges) (- (cadr win-x-y)))))
-  )
+    (cons (+ (car x-y) (car  edges) (- (car win-x-y)) (or dx 0))
+          (+ (cdr x-y) (cadr edges) (- (cadr win-x-y)) (or dy 0)))))
 
 
 
 (defun completion-window-inside-posn-at-point
-  (&optional position window)
+  (&optional position window dx dy)
   "Return pixel position of top left corner of glyph at POSITION,
 relative to top left corner of the text area in WINDOW. Defaults
 to the position of point in the selected window.
+
+DX and DY specify optional offsets from the top left of the glyph.
 
 See also `completion-window-posn-at-point' and
 `completion-frame-posn-at-point'.."
 
   (unless window (setq window (selected-window)))
   (unless position (setq position (window-point window)))
-  (posn-x-y (posn-at-point position window))
-  )
+  (let ((x-y (posn-x-y (posn-at-point position window))))
+    (cons (+ (car x-y) (or dx 0)) (+ (cdr x-y) (or dy 0)))))
 
 
 
-(defun completion-frame-posn-at-point (&optional position window)
+(defun completion-frame-posn-at-point
+  (&optional position window dx dy)
   "Return pixel position of top left corner of glyph at POSITION,
 relative to top left corner of frame containing WINDOW. Defaults
 to the position of point in the selected window.
+
+DX and DY specify optional offsets from the top left of the glyph.
 
 See also `completion-window-posn-at-point' and
 `completion-window-inside-posn-at-point'."
@@ -4381,33 +4406,33 @@ See also `completion-window-posn-at-point' and
 
   (let ((x-y (posn-x-y (posn-at-point position window)))
         (edges (window-inside-pixel-edges window)))
-    (cons (+ (car x-y) (car  edges))
-          (+ (cdr x-y) (cadr edges))))
-  )
+    (cons (+ (car x-y) (car  edges) (or dx 0))
+          (+ (cdr x-y) (cadr edges) (or dy 0)))))
 
 
 
-
-
+
 ;;; ===============================================================
-;;;                     Compatibility Stuff
+;;;                     Compatibility Hacks
 
 ;; prevent bogus compiler warnings
 (eval-when-compile
-  (defun completion-compat-window-offsets (dummy)))
+  (defun completion--compat-window-offsets (dummy))
+  (defun completion--compat-frame-posn-at-point
+    (&optional arg1 arg2 arg3 arg4)))
 
 
 
 (unless (fboundp 'posn-at-point)
-  ;;  (require 'completion-ui-compat)
 
-
-  (defun completion-compat-frame-posn-at-point
-    (&optional position window)
+  (defun completion--compat-frame-posn-at-point
+    (&optional position window dx dy)
     "Return pixel position of top left corner of glyph at POSITION,
 relative to top left corner of frame containing WINDOW. Defaults
-to the position of point in the selected window."
+to the position of point in the selected window.
 
+DX and DY specify optional offsets from the top left of the
+glyph."
     (unless window (setq window (selected-window)))
     (unless position (setq position (window-point window)))
 
@@ -4416,12 +4441,12 @@ to the position of point in the selected window."
                                 position
                                 (cons (window-width) (window-height))
                                 (window-width)
-                                        ; prob. shouldn't be 0
+                                ; prob. shouldn't be 0
                                 (cons (window-hscroll) 0)
                                 window))
            (x (nth 1 x-y))
            (y (nth 2 x-y))
-           (offset (completion-compat-window-offsets window))
+           (offset (completion--compat-window-offsets window))
            (restore (mouse-pixel-position))
            pixel-pos)
 
@@ -4434,14 +4459,16 @@ to the position of point in the selected window."
                                 (cddr restore))
 
       ;; return pixel position
-      (setcdr pixel-pos
-              (- (cdr pixel-pos)
-                 (/ (frame-char-height (window-frame window)) 2)))
+      (setf (car pixel-pos) (+ (car pixel-pos) (or dx 0))
+	    (cdr pixel-pos)
+	    (+ (- (cdr pixel-pos)
+		  (/ (frame-char-height (window-frame window)) 2))
+	       (or dy 0)))
       pixel-pos))
 
 
 
-  (defun completion-compat-posn-at-point-as-event
+  (defun completion--compat-posn-at-point-as-event
     (&optional position window dx dy)
     "Return pixel position of top left corner of glyph at POSITION,
 relative to top left corner of WINDOW, as a mouse-1 click
@@ -4456,8 +4483,6 @@ glyph."
 
     (unless window (setq window (selected-window)))
     (unless position (setq position (window-point window)))
-    (unless dx (setq dx 0))
-    (unless dy (setq dy 0))
 
     ;; get window-relative position in units of characters
     (let* ((x-y (compute-motion (window-start) '(0 . 0)
@@ -4469,7 +4494,7 @@ glyph."
                                 window))
            (x (nth 1 x-y))
            (y (nth 2 x-y))
-           (offset (completion-compat-window-offsets window))
+           (offset (completion--compat-window-offsets window))
            (restore (mouse-pixel-position))
            (frame (window-frame window))
            (edges (window-edges window))
@@ -4493,16 +4518,32 @@ glyph."
                            (/ (frame-char-height frame) 2)))
 
       ;; return a fake event containing the position
-      (setcar pixel-pos (+ (car pixel-pos) dx))
-      (setcdr pixel-pos (+ (cdr pixel-pos) dy))
+      (setcar pixel-pos (+ (car pixel-pos) (or dx 0)))
+      (setcdr pixel-pos (+ (cdr pixel-pos) (or dy 0)))
       (list 'mouse-1 (list window position pixel-pos))))
+
+
+
+  (defun completion--compat-window-posn-at-point
+    (&optional position window dx dy)
+    "Return pixel position of top left corner of glyph at POSITION,
+relative to top left corner of WINDOW. Defaults to the position
+of point in the selected window.
+
+DX and DY specify optional offsets from the top left of the
+glyph."
+    (let ((x-y (completion--compat-frame-posn-at-point
+		position window dx dy))
+	  (win-x-y (completion--compat-window-offsets window)))
+      (cons (+ (car x-y) (car win-x-y))
+	    (+ (cdr x-y) (cdr win-x-y)))))
 
 
 
 ;;; Borrowed from senator.el (I promise I'll give it back when I'm
 ;;; finished...)
 
-  (defun completion-compat-window-offsets (&optional window)
+  (defun completion--compat-window-offsets (&optional window)
     "Return offsets of WINDOW relative to WINDOW's frame.
 Return a cons cell (XOFFSET . YOFFSET) so the position (X . Y) in
 WINDOW is equal to the position ((+ X XOFFSET) .  (+ Y YOFFSET))
@@ -4543,48 +4584,64 @@ in WINDOW'S frame."
       (cons xoffset yoffset)))
 
 
-
-  (defun completion-compat-line-number-at-pos (pos)
+  (defun completion--compat-line-number-at-pos (pos)
     "Return (narrowed) buffer line number at position POS.
 \(Defaults to the point.\)"
     (1+ (count-lines (point-min) pos)))
 
 
-
   (defalias 'completion-posn-at-point-as-event
-    'completion-compat-posn-at-point-as-event)
+    'completion--compat-posn-at-point-as-event)
   (defalias 'completion-frame-posn-at-point
-    'completion-compat-frame-posn-at-point)
-  )
+    'completion--compat-frame-posn-at-point)
+  (defalias 'completion-window-posn-at-point
+    'completion--compat-window-posn-at-point)
+)
 
 
-
-;;; =================================================================
-;;;                 Set modification hook functions
-
-(add-hook 'after-change-functions
-          (lambda (&rest unused) (completion-cancel-tooltip)))
-
-;; we reset tooltip flag after any command because Emacs hides tooltips
-;; after any command
-(add-hook 'pre-command-hook 'completion-cancel-tooltip)
-
-
-
-;;; =================================================================
-;;;                      Compatibility hacks
 
 ;; If the current Emacs version doesn't support overlay keybindings half
 ;; decently, have to simulate them using the
-;; `completion-run-if-within-overlay' hack. So far, no Emacs version supports
+;; `completion--run-if-within-overlay' hack. So far, no Emacs version supports
 ;; things properly for zero-length overlays, so we always have to do this!
 
 (when (<= emacs-major-version 21)
-  (completion-simulate-overlay-bindings completion-dynamic-map completion-map
-                                        'completion-function)
-  (completion-simulate-overlay-bindings auto-completion-dynamic-map
+  (completion--simulate-overlay-bindings completion-overlay-map completion-map
+                                        'completion-ui)
+  (completion--simulate-overlay-bindings auto-completion-overlay-map
                                         auto-completion-map
                                         'auto-completion-mode t))
 
+
+
+
+;;; ================================================================
+;;;                Load user-interface modules
+
+(provide 'completion-ui)
+(require 'completion-ui-dynamic)
+(require 'completion-ui-hotkeys)
+(require 'completion-ui-echo)
+(require 'completion-ui-tooltip)
+(require 'completion-ui-popup-tip)
+(require 'completion-ui-menu)
+(require 'completion-ui-popup-frame)
+(require 'completion-ui-sources)
+
+
+;; ;; set default auto-show interface to popup-tip
+;; (setq completion-auto-show 'completion-show-popup-tip)
+
+;; ;; (Note: this is kinda ugly, but setting the default in the defcustom seems
+;; ;; to conflict with refreshing the defcustom in
+;; ;; `compeltion-ui-register-interface'. Since Completion-UI is almost
+;; ;; invariably loaded before a user's customization settings, theirs will
+;; ;; still take precedence.)
+
+
+
+;; Local Variables:
+;; eval: (font-lock-add-keywords nil '(("(\\(completion-ui-defcustom-per-source\\)\\>[ \t]*\\(\\sw+\\)?" (1 font-lock-keyword-face) (2 font-lock-variable-name-face))))
+;; End:
 
 ;;; completion-ui.el ends here

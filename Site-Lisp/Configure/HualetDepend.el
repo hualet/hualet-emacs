@@ -126,7 +126,6 @@
 ;(require 'shell-history)               ;Shell历史
 (require 'paredit)                     ;括号编辑模式
 ;;; (require 'mwe-log-commands)       ;命令日志
-(require 'predictive)                  ;英文助手
 ;(require 'contentswitch)               ;按内容切换缓存或文件
 ;;; (require 'etest)                  ;测试工具
 ;(require 'fringe-helper)               ;边缘帮助

@@ -2,53 +2,40 @@
 ;;; auto-overlay-common.el --- general overlay functions
 
 
-;; Copyright (C) 2006 Toby Cubitt
+;; Copyright (C) 2006-2007, 2012 Toby Cubitt
 
 ;; Author: Toby Cubitt <toby-predictive@dr-qubit.org>
-;; Version: 0.1.1
+;; Version: 0.2.1
 ;; Keywords: automatic, overlays
 ;; URL: http://www.dr-qubit.org/emacs.php
 
-
-;; This file is part of the Emacs Automatic Overlays package.
+;; This file is NOT part of the Emacs.
 ;;
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License
-;; as published by the Free Software Foundation; either version 2
-;; of the License, or (at your option) any later version.
+;; This file is free software: you can redistribute it and/or modify it under
+;; the terms of the GNU General Public License as published by the Free
+;; Software Foundation, either version 3 of the License, or (at your option)
+;; any later version.
 ;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
+;; This program is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+;; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+;; more details.
 ;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-;; MA 02110-1301, USA.
-
-
-;;; Change Log:
-;;
-;; Version 0.1.1
-;; * bugfix in `auto-overlay-local-binding'
-;;
-;; Version 0.1
-;; * initial version split from auto-overlays
-
+;; You should have received a copy of the GNU General Public License along
+;; with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ;;; Code:
-
 
 (provide 'auto-overlay-common)
 
 
 (defun auto-overlays-at-point (&optional point prop-test inactive)
-  "Return overlays overlapping POINT (or the point, if POINT is
-null). If PROP-TEST is supplied, it should be a list which
-specifies a property test with one of the following forms (or a
-list of such lists if more than one property test is required):
+  "Return overlays overlapping POINT
+(or the point, if POINT is null). If PROP-TEST is supplied, it
+should be a list which specifies a property test with one of the
+following forms (or a list of such lists if more than one
+property test is required):
 
   (FUNCTION PROPERTY)
 
@@ -59,7 +46,7 @@ list of such lists if more than one property test is required):
 where PROPERTY indicates an overlay property name (a symbol), and
 VALUE indicates an arbitrary value or lisp expression.
 
-For each overlay between START and END, first the values
+For each overlay overlapping POINT, first the values
 corresponding to the property names are retrieved from the
 overlay, then FUNCTION is called with the properties values
 followed by the other values as its arguments. The test is
@@ -74,7 +61,7 @@ Note that this function returns any overlay. If you want to
 restrict it to auto overlays, include '(identity auto-overlay) in
 PROP-TEST."
   (when (null point) (setq point (point)))
-  
+
   (let (overlay-list)
     ;; get overlays overlapping POINT and zero-length overlays at POINT
     (setq overlay-list
@@ -89,7 +76,7 @@ PROP-TEST."
       (when (and (> (overlay-end o) point)
 		 (= (overlay-start o) point))
 	(push o overlay-list)))
-    
+
     overlay-list)
 )
 
@@ -139,15 +126,15 @@ PROP-TEST."
       (setq prop-test (list '(null inactive) prop-test))))
    (t
     (unless inactive (setq prop-test (push '(null inactive) prop-test)))))
-  
-  (let (overlay-list function prop-list value-list result)    
+
+  (let (overlay-list function prop-list value-list result)
     ;; check properties of each overlay in region
     (dolist (o (overlays-in start end))
       ;; check overlay is entirely within region
       (if (and within
 	       (or (< (overlay-start o) start) (> (overlay-end o) end)))
 	  (setq result nil)
-	
+
 	;; if it is, or we don't care
 	(setq result t)
 	(catch 'failed
@@ -164,7 +151,7 @@ PROP-TEST."
 			(and (setq value-list (nth 2 test))  ; nil isn't list
 			     (listp value-list)))
 	      (setq value-list (list value-list)))
-	    
+
 	    ;; apply the test
 	    (setq result
 		  (and result
@@ -173,7 +160,7 @@ PROP-TEST."
 					      prop-list)
 				      value-list))))
 	    (when (null result) (throw 'failed nil)))))
-      
+
       ;; add overlay to result list if its properties matched
       (when result (push o overlay-list)))
     ;; return result list
@@ -190,9 +177,9 @@ precedence (i.e. the one that begins later, or if they begin at
 the same point the one that ends earlier).
 
 See `auto-overlays-at' for ane explanation of the PROPTEST argument."
-  
+
   (unless point (setq point (point)))
-  
+
   ;; get all overlays at point with a non-nil SYMBOL property
   (let* ((overlay-list (auto-overlays-at-point point proptest))
 	 (overlay (pop overlay-list))
@@ -216,24 +203,27 @@ See `auto-overlays-at' for ane explanation of the PROPTEST argument."
 
 
 
-(defun auto-overlay-local-binding (symbol &optional point)
+(defun auto-overlay-local-binding (symbol &optional point only-overlay)
   "Return \"overlay local \" binding of SYMBOL at POINT,
-or the current local binding if there is no overlay
-binding. POINT defaults to the point.
+or the current local binding if there is no overlay binding. If
+there is no overlay binding and SYMBOL is not bound, return
+nil. POINT defaults to the point.
 
-An \"overlay local\" binding is creating by giving an overlay a
+If ONLY-OVERLAY is non-nil, only overlay bindings are
+returned. If none exists at POINT, nil is returned
+
+An \"overlay local\" binding is created by giving an overlay a
 non-nil value for a property named SYMBOL. If more than one
 overlay at POINT has a non-nil SYMBOL property, the value from
 the highest priority overlay is returned.
 
 See `auto-overlay-highest-priority-at-point' for a definition of
 \"highest priority\"."
-  
+
   (let ((overlay (auto-overlay-highest-priority-at-point
 		  point `(identity ,symbol))))
     (if overlay
 	(overlay-get overlay symbol)
-      (when (boundp symbol) (eval symbol))))
-)
+      (and (not only-overlay) (boundp symbol) (symbol-value symbol)))))
 
 ;; auto-overlay-common.el ends here

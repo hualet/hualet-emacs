@@ -2,74 +2,30 @@
 ;;; auto-overlay-self.el --- self-delimited automatic overlays
 
 
-;; Copyright (C) 2005-2007 Toby Cubitt
+;; Copyright (C) 2005-2007, 2012 Toby Cubitt
 
 ;; Author: Toby Cubitt <toby-predictive@dr-qubit.org>
-;; Version: 0.2.8
+;; Version: 0.2.9
 ;; Keywords: automatic, overlays, self
 ;; URL: http://www.dr-qubit.org/emacs.php
 
-;; This file is part of the Emacs Automatic Overlays package.
+;; This file is NOT part of the Emacs.
 ;;
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License
-;; as published by the Free Software Foundation; either version 2
-;; of the License, or (at your option) any later version.
+;; This file is free software: you can redistribute it and/or modify it under
+;; the terms of the GNU General Public License as published by the Free
+;; Software Foundation, either version 3 of the License, or (at your option)
+;; any later version.
 ;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
+;; This program is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+;; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+;; more details.
 ;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-;; MA 02110-1301, USA.
-
-
-;;; Change Log:
-;;
-;; Version 0.2.8
-;; * renamed 'entry-id and 'subentry-id to 'definition-id and 'regexp-id
-;;
-;; Version 0.2.7
-;; * fixed bug in `auto-o-parse-self-match' which caused a matched self match
-;;   to have null 'parent property if a new self match was created inside an
-;;   existing self overlay
-;;
-;; Version 0.2.6
-;; * set overlay properties straight after creation in `auto-o-make-self',
-;;   rather than leaving it to `auto-overlay-update', in case matching causes
-;;   exclusive reparsing, for which properties are already required
-;;
-;; Version 0.2.5
-;; * removed `auto-overlay-functions' and changed to use new interface
-;;
-;; Version 0.2.4
-;; * fixed(?) bug in auto-o-self-list that caused it to
-;;   sometimes miss out the parent overlay itself from the list
-;;
-;; Version 0.2.3
-;; * updated to reflect changes in `auto-overlays.el'
-;; * changed `auto-o-self-list' to make it run faster
-;;
-;; Version 0.2.2
-;; * small but important bug fix
-;;
-;; Version 0.2.1
-;; * bug fixes
-;;
-;; Version 0.2
-;; * substantially re-written to postpone cascading until absolutely
-;;   necessary, for improved responsiveness
-;;
-;; Version 0.1
-;; * initial version separated off from auto-overlays.el
-
+;; You should have received a copy of the GNU General Public License along
+;; with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ;;; Code:
-
 
 (require 'auto-overlays)
 (provide 'auto-overlay-self)
@@ -108,17 +64,17 @@
 (defun auto-o-parse-self-match (o-match)
   ;; perform any necessary updates of auto overlays due to a match for a self
   ;; regexp
-  
+
   (let* ((overlay-list (auto-o-self-list o-match))
 	 (o (car overlay-list)))
-    
+
     (cond
      ;; if stack is empty, create a new end-unmatched overlay, adding it to
      ;; the list of unascaded overlays (avoids treating it as a special
      ;; case), and return it
      ((null overlay-list)
       (auto-o-make-self o-match nil))
-     
+
      ;; if new delimiter is inside the first existing overlay and existing one
      ;; is end-unmatched, just match it
      ((and (not (overlay-get o 'end))
@@ -128,8 +84,8 @@
       (setq auto-o-pending-self-cascade (delq o auto-o-pending-self-cascade))
       ;; return nil since haven't created any new overlays
       nil)
-     
-     
+
+
      ;; otherwise...
      (t
       (let (o-new)
@@ -140,7 +96,7 @@
 	    (setq o-new (auto-o-make-self
 			 o-match
 			 (overlay-get (overlay-get o 'start) 'delim-start)))
-	  
+
 	  ;; if the new match is inside an existing overlay...
 	  (setq o (pop overlay-list))
 	  ;; create overlay from end of existing one till start of the one
@@ -154,7 +110,7 @@
 	  ;; match end of existing one with the new match, protecting its old
 	  ;; end match which is now matched with start of new one
 	  (auto-o-match-overlay o nil o-match 'no-props nil 'protect-match))
-      
+
       ;; return newly created overlay
       o-new))
      ))
@@ -211,7 +167,7 @@
   ;; If END is nil, the new overlay is end-unmatched and ends at the end of
   ;; the buffer.
   (let (o-new)
-    
+
     ;; create new overlay (location ensures right things happen when matched)
     (let (pos)
       (cond
@@ -219,15 +175,15 @@
        ((number-or-marker-p end) (setq pos end))
        (t (setq pos (point-max))))
       (setq o-new (make-overlay pos pos nil nil 'rear-advance)))
-    
+
     ;; give overlay some basic properties
     (overlay-put o-new 'auto-overlay t)
     (overlay-put o-new 'set-id (overlay-get o-start 'set-id))
     (overlay-put o-new 'definition-id (overlay-get o-start 'definition-id))
-    
+
     ;; if overlay is end-unmatched, add it to the list of uncascaded overlays
     (unless (overlayp end) (push o-new auto-o-pending-self-cascade))
-    
+
     ;; match the new overlay and return it
     (auto-o-match-overlay o-new o-start (if (overlayp end) end nil))
     o-new)
@@ -258,7 +214,7 @@
   (when (> (length overlay-list) 1)
     (let ((o (car overlay-list))
 	  (o1 (nth 1 overlay-list)))
-      
+
       ;; match first (presumably end-matched) overlay and remove it from list
       (pop overlay-list)
       (auto-o-match-overlay o nil (overlay-get o1 'start) 'no-props)
@@ -291,7 +247,7 @@
 				       (delq o1 auto-o-pending-self-cascade))
 				 ;; return t to indicate cascading ended early
 				 t)))))
-	  
+
 	  ;; if there's an overlay left, "flip" it so it's end-unmatched and
 	  ;; extends to next overlay in buffer, and add it to the list of
 	  ;; unmatched overlays
@@ -315,7 +271,7 @@
 ;;   ;; is null, all overlays after O-START are included.
 
 ;;   (when (null end) (setq end (point-max)))
-  
+
 ;;   (let (overlay-list)
 ;;     ;; create list of all overlays corresponding to same entry between O-START
 ;;     ;; and END
@@ -342,7 +298,7 @@
   ;; is null, all overlays after O-START are included.
 
   (when (null end) (setq end (point-max)))
-  
+
   (let (overlay-list)
     ;; create list of all overlays corresponding to same entry between O-START
     ;; and END

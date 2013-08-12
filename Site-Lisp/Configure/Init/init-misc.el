@@ -289,7 +289,7 @@
 
 ;; ### Whitespace ###
 ;; --- 空格清理
-(add-hook 'python-mode-hook 'whitespace-cleanup)
+;; (add-hook 'python-mode-hook 'whitespace-cleanup)
 
 ;;;; ### Mail-notify ###
 ;;;; --- 邮件提醒

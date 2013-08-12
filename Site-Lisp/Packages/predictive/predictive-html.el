@@ -1,52 +1,27 @@
 
-;;; predictive-setup-html.el --- predictive mode HTML setup function
+;;; predictive-html.el --- predictive mode HTML setup function
 
 
-;; Copyright (C) 2005 2008 Toby Cubitt
+;; Copyright (C) 2005 2008-2010, 2012 Toby Cubitt
 
 ;; Author: Toby Cubitt
-;; Version: 0.4.1
+;; Version: 0.5.3
 ;; Keywords: predictive, setup function, html
 
-;; This file is part of the Emacs Predictive Completion package.
+;; This file is NOT part of Emacs.
 ;;
-;; The Emacs Predicive Completion package is free software; you can
-;; redistribute it and/or modify it under the terms of the GNU
-;; General Public License as published by the Free Software
-;; Foundation; either version 2 of the License, or (at your option)
+;; This file is free software: you can redistribute it and/or modify it under
+;; the terms of the GNU General Public License as published by the Free
+;; Software Foundation, either version 3 of the License, or (at your option)
 ;; any later version.
 ;;
-;; The Emacs Predicive Completion package is distributed in the hope
-;; that it will be useful, but WITHOUT ANY WARRANTY; without even the
-;; implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-;; PURPOSE.  See the GNU General Public License for more details.
+;; This program is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+;; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+;; more details.
 ;;
-;; You should have received a copy of the GNU General Public License
-;; along with the Emacs Predicive Completion package; if not, write
-;; to the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-;; Boston, MA 02111-1307 USA
-
-
-;;; Change Log:
-;;
-;; Version 0.4
-;; * made `predictive-setup-html' fail gracefully when a required dictionary
-;;   can't be found
-;;
-;; Version 0.4
-;; * updated to bring it into line with current auto-overlays
-;; * implemented missing `predictive-html-forward-word' function
-;;
-;; Version 0.3
-;; * major overhaul to bring it up to date with current auto-overlays,
-;;   compltion-ui and predictive code
-;;
-;; Version 0.2
-;; * modified to use the new auto-overlays package
-;;
-;; Version 0.1
-;; * initial release
-
+;; You should have received a copy of the GNU General Public License along
+;; with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ;;; Code:
@@ -63,8 +38,6 @@
 
 ;; variables used to restore local settings of variables when predictive mode
 ;; is disabled in a Html buffer
-(defvar predictive-restore-main-dict nil)
-(make-variable-buffer-local 'predictive-restore-main-dict)
 (defvar predictive-restore-override-syntax-alist nil)
 (make-variable-buffer-local 'predictive-restore-override-syntax-alist)
 
@@ -102,52 +75,42 @@ mode is enabled via entry in `predictive-major-mode-alist'."
    ;; ----- enabling html setup -----
    ((> arg 0)
     (catch 'load-fail
-      
-      ;; save predictive-main-dict; restored when predictive mode is disabled
-      (setq predictive-restore-main-dict predictive-main-dict)
-      
+
       ;; load the dictionaries
       (mapc (lambda (dic)
 	      (unless (predictive-load-dict dic)
 		(message "Failed to load dictionary %s" dic)
 		(throw 'load-fail nil)))
 	    predictive-html-dicts)
-      
-      ;; add html dictionaries to main dictionary list
-      (make-local-variable 'predictive-main-dict)
-      (when (atom predictive-main-dict)
-	(setq predictive-main-dict (list predictive-main-dict)))
-      (setq predictive-main-dict
-	    (append predictive-main-dict '(dict-html dict-html-char-entity)))
-      
-      ;; save overlays and unload regexp definitions before killing buffer
-      (add-hook 'kill-buffer-hook
-		(lambda ()
-		  (auto-overlay-stop 'predictive nil 'save 'leave-overlays)
-		  (auto-overlay-unload-set 'predictive))
-		nil t)
-      
+
+      ;; set html dictionaries to be used alongside main dictionary
+      (setq predictive-auxiliary-dict '(dict-html dict-html-char-entity))
+
+      ;; save overlays along with buffer
+      (add-hook 'after-save-hook 'predictive-html-after-save nil t)
+      (add-hook 'kill-buffer-hook 'predictive-html-kill-buffer nil t)
+
       ;; use html browser menu if first character of prefix is "<" or "&"
-      (make-local-variable 'completion-menu)
-      (setq completion-menu
-	    (lambda (prefix completions)
-	      (if (or (string= (substring prefix 0 1) "<")
-		      (string= (substring prefix 0 1) "&"))
-		  (predictive-html-construct-browser-menu prefix completions)
-		(completion-construct-menu prefix completions))
-	      ))
-      
+      (set (make-local-variable 'predictive-menu-function)
+	   (lambda (overlay)
+	     (if (or (string= (substring (overlay-get overlay 'prefix) 0 1)
+			      "<")
+		     (string= (substring (overlay-get overlay 'prefix) 0 1)
+			      "&"))
+		 (predictive-html-construct-browser-menu overlay)
+	       (completion-construct-menu overlay))))
+
       ;; delete any existing predictive auto-overlay regexps and load html
       ;; auto-overlay regexps
       (auto-overlay-unload-set 'predictive)
       (predictive-html-load-regexps)
       (auto-overlay-start 'predictive)
-      
+
       ;; load the keybindings and related settings
       (predictive-html-load-keybindings)
       ;; consider \ as start of a word
-      (setq completion-word-thing 'predictive-html-word)
-      
+      (setq predictive-word-thing 'predictive-html-word)
+
       t))  ; indicate successful setup
 
 
@@ -157,27 +120,19 @@ mode is enabled via entry in `predictive-major-mode-alist'."
     (auto-overlay-stop 'predictive nil 'save)
     (auto-overlay-unload-set 'predictive)
     ;; restore predictive-main-dict to saved setting
-    (kill-local-variable 'predictive-main-dict)
-    (setq predictive-main-dict predictive-restore-main-dict)
-    (kill-local-variable 'predictive-restore-main-dict)
+    (kill-local-variable 'predictive-auxiliary-dict)
     ;; restore completion-dynamic-override-syntax-alist to saved setting
     (kill-local-variable 'completion-dynamic-override-syntax-alist)
     (setq auto-completion-override-syntax-alist
 	  predictive-restore-override-syntax-alist)
     (kill-local-variable 'predictive-restore-override-syntax-alist)
     ;; remove other local variable settings
-    (kill-local-variable 'completion-menu)
-    ;; remove hook function that saves overlays
-    (remove-hook 'kill-buffer-hook
-		 (lambda ()
-		   (auto-overlay-stop 'predictive nil 'save 'leave-overlays)
-		   (auto-overlay-unload-set 'predictive))
-		 t)
-    
-    t))  ; indicate successful reversion of changes
-)
+    (kill-local-variable 'predictive-menu-function)
+    ;; remove hook functions that save overlays
+    (remove-hook 'after-save-hook 'predictive-html-after-save t)
+    (remove-hook 'kill-buffer-hook 'predictive-html-kill-buffer t)
 
-
+    t)))  ; indicate successful reversion of changes
 
 
 
@@ -199,7 +154,7 @@ mode is enabled via entry in `predictive-major-mode-alist'."
 	   (priority . 20)
 	   (face . (background-color . ,predictive-overlay-debug-color)))
 	  ))
-  
+
   ;; "<..." starts various tags, ended by ">". "<" makes sure all other ">"s
   ;; are matched
   (auto-overlay-load-definition
@@ -388,14 +343,12 @@ mode is enabled via entry in `predictive-major-mode-alist'."
 	    (">"
 	     :edge end
 	     (priority . 10))
-	    ))
-)
+	    )))
 
 
 
 (defun predictive-html-load-keybindings ()
   "Load the predictive mode html key bindings."
-  
   ;; make "<", ">", and "&" do the right thing
   (setq predictive-restore-override-syntax-alist
 	auto-completion-override-syntax-alist)
@@ -404,21 +357,45 @@ mode is enabled via entry in `predictive-major-mode-alist'."
 	(append '((?< . (accept word))
 		  (?> . (accept none))
 		  (?& . (accept word)))
-		auto-completion-override-syntax-alist))
-)
+		auto-completion-override-syntax-alist)))
 
 
 
-(defun predictive-html-construct-browser-menu (prefix completions)
+(defun predictive-html-kill-buffer ()
+  ;; Function called from `kill-buffer-hook' to tidy things up
+  ;; save overlays if buffer was saved
+  (unless (buffer-modified-p)
+    (auto-overlay-save-overlays 'predictive nil
+				predictive-auxiliary-file-location)))
+
+
+
+(defun predictive-html-after-save ()
+  ;; Function called from `after-save-hook'
+  (auto-overlay-save-overlays 'predictive nil
+			      predictive-auxiliary-file-location))
+
+
+
+(defun predictive-html-reparse-buffer ()
+  "Clear all auto-overlays, then reparse buffer from scratch."
+  (interactive)
+
+  ;; restart the predictive auto-overlays without saving to file
+  (auto-overlay-stop 'predictive)
+  (auto-overlay-start 'predictive nil 'ignore-save-file))
+
+
+
+(defun predictive-html-construct-browser-menu (overlay)
   "Construct the html browser menu keymap."
 
   ;; construct menu, dropping the last two entries which are a separator and a
   ;; link back to the basic completion menu (would just redisplay this menu,
   ;; since we're using the browser as the default menu)
   (let ((menu (completion-construct-browser-menu
-	       prefix completions 'completion-browser-menu-item)))
-    (setq menu (butlast menu 2)))
-)
+	       overlay 'completion-browser-menu-item)))
+    (setq menu (butlast menu 2))))
 
 
 

@@ -2,66 +2,30 @@
 ;;; auto-overlay-nested.el --- nested start/end-delimited automatic overlays
 
 
-;; Copyright (C) 2005-2007 Toby Cubitt
+;; Copyright (C) 2005-2007, 2012 Toby Cubitt
 
 ;; Author: Toby Cubitt <toby-predictive@dr-qubit.org>
-;; Version: 0.1.7
+;; Version: 0.1.8
 ;; Keywords: automatic, overlays, nested
 ;; URL: http://www.dr-qubit.org/emacs.php
 
-
-;; This file is part of the Emacs Automatic Overlays package.
+;; This file is NOT part of the Emacs.
 ;;
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License
-;; as published by the Free Software Foundation; either version 2
-;; of the License, or (at your option) any later version.
+;; This file is free software: you can redistribute it and/or modify it under
+;; the terms of the GNU General Public License as published by the Free
+;; Software Foundation, either version 3 of the License, or (at your option)
+;; any later version.
 ;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
+;; This program is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+;; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+;; more details.
 ;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-;; MA 02110-1301, USA.
-
-
-;;; Change Log:
-;;
-;; Version 0.1.7
-;; * added new `auto-overlay-complex-class' property
-;; * renamed 'entry-id and 'subentry-id to 'definition-id and 'regexp-id
-;;
-;; Version 0.1.6
-;; * renamed from "nest" to "nested"
-;; 
-;; Version 0.1.5
-;; * set overlay properties straight after creation in `auto-o-make-nest',
-;;   rather than leaving it to `auto-overlay-update', in case matching causes
-;;   exclusive reparsing, for which properties are already required
-;;
-;; Version 0.1.4
-;; * removed `auto-overlay-functions' and changed to use new interface
-;; * renamed from "stack" to "nest"
-;;
-;; Version 0.1.3
-;; * updated to reflect changes in `auto-overlays.el'
-;;
-;; Version 0.1.2
-;; * bug fix to `auto-o-suicide' behaviour, require change to `auto-o-stack'
-;;
-;; Version 0.1.1
-;; * bug fixes
-;;
-;; Version 0.1
-;; * initial version separated off from auto-overlays.el
-
+;; You should have received a copy of the GNU General Public License along
+;; with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ;;; Code:
-
 
 (require 'auto-overlays)
 (provide 'auto-overlay-nested)
@@ -85,7 +49,7 @@
      ;; if the stack is empty, just create and return a new unmatched overlay
      ((null overlay-stack)
       (auto-o-make-nested o-match 'unmatched))
-     
+
      ;; if appropriate edge of innermost overlay is unmatched, just match it
      ((or (and (eq (auto-o-edge o-match) 'start)
 	       (not (auto-o-start-matched-p o)))
@@ -94,7 +58,7 @@
       (auto-o-match-overlay o o-match)
       ;; return nil since haven't created any new overlays
       nil)
-     
+
      ;; otherwise...
      (t
       ;; create new innermost overlay and add it to the overlay stack
@@ -103,8 +67,7 @@
       (auto-o-nested-stack-cascade overlay-stack)
       ;; return newly created overlay
       (car overlay-stack)))
-    )
-)
+    ))
 
 
 
@@ -112,10 +75,10 @@
 (defun auto-o-nested-suicide (o-self)
   ;; Called when match no longer matches. Unmatch the match overlay O-SELF, if
   ;; necessary deleting its parent overlay or cascading the stack.
-  
+
   (let* ((overlay-stack (auto-o-nested-stack o-self))
 	(o-parent (car overlay-stack)))
-    
+
     (cond
      ;; if other end of parent is unmatched, just delete parent
      ((not (auto-o-edge-matched-p
@@ -130,16 +93,15 @@
 	  (auto-o-match-overlay o-parent 'unmatched nil)
 	    ;; if we're an end match, make parent end-unmatched
 	(auto-o-match-overlay o-parent nil 'unmatched)))
-     
+
       ;; otherwise, unmatch ourselves from parent and cascade the stack
      (t
       (overlay-put o-parent (auto-o-edge o-self) nil)
       (overlay-put o-self 'parent nil)
       (auto-o-nested-stack-cascade overlay-stack))
-     ))
-)
+     )))
 
-      
+
 
 
 (defun auto-o-make-nested (o-match &optional unmatched)
@@ -159,7 +121,7 @@
       (overlay-put o-new 'set-id (overlay-get o-match 'set-id))
       (overlay-put o-new 'definition-id (overlay-get o-match 'definition-id))
       (auto-o-match-overlay o-new o-match 'unmatched))
-     
+
      ((eq (auto-o-edge o-match) 'end)
       (setq pos (overlay-get o-match 'delim-start))
       (setq o-new (make-overlay pos pos nil nil 'rear-advance))
@@ -169,8 +131,7 @@
       (auto-o-match-overlay o-new 'unmatched o-match)))
 
     ;; return the new overlay
-    o-new)
-)
+    o-new))
 
 
 
@@ -178,10 +139,10 @@
   ;; Cascade the ends of the overlays in OVERLAY-STACK up or down the stack,
   ;; so as to re-establish a valid stack. It assumes that only the innermost
   ;; is incorrect.
-  
+
   (let ((o (car overlay-stack)) o1)
     (cond
-     
+
      ;; if innermost overlay is start-matched (and presumably
      ;; end-unmatched)...
      ((auto-o-start-matched-p o)
@@ -200,8 +161,8 @@
 	  ;; FIXME: could postpone re-parsing here in case it can be avoided
 	  (auto-o-match-overlay o1 nil 'unmatch nil nil 'protect-match)
 	(auto-o-delete-overlay o1 nil 'protect-match)))
-     
-     
+
+
      ;; if innermost overlay is end-matched (and presumably
      ;; start-unmatched)...
      ((auto-o-end-matched-p o)
@@ -233,7 +194,7 @@
   ;; implies they cover identical regions if overlays are correctly
   ;; stacked). For other overlays with identical lengths, the order is
   ;; undefined.
-  
+
   ;; find overlays corresponding to same entry overlapping O-MATCH
   (let ((overlay-stack (auto-overlays-at-point
 			(if (eq (auto-o-edge o-match) 'start)

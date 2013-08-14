@@ -249,7 +249,7 @@
 ;(require 'wget-extension)               ;wget 扩展
 ;(require 'find-func-extension)          ;`find-func' 的扩展
 (require 'window-extension)             ;窗口增强函数
-;(require 'buffer-extension)             ;缓存增强函数
+(require 'buffer-extension)             ;缓存增强函数
 (require 'lazy-set-key)                 ;懒惰按键设置
 (require 'sdcv)                         ;星际译王的支持
 (require 'w3m-extension)                ;W3m扩展

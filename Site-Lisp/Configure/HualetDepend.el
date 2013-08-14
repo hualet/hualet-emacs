@@ -264,7 +264,7 @@
 ;;; (require 'alarm)                        ;闹钟
 ;(require 'mail-notify)                  ;邮件提醒
 ;(require 'gnus-notify+)                 ;Gnus提醒
-;(require 'speedbar-extension)           ;speedbar扩展
+(require 'speedbar-extension)           ;speedbar扩展
 ;;; (require 'etags-extension)              ;etags扩展
 (require 'multi-term)                   ;多标签SHELL
 ;(require 'lazycat-c-style)              ;C 的编程风格
@@ -328,5 +328,9 @@
 (require 'multiple-cursors)             ;Emacs的multi-cursor
 (require 'paredit-extension)
 (require 'cowsay)                       
+(require 'direx)                        ;目录结构展示
+(require 'direx-project)                ;工程目录结构
+(require 'direx-project-extension)      ;工程目录结构的扩展
+;; (require 'jedi-direx)                   ;jedi 代码结构展示
 
 (provide 'HualetDepend)

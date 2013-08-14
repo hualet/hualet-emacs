@@ -553,7 +553,7 @@ ac-complete-mode-map
    ("m" . speedbar-create-directory)    ;创建目录
    ("K" . speedbar-buffer-kill-buffer)  ;关闭当前buffer
    )
- speedbar-key-map
+ speedbar-mode-map
  )
 ;;; ### Top ###
 ;;; --- 进程管理器
@@ -601,5 +601,9 @@ ac-complete-mode-map
  Man-mode-map
  )
 (lazy-set-key sdcv-key-alist Man-mode-map)    ;sdcv的局部按键绑定
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Direx ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "C-x C-j") 'direx:jump-to-directory)
+(global-set-key (kbd "s-c s-c") 'direx-project-toggle-direx-project-window)
 
 (provide 'HualetKeySet)

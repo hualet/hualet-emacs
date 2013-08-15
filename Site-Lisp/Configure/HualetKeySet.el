@@ -577,6 +577,16 @@ ac-complete-mode-map
    ("U" . top-mode-show-specific-user))
  top-mode-map
  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Predictive ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(lazy-unset-key
+ '("M-/")
+ predictive-map)
+(lazy-set-key
+ '(
+   ("M-h" . completion-extend-prefix))
+ predictive-map)
+
 ;;; ### Man ###
 ;;; --- Man
 (lazy-set-key

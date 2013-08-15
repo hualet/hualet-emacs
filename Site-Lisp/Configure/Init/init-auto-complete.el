@@ -8,7 +8,7 @@
                                      ac-source-words-in-buffer
                                      ac-source-filename
                                      ac-source-files-in-current-dir
-                                     ac-source-dictionary
+                                     ;; ac-source-dictionary
                                      ac-source-words-in-same-mode-buffers
                                      )))
 

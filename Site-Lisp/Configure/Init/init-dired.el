@@ -91,18 +91,14 @@
 (setq my-dired-omit-extensions '(".cache"))            ;设置忽略文件的扩展名列表
 (add-hook 'dired-after-readin-hook 'dired-sort-method) ;先显示目录, 然后显示文件
 (add-hook 'dired-mode-hook 'dired-omit-method)         ;隐藏文件的方法
+
+;; This will cause dired-do-shell-command can't work.
 (setq dired-guess-shell-alist-user                     ;设置文件默认打开的模式
-      '(
+      (list
         ;; 图书
-        (list "\\.chm$" '(concat
-                          "firefox chm:"            ;执行特定的命令
-                          (replace-regexp-in-string ;替换空格为%20
-                           " " "%20" (w3m-expand-file-name-as-url (dired-get-filename))) ;用URL的模式解析文件名
-                          " -q"))
-        (list "\\.pdf$" "wine /data/Backup/WindowsTools/FoxitReader/FoxitReader.exe")
-        (list "\\.pdg$" "wine /data/Backup/WindowsTools/MiniPDG/pdgreader.exe")
+        (list "\\.chm$" "chmsee")
         ;; 多媒体
-        (list (format "\\(%s\\)$" (emms-player-get emms-player-mplayer 'regex)) "mplayer")
+        ;; (list (format "\\(%s\\)$" (emms-player-get emms-player-mplayer 'regex)) "mplayer")
         (list "\\.\\(jpe?g\\|png\\)$" "eog" " -q")
         ;; 网页
         (list "\\.html?$" "firefox")

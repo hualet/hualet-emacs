@@ -26,4 +26,11 @@
   (interactive)
   (w3m-view-this-url-1 "http://www.emacswiki.org/cgi-bin/wiki?action=random" nil t))
 
+(defun w3m-open-url-in-chrome ()
+  "Open the anchor under cursor in a modern browser if it is a url, otherwise the current url."
+  (interactive)
+  (if (w3m-anchor) 
+      (start-process "w3m-to-chrome" "*w3m-to-chrome*" "google-chrome" (w3m-anchor))
+    (start-process "w3m-to-chrome" "*w3m-to-chrome*" "google-chrome" w3m-current-url)))
+
 (provide 'w3m-extension)

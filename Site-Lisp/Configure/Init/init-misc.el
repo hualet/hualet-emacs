@@ -631,6 +631,9 @@
 (eval-after-load "python"
   '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Undo  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-undo-tree-mode)                 ;全局undo-tree-mode
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here

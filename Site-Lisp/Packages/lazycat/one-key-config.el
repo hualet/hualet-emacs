@@ -87,6 +87,7 @@
 (defvar my-picture-directory "")
 (defvar my-notes-directory "")
 (defvar my-screenshots-storage-directory "")
+(defvar my-working-directory "")
 (defvar my-project-directory "")
 
 
@@ -331,6 +332,7 @@
         (("b" . "Books") . (lambda () (interactive) (dired-x-find-file my-book-directory)))
         (("i" . "Pictures") . (lambda () (interactive) (dired-x-find-file my-picture-directory)))
         (("s" . "Screenshots") . (lambda () (interactive) (dired-x-find-file my-screenshots-storage-directory)))
+        (("w" . "Working") . (lambda () (interactive) (dired-x-find-file my-working-directory)))
         (("r" . "Backup") . (lambda () (interactive) (dired-x-find-file my-resource-backup-directory)))
         (("n" . "Notes") . (lambda () (interactive) (dired-x-find-file my-notes-directory)))
         (("x" . "Reading") . (lambda () (interactive) (dired-x-find-file my-reading-directory)))

@@ -76,7 +76,7 @@
    ("O" . w3m-goto-linknum)                             ;数字连接快速跳转
    ("f" . w3m-view-this-url)                            ;在当前标签打开
    ("o" . w3m-view-this-url-new-session)                ;在后台标签打开
-   ("M" . w3m-open-link-in-chromium)                    ;Open link in chromium browser
+   ("M" . w3m-open-url-in-chrome)       ;Open link in chrome browser
    ("M-o" . w3m-open-link-file-under-current-directory) ;open link file under current directory
    ("m" . tabbar-forward-tab)                           ;切换到右边的标签
    ("n" . tabbar-backward-tab)                          ;切换到左边的标签
@@ -615,5 +615,8 @@ ac-complete-mode-map
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Direx ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "C-x C-j") 'direx:jump-to-directory)
 (global-set-key (kbd "s-c s-c") 'direx-project-toggle-direx-project-window)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Gtk Look ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define-key global-map [?\C-h ?\C-j] 'gtk-lookup-symbol)
 
 (provide 'HualetKeySet)

@@ -49,6 +49,7 @@
  '(my-screenshots-storage-directory "~/Pictures/Screenshots/")       ;屏幕截图目录
  '(my-notes-directory "~/Notes/")                             ;笔记目录
  '(my-project-directory "~/project/")                             ;项目目录
+ '(my-working-directory "~/project/deepin-system-settings") ;当前工作目录
 
 
  ;; ERC

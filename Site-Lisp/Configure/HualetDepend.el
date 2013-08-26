@@ -62,6 +62,7 @@
 ;(require 'buffer-move)                  ;buffer移动功能
 (require 'scroll-mode-line-mode)        ;Mode-line滚动
 ;(require 'cc-mode)                      ;C语言模式
+(require 'undo-tree)                    ;undo tree
 ;(require 'redo)                         ;重做命令
 ;;;(require 'ascii)                        ;ASCII编码
 ;(require 'ediff)                        ;文件比较功能
@@ -332,5 +333,10 @@
 (require 'direx-project)                ;工程目录结构
 (require 'direx-project-extension)      ;工程目录结构的扩展
 ;; (require 'jedi-direx)                   ;jedi 代码结构展示
+(require 'gtk-look)                     ;devhelp 式的文档阅读
+(require 'wgrep)                        ;可写的grep模式
+
+
+(autoload 'rainbow-mode "rainbow-mode") ;rainbow-mode
 
 (provide 'HualetDepend)

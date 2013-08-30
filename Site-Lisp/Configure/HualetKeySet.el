@@ -315,6 +315,7 @@ ac-complete-mode-map
    ("s" . one-key-menu-dired-sort)             ;排序
    ("?" . dired-get-size)                      ;得到文件的大小
    ("M-o" . dired-toggle-omit)                 ;切换忽略状态
+   ("T" . dired-do-tarball)                    ;tarball压缩
    )
  dired-mode-map
  )
@@ -618,5 +619,10 @@ ac-complete-mode-map
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Gtk Look ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define-key global-map [?\C-h ?\C-j] 'gtk-lookup-symbol)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Undo tree ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(lazy-unset-key
+ '("C-x u")
+ undo-tree-map)                         ;卸载按键
 
 (provide 'HualetKeySet)

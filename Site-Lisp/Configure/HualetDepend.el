@@ -335,8 +335,6 @@
 ;; (require 'jedi-direx)                   ;jedi 代码结构展示
 (require 'gtk-look)                     ;devhelp 式的文档阅读
 (require 'wgrep)                        ;可写的grep模式
-
-
-(autoload 'rainbow-mode "rainbow-mode") ;rainbow-mode
+(require 'rainbow-mode)
 
 (provide 'HualetDepend)

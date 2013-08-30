@@ -167,5 +167,16 @@ Assumes that the frame is only split into two."
       (split-window-vertically)) ; gives us a split with the other window twice
     (switch-to-buffer nil))) ; restore the original window in this part of the frame
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Dired ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun dired-do-tarball (tarball-name &optional use-bzip2)
+  "Compress marked file or current file using tar and gzip(or bzip2 if use-bzip2 is set non nil)."
+  (interactive "sTarbal name(no suffix):")
+  (let ((file-list (dired-get-marked-files)))
+    (if use-bzip2
+        (shell-command-to-string (format "tar -cvj -f %s %s" (concat tarball-name ".tar.bz2")
+                                         (mapconcat 'identity file-list "")))
+      (shell-command-to-string (format "tar -cvz -f %s %s" (concat tarball-name ".tar.gz")
+                                       (mapconcat 'identity file-list ""))))))
+
 
 (provide 'hualet-toolkit)

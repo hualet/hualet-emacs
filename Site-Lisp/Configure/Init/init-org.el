@@ -11,7 +11,9 @@
  'org-babel-load-languages
  '((python . t)))
 
-(setq org-todo-keywords
-      '((sequence "TODO" "DOING" "HANGUP" "|" "DONE" "CANCEL")))
+(custom-set-variables 
+ '(org-tags-column 80)                 ;设置tag的对齐位置
+ '(org-todo-keywords '((sequence "TODO" "DOING" "HANGUP" "|" "DONE" "CANCEL"))) ;设置TODO的详细完成阶段
+ )
 
 (provide 'init-org)

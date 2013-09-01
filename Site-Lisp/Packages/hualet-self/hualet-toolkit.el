@@ -55,8 +55,7 @@ buffer is not visiting a file."
 (defun find-file-smb (file)
   "Access file through samba protocol."
   (interactive "fFind file as samba: ")
-  (find-file (concat "smb:" file))
-  )
+  (find-file (concat "/smb:" file)))
 
 (defun dot-emacs ()
   "Open my .emacs."

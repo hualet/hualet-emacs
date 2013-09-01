@@ -44,13 +44,13 @@
  '(my-book-directory "~/Book/")                                     ;图书目录
  '(my-reading-directory "~/Book/Reading/")                          ;看书目录
  '(my-picture-directory "~/Pictures/")                               ;图片目录
+ '(my-music-directory "~/Music")                                     ;音乐目录
  '(my-emacs-package-directory "~/.emacs.d/HualetEmacs/Site-Lisp/Packages/")                              
  '(my-emacs-configure-directory "~/.emacs.d/HualetEmacs/Site-Lisp/Configure/")                              
  '(my-screenshots-storage-directory "~/Pictures/Screenshots/")       ;屏幕截图目录
  '(my-notes-directory "~/Notes/")                             ;笔记目录
  '(my-project-directory "~/project/")                             ;项目目录
  '(my-working-directory "~/project/deepin-system-settings") ;当前工作目录
-
 
  ;; ERC
  '(erc-server "irc.freenode.net")       ;设置服务器

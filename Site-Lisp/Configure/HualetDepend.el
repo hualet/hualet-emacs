@@ -270,7 +270,7 @@
 (require 'multi-term)                   ;多标签SHELL
 ;(require 'lazycat-c-style)              ;C 的编程风格
 ;;; (require 'festival-extension)           ;Festival扩展
-;(require 'emms-extension)               ;emms扩展
+(require 'emms-extension)               ;emms扩展
 ;(require 'paredit-extension)            ;Paredit扩展
 ;;; (require 'xgtags-extension)             ;xgtags的扩展
 ;(require 'c-mode-extension)             ;C 模式的扩展

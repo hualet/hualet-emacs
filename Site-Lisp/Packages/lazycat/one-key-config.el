@@ -77,18 +77,19 @@
 ;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Variable ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar my-default-download-directory "")
-(defvar my-emacs-package-directory "")
-(defvar my-emacs-configure-directory "")
-(defvar my-home-directory "")
-(defvar my-resource-backup-directory "")
-(defvar my-book-directory "")
-(defvar my-reading-directory "")
-(defvar my-picture-directory "")
-(defvar my-notes-directory "")
-(defvar my-screenshots-storage-directory "")
-(defvar my-working-directory "")
-(defvar my-project-directory "")
+(defvar my-default-download-directory nil)
+(defvar my-emacs-package-directory nil)
+(defvar my-emacs-configure-directory nil)
+(defvar my-home-directory nil)
+(defvar my-resource-backup-directory nil)
+(defvar my-book-directory nil)
+(defvar my-music-directory nil)
+(defvar my-reading-directory nil)
+(defvar my-picture-directory nil)
+(defvar my-notes-directory nil)
+(defvar my-screenshots-storage-directory nil)
+(defvar my-working-directory nil)
+(defvar my-project-directory nil)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Root ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -107,36 +108,36 @@
   (one-key-menu "ROOT" one-key-menu-root-alist))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EMMS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (defvar one-key-menu-emms-alist nil
-;;   "The `one-key' menu alist for EMMS.")
+(defvar one-key-menu-emms-alist nil
+  "The `one-key' menu alist for EMMS.")
 
-;; (setq one-key-menu-emms-alist
-;;       '(
-;;         (("g" . "Playlist Go") . emms-playlist-mode-go)
-;;         (("d" . "Play Directory Tree") . emms-play-directory-tree)
-;;         (("f" . "Play File") . emms-play-file)
-;;         (("i" . "Play Playlist") . emms-play-playlist)
-;;         (("m" . "Play Matching") . emms-play-matching)
-;;         (("t" . "Add Directory Tree") . emms-add-directory-tree)
-;;         (("c" . "Toggle Repeat Track") . emms-toggle-repeat-track)
-;;         (("v" . "Jump To File") . emms-jump-to-file)
-;;         (("w" . "Toggle Repeat Playlist") . emms-toggle-repeat-playlist)
-;;         (("u" . "Play Now") . emms-play-now)
-;;         (("z" . "Show") . emms-show)
-;;         (("l" . "Lyrics Toggle Show") . emms-lyrics-toggle-display-on-minibuffer)
-;;         (("r" . "Lyrics Re download") . emms-lyrics-redownload-lyric)
-;;         (("e" . "Lyrics Visit") . emms-lyrics-visit-lyric)
-;;         (("s" . "Emms Streams") . emms-streams)
-;;         (("b" . "Emms Browser") . emms-browser)
-;;         (("p" . "Anything Playlist") . anything-emms-playlist)
-;;         (("o" . "Anything Directory") . anything-emms-directory)
-;;         ((";" . "Anything File") . anything-emms-file)
-;;         ))
+(setq one-key-menu-emms-alist
+      '(
+        (("g" . "Playlist Go") . emms-playlist-mode-go)
+        (("d" . "Play Directory Tree") . emms-play-directory-tree)
+        (("f" . "Play File") . emms-play-file)
+        (("i" . "Play Playlist") . emms-play-playlist)
+        (("m" . "Play Matching") . emms-play-matching)
+        (("t" . "Add Directory Tree") . emms-add-directory-tree)
+        (("c" . "Toggle Repeat Track") . emms-toggle-repeat-track)
+        (("v" . "Jump To File") . emms-jump-to-file)
+        (("w" . "Toggle Repeat Playlist") . emms-toggle-repeat-playlist)
+        (("u" . "Play Now") . emms-play-now)
+        (("z" . "Show") . emms-show)
+        (("l" . "Lyrics Toggle Show") . emms-lyrics-toggle-display-on-minibuffer)
+        (("r" . "Lyrics Re download") . emms-lyrics-redownload-lyric)
+        (("e" . "Lyrics Visit") . emms-lyrics-visit-lyric)
+        (("s" . "Emms Streams") . emms-streams)
+        (("b" . "Emms Browser") . emms-browser)
+        (("p" . "Anything Playlist") . anything-emms-playlist)
+        (("o" . "Anything Directory") . anything-emms-directory)
+        ((";" . "Anything File") . anything-emms-file)
+        ))
 
-;; (defun one-key-menu-emms ()
-;;   "The `one-key' menu for EMMS."
-;;   (interactive)
-;;   (one-key-menu "EMMS" one-key-menu-emms-alist t))
+(defun one-key-menu-emms ()
+  "The `one-key' menu for EMMS."
+  (interactive)
+  (one-key-menu "EMMS" one-key-menu-emms-alist t))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EMMS Playlist Sort ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (defvar one-key-menu-emms-playlist-sort-alist nil

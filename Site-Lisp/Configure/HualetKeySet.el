@@ -625,4 +625,68 @@ ac-complete-mode-map
  '("C-x u")
  undo-tree-map)                         ;卸载按键
 
+;;; ### EMMS ###
+;;; --- Emacs 多媒体系统
+(lazy-set-key
+ '(
+   ("C-c p" . one-key-menu-emms)        ;播放器菜单
+   ("<up>" . emms-volume-mode-plus)     ;增加音量
+   ("<down>" . emms-volume-mode-minus)  ;减少音量
+   ("<S-left>" . emms-seek-backward)      ;后退
+   ("<S-right>" . emms-seek-forward)      ;前进
+   ("<left>" . emms-previous)             ;上一曲
+   ("<right>" . emms-next)                ;下一曲
+   ("M-A" . emms-pause)                 ;暂停/播放
+   ("M-X" . emms-random)                ;随机播放
+   ("M-Z" . emms-stop)                  ;停止
+   ))
+;;; ### Emms Playlist ###
+;;; --- EMMS 播放列表
+(lazy-unset-key
+ '("s" "m" "u" "M-<" "M->")
+ emms-playlist-mode-map)                ;卸载按键
+(lazy-set-key
+ '(
+   ("C-x C-s" . emms-playlist-save)             ;保存播放列表
+   ("C-y" . emms-playlist-mode-yank)            ;剪切
+   ("C-k" . emms-playlist-mode-kill-track)      ;删除当前TRACK
+   ("C-w" . emms-playlist-mode-kill)            ;删除
+   ("C-/" . emms-playlist-mode-undo)            ;撤销
+   ("J" . scroll-up-one-line)                   ;向上滚动一行
+   ("K" . scroll-down-one-line)                 ;向下滚动一行
+   ("." . emms-playlist-mode-first)             ;浏览最上面一行
+   ("," . emms-playlist-mode-last)              ;浏览最下面一行
+   ("C-j" . emms-playlist-mode-insert-newline)  ;新建一行
+   ("M-y" . emms-playlist-mode-yank-pop)        ;YANK弹出
+   ("M-n" . emms-playlist-mode-next)            ;下一个播放列表
+   ("M-p" . emms-playlist-mode-previous)        ;上一个播放列表
+   ("a" . emms-playlist-mode-add-contents)      ;向当前播放列表添加内容
+   ("d" . emms-playlist-mode-kill-entire-track) ;从播放列表中移除当前TRACK
+   ("C" . emms-playlist-mode-clear)             ;清空当前的播放列表
+   ("f" . emms-playlist-mode-play-smart)        ;播放当前TRACK
+   ("b" . emms-playlist-set-playlist-buffer)    ;设定当前播放列表BUFFER
+   ("n" . emms-next)                            ;播放下一首
+   ("p" . emms-previous)                        ;播放上一首
+   ("r" . emms-random)                          ;随机播放下一首
+   (">" . emms-seek-forward)                    ;前进
+   ("<" . emms-seek-backward)                   ;后退
+   ("A" . emms-pause)                           ;暂停
+   ("Z" . emms-stop)                            ;停止
+   ("S" . emms-show)                            ;显示播放信息
+   ("q" . emms-playlist-mode-bury-buffer)       ;退出
+   ("?" . describe-mode)                        ;帮助
+   ("g" . emms-playlist-mode-center-current)    ;跳转到当前播放TRACK
+   ("G" . emms-jump-to-file)                    ;定位当前音乐文件的位置
+   ("D" . emms-delete-file-from-disk)           ;丛磁盘删除当前的文件
+   (";" . emms-tag-editor-edit-marked-tracks)   ;编辑标记的TAG
+   ("H" . emms-last-mark-track)                 ;最后一个标记
+   ("L" . emms-first-mark-track)                ;第一个标记
+   ("N" . emms-next-mark-track)                 ;下一个标记
+   ("P" . emms-prev-mark-track)                 ;上一个标记
+   ;; ("s" . one-key-menu-emms-playlist-sort)      ;列表排序菜单
+   ;; ("m" . one-key-menu-emms-playlist-mark)      ;列表标记菜单
+   )
+ emms-playlist-mode-map
+ )
+
 (provide 'HualetKeySet)

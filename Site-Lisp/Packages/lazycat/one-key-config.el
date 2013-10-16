@@ -90,6 +90,7 @@
 (defvar my-screenshots-storage-directory nil)
 (defvar my-working-directory nil)
 (defvar my-project-directory nil)
+(defvar my-test-directory nil)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Root ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -340,6 +341,7 @@
         (("e" . "Emacs Packages") . (lambda () (interactive) (dired-x-find-file my-emacs-package-directory)))
         (("c" . "Emacs Configure") . (lambda () (interactive) (dired-x-find-file my-emacs-configure-directory)))
         (("p" . "Project") . (lambda () (interactive) (dired-x-find-file my-project-directory)))
+        (("t" . "Test") . (lambda () (interactive) (dired-x-find-file my-test-directory)))
         ))
 
 (defun one-key-menu-directory ()

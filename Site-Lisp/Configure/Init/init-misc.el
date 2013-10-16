@@ -39,7 +39,7 @@
 (put 'narrow-to-region 'disabled nil)   ;开启变窄区域
 (setq print-escape-newlines t)          ;显示字符窗中的换行符为 \n
 
-(delete-selection-mode 1)               ;像在其他环境下一样编辑region
+(delete-selection-mode 1)               ;像在其他环境下一样编辑region --hualet
 
 ;;; ### Coding ###
 ;;; --- 编码设置
@@ -159,39 +159,39 @@
 ;(autoload 'cycle-buffer-backward-permissive "cycle-buffer" "Cycle backward allowing *buffers*." t)
 ;(autoload 'cycle-buffer-toggle-interesting "cycle-buffer" "Toggle if thisc buffer will be considered." t)
 ;
-;;;; ### auto-mode-alist ###
-;;;; --- 绑定扩展名到特定的模式
-;(dolist (elt-cons '(
-;                    ("\\.markdown" . markdown-mode)
-;                    ("\\.md" . markdown-mode)
-;                    ("\\.coffee$" . coffee-mode)
-;                    ("\\.iced$" . coffee-mode)
-;                    ("Cakefile" . coffee-mode)
-;                    ("\\.stumpwmrc\\'" . lisp-mode)
-;                    ("\\.[hg]s\\'" . haskell-mode)
-;                    ("\\.hi\\'" . haskell-mode)
-;                    ("\\.hs-boot\\'" . haskell-mode)
-;                    ("\\.chs\\'" . haskell-mode)
-;                    ("\\.l[hg]s\\'" . literate-haskell-mode)
-;                    ("\\.inc\\'" . asm-mode)
-;                    ("\\.max\\'" . maxima-mode)
-;                    ("\\.lrc\\'" . emms-lyrics-mode)
-;                    ("\\.org\\'" . org-mode)
-;                    ("\\.cron\\(tab\\)?\\'" . crontab-mode)
-;                    ("cron\\(tab\\)?\\." . crontab-mode)
-;                    ("\\.a90\\'" . intel-hex-mode)
-;                    ("\\.hex\\'" . intel-hex-mode)
-;                    ("\\.html\\'" . html-helper-mode)
-;                    ("SConstruct". python-mode)
-;                    ("\\.ml\\'" . tuareg-mode)
-;                    ("\\.mli\\'" . tuareg-mode)
-;                    ("\\.mly\\'" . tuareg-mode)
-;                    ("\\.mll\\'" . tuareg-mode)
-;                    ("\\.mlp\\'" . tuareg-mode)
-;                    ("\\.qml\\'" . qml-mode)
-;                    ))
-;  (add-to-alist 'auto-mode-alist elt-cons))
-;
+;; ### auto-mode-alist ###
+;; --- 绑定扩展名到特定的模式
+(dolist (elt-cons '(
+                   ("\\.markdown" . markdown-mode)
+                   ("\\.md" . markdown-mode)
+                   ("\\.coffee$" . coffee-mode)
+                   ("\\.iced$" . coffee-mode)
+                   ("Cakefile" . coffee-mode)
+                   ("\\.stumpwmrc\\'" . lisp-mode)
+                   ("\\.[hg]s\\'" . haskell-mode)
+                   ("\\.hi\\'" . haskell-mode)
+                   ("\\.hs-boot\\'" . haskell-mode)
+                   ("\\.chs\\'" . haskell-mode)
+                   ("\\.l[hg]s\\'" . literate-haskell-mode)
+                   ("\\.inc\\'" . asm-mode)
+                   ("\\.max\\'" . maxima-mode)
+                   ("\\.lrc\\'" . emms-lyrics-mode)
+                   ("\\.org\\'" . org-mode)
+                   ("\\.cron\\(tab\\)?\\'" . crontab-mode)
+                   ("cron\\(tab\\)?\\." . crontab-mode)
+                   ("\\.a90\\'" . intel-hex-mode)
+                   ("\\.hex\\'" . intel-hex-mode)
+                   ("\\.html\\'" . html-helper-mode)
+                   ("SConstruct". python-mode)
+                   ("\\.ml\\'" . tuareg-mode)
+                   ("\\.mli\\'" . tuareg-mode)
+                   ("\\.mly\\'" . tuareg-mode)
+                   ("\\.mll\\'" . tuareg-mode)
+                   ("\\.mlp\\'" . tuareg-mode)
+                   ("\\.qml\\'" . qml-mode)
+                   ))
+ (add-to-alist 'auto-mode-alist elt-cons))
+
 ;;; Zencoding mode.
 ;(add-hook 'sgml-mode-hook 'zencoding-mode)
 ;(add-hook 'html-helper-mode-hook 'zencoding-mode)
@@ -232,6 +232,7 @@
 ;;--- 增强的括号高亮
 (add-hook 'find-file-hook 'highlight-parentheses-mode t)
 (add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode t)
+(add-hook 'slime-repl-mode-hook 'highlight-parentheses-mode t)
 
 ;;;; ### Kill ring search ###
 ;;;; --- 删除环搜索
@@ -282,7 +283,9 @@
 ;
 ;;;; ### Doc View ###
 ;;;; --- PDF, PS, DVI 图书浏览器
-;(setq doc-view-cache-directory my-translate-png-directory) ;doc-view转换的图书目录
+;; (setq doc-view-cache-directory my-translate-png-directory) ;doc-view转换的图书目录
+(setq doc-view-image-width (- (display-pixel-width) 16))
+(setq doc-view-resolution 300)
 
 ;;; ### Color moccur ###
 ;;; --- 增强的Buffer搜索

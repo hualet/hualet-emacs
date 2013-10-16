@@ -632,8 +632,6 @@ ac-complete-mode-map
    ("C-c p" . one-key-menu-emms)        ;播放器菜单
    ("<up>" . emms-volume-mode-plus)     ;增加音量
    ("<down>" . emms-volume-mode-minus)  ;减少音量
-   ("<S-left>" . emms-seek-backward)      ;后退
-   ("<S-right>" . emms-seek-forward)      ;前进
    ("<left>" . emms-previous)             ;上一曲
    ("<right>" . emms-next)                ;下一曲
    ("M-A" . emms-pause)                 ;暂停/播放
@@ -688,5 +686,8 @@ ac-complete-mode-map
    )
  emms-playlist-mode-map
  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Org-mode ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "C-c c") 'org-capture)
 
 (provide 'HualetKeySet)

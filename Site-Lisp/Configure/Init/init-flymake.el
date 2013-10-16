@@ -1,4 +1,12 @@
 (autoload 'flymake-find-file-hook "flymake" "" t)
+(dolist (hook (list
+               ;; 'c-mode-hook
+               'c++-mode-hook
+               'java-mode-hook
+               'python-mode-hook
+               ))
+  (add-hook hook 'flymake-find-file-hook))
+
 (add-hook 'find-file-hook 'flymake-find-file-hook)
 (setq flymake-gui-warnings-enabled nil)
 (setq flymake-log-level 0)
@@ -13,5 +21,6 @@
   (add-to-list 'flymake-allowed-file-name-masks
                '("\\.py\\'" flymake-pyflakes-init))
   )
+(setq flymake-extension-use-showtip t)  ;use `shotip' display error or warning.
 
 (provide 'init-flymake)

@@ -78,7 +78,7 @@
 ;(require 'ido)                         ;ido模式
 ;(require 'browse-kill-ring)            ;超强恢复
 (require 'recentf)                     ;打开最近的文件
-;;; (require 'xcscope)                     ;cscope
+(require 'xcscope)                     ;cscope
 ;(require 'smiley)                      ;整加simpley
 ;(require 'emms-source-file)            ;Emms 文件
 ;(require 'emms-source-playlist)        ;Emms 列表
@@ -129,7 +129,7 @@
 ;;; (require 'mwe-log-commands)       ;命令日志
 ;(require 'contentswitch)               ;按内容切换缓存或文件
 ;;; (require 'etest)                  ;测试工具
-;(require 'fringe-helper)               ;边缘帮助
+(require 'fringe-helper)               ;边缘帮助
 ;(require 'newcomment)                  ;关于注释的函数
 ;;;(require 'icicles)                      ;智能minibuffer补全
 ;;;(require 'icicles-install)              ;icicles自动安装
@@ -280,7 +280,7 @@
 ;(require 'wdired-extension)             ;wdired 的扩展
 ;(require 'dired-sort)                   ;排序 dired 文件
 (require 'dired-open)                   ;在 dired 中打开不同文件
-;(require 'flymake-extension)            ;flymake 的一些扩展
+(require 'flymake-extension)            ;flymake 的一些扩展
 ;(require 'haskell-extension)            ;Haskell的一些扩展
 ;(require 'show-help)                    ;用 showtip 显示帮助信息
 ;(require 'rect-extension)               ;矩形编辑扩展
@@ -325,7 +325,7 @@
 ;(require 'gtk2hs)                       ;gtk2hs绑定工具
 (require 'python-mode-utils)            ;Python 工具
 ;; (require 'pymacs)
-;(require 'qml-mode)                     ;QML mode
+(require 'qml-mode)                     ;QML mode
 (require 'multiple-cursors)             ;Emacs的multi-cursor
 (require 'paredit-extension)
 (require 'cowsay)                       

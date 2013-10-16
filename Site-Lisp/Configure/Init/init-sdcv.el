@@ -87,11 +87,9 @@
 (setq sdcv-dictionary-simple-list       ;星际译王屏幕取词词典, 简单, 快速
       '(
         "朗道英汉字典5.0"
-        "牛津现代英汉双解词典"
         ))
 (setq sdcv-dictionary-complete-list     ;星际译王的词典, 完全, 详细
       '(
-        "朗道英汉字典5.0"
         "牛津现代英汉双解词典"
         ))
 

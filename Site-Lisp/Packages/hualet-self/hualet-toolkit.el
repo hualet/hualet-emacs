@@ -146,6 +146,11 @@ To use this extension, you need install xtrlock in your system."
         (w3m-view-this-url-1 url nil t)
       (shell-command (format "xdg-open %s" url)))))
 
+(defun google-the-keyword (kword)
+  "Search the `kword' using google."
+  (interactive "s Search keyword:")
+  (shell-command (format "google-chrome http://www.google.com.hk/search?q=%s" (url-hexify-string kword))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun hualet-insert-filename (filename)
   "Insert filename using the completion ability of minibuffer."

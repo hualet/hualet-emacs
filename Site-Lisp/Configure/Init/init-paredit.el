@@ -87,6 +87,7 @@
                'lisp-mode-hook
                'maxima-mode-hook
                'ielm-mode-hook
+               'slime-repl-mode-hook
                'sh-mode-hook
                'makefile-gmake-mode-hook
                'js-mode-hook

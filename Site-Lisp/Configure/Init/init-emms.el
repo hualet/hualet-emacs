@@ -19,6 +19,7 @@
 (setq emms-playlist-buffer-name "*Musics*")
 
 (emms-mode-line-disable)                           ;不在mode-line显示信息
+(setq emms-repeat-playlist t)
 (add-hook 'emms-player-finished-hook 'emms-random) ;播放完自动随机下一曲
 (add-to-list 'emms-track-initialize-functions 'emms-info-initialize-track) ;初始化音轨信息
 (setq emms-source-file-directory-tree-function 'emms-source-file-directory-tree-find) ;更加快速的查找（依赖find命令）

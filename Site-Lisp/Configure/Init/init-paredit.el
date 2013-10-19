@@ -94,6 +94,7 @@
                'go-mode-hook
                'qml-mode-hook
                'xml-mode-hook
+               'html-helper-mode-hook
                ))
   (add-hook hook '(lambda () (paredit-mode 1))))
 

@@ -81,6 +81,7 @@
 (defvar my-emacs-package-directory nil)
 (defvar my-emacs-configure-directory nil)
 (defvar my-home-directory nil)
+(defvar my-go-workspace nil)
 (defvar my-resource-backup-directory nil)
 (defvar my-book-directory nil)
 (defvar my-music-directory nil)
@@ -331,6 +332,7 @@
       '(
         (("h" . "Home") . (lambda () (interactive) (dired-x-find-file my-home-directory)))
         (("d" . "Downloads") . (lambda () (interactive) (dired-x-find-file my-default-download-directory)))
+        (("g" . "Golang") . (lambda () (interactive) (dired-x-find-file my-go-workspace)))
         (("b" . "Books") . (lambda () (interactive) (dired-x-find-file my-book-directory)))
         (("i" . "Pictures") . (lambda () (interactive) (dired-x-find-file my-picture-directory)))
         (("s" . "Screenshots") . (lambda () (interactive) (dired-x-find-file my-screenshots-storage-directory)))
@@ -355,7 +357,9 @@
 
 (setq one-key-menu-cycle-buffer-alist
       '(
-        (("l" . "Elisp") . (lambda () (interactive) (cycle-buffer-in-special-mode 'emacs-lisp-mode)))
+        (("e" . "Elisp") . (lambda () (interactive) (cycle-buffer-in-special-mode 'emacs-lisp-mode)))
+        (("l" . "CommonLisp") . (lambda () (interactive) (cycle-buffer-in-special-mode 'lisp-mode)))
+        (("g" . "Golang") . (lambda () (interactive) (cycle-buffer-in-special-mode 'go-mode)))
         (("i" . "IRC") . (lambda () (interactive) (cycle-buffer-in-special-mode 'erc-mode)))
         (("d" . "Dired") . (lambda () (interactive) (cycle-buffer-in-special-mode 'dired-mode)))
         (("o" . "Org") . (lambda () (interactive) (cycle-buffer-in-special-mode 'org-mode)))

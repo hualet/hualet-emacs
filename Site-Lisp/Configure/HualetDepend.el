@@ -233,8 +233,8 @@
 ;;; (require 'mumamo)
 ;(require 'js2-mode)                     ;javascript mode
 (require 'pretty-lambdada)              ;pretty lambda
-;(require 'html-helper-mode)             ;html helper mode
-;(require 'zencoding-mode)
+(require 'html-helper-mode)             ;html helper mode
+(require 'emmet-mode)                   ;upgraded zencoding mode
 ;(require 'tuareg)                       ;ocaml edit mode
 ;(require 'ocamldebug)                   ;ocaml debug mode
 ;(require 'flymake-jslint)               ;flymake for javascript

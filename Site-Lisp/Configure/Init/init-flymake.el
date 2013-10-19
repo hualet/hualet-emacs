@@ -7,7 +7,6 @@
                ))
   (add-hook hook 'flymake-find-file-hook))
 
-(add-hook 'find-file-hook 'flymake-find-file-hook)
 (setq flymake-gui-warnings-enabled nil)
 (setq flymake-log-level 0)
 (when (load "flymake" t)

@@ -40,6 +40,7 @@
  ;; 目录设置
  '(my-home-directory "~/")                       ;HOME目录
  '(my-default-download-directory "~/Downloads/") ;默认下载目录
+ '(my-go-workspace "~/Golang/")                  ;go的工作空间
  '(my-resource-backup-directory "~/Backup/") ;资料备份目录
  '(my-book-directory "~/Book/")            ;图书目录
  '(my-reading-directory "~/Book/Reading/") ;看书目录
@@ -50,7 +51,7 @@
  '(my-screenshots-storage-directory "~/Pictures/Screenshots/") ;屏幕截图目录
  '(my-notes-directory "~/Notes/")                           ;笔记目录
  '(my-project-directory "~/project/")                       ;项目目录
- '(my-test-directory "~/project/test")                      ;测试目录
+ '(my-test-directory "~/project/TestProject")               ;尝试目录
  '(my-working-directory "~/project/wifibox") ;当前工作目录
 
  ;; ERC

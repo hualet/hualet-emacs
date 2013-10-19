@@ -425,6 +425,14 @@ ac-complete-mode-map
    )
  python-mode-map)
 
+;; ### Elisp mode ###
+(lazy-set-key
+ '(
+   ("C-c C-v" . find-variable-at-point)
+   ("C-c C-j" . find-function-at-point)
+   )
+ emacs-lisp-mode-map)
+
 ;; ### Multi-Scratch ###
 ;; 
 (lazy-set-key

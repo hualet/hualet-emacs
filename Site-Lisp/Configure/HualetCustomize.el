@@ -22,10 +22,9 @@
  '(my-irc-channel-list
    '(
      "#emacs"
-     "#haskell"
      "#python"
      "#ubuntu"
-     "#django"
+     "#lisp"
      ))
  ;; 打开或关闭文件
  '(startup-open-file-list               ;启动打开的文件列表
@@ -52,7 +51,7 @@
  '(my-notes-directory "~/Notes/")                           ;笔记目录
  '(my-project-directory "~/project/")                       ;项目目录
  '(my-test-directory "~/project/TestProject")               ;尝试目录
- '(my-working-directory "~/project/wifibox") ;当前工作目录
+ '(my-working-directory "~/project/deepin-system-settings") ;当前工作目录
 
  ;; ERC
  '(erc-server "irc.freenode.net")       ;设置服务器

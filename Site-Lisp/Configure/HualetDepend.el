@@ -3,8 +3,11 @@
 ;(require 'shell)                   ;Shell模式
 ;(require 'shell-command)           ;增强的shell-command
 ;(require 'ansi-color)              ;转换shell中的颜色序列为face
+(require 'flymake)
 ;(require 'flymake-shell)           ;对shell模式的实时语法检查
 (require 'flymake-cursor)          ;把flymake的错误信息显示在minibuf
+;(require 'flymake-jslint)               ;flymake for javascript
+(require 'flymake-extension)            ;flymake 的一些扩展
 ;(require 'kill-ring-search)        ;Kill ring 搜索
 (require 'highlight-parentheses)   ;智能括号
 (require 'top-mode)                ;top
@@ -237,8 +240,7 @@
 (require 'emmet-mode)                   ;upgraded zencoding mode
 ;(require 'tuareg)                       ;ocaml edit mode
 ;(require 'ocamldebug)                   ;ocaml debug mode
-;(require 'flymake-jslint)               ;flymake for javascript
-;(require 'go-mode-load)                 ;Go language
+
 ;(require 'coffee-mode)
 ;(require 'markdown-mode)                ;Markdown
 ;
@@ -280,7 +282,6 @@
 ;(require 'wdired-extension)             ;wdired 的扩展
 ;(require 'dired-sort)                   ;排序 dired 文件
 (require 'dired-open)                   ;在 dired 中打开不同文件
-(require 'flymake-extension)            ;flymake 的一些扩展
 ;(require 'haskell-extension)            ;Haskell的一些扩展
 ;(require 'show-help)                    ;用 showtip 显示帮助信息
 ;(require 'rect-extension)               ;矩形编辑扩展

@@ -21,7 +21,6 @@
 (require 'init-paredit)           ;括号编辑模式
 (require 'init-flymake)           ;实时语法检查
 ;; (require 'init-python-mode)
-(require 'init-go-mode)                 ;Go语言
 (require 'init-emmet)
 ;;(require 'init-etags)             ;Etags 用于建立代码并提供补全数据
 (require 'init-emms)              ;Emacs 多媒体系统
@@ -33,6 +32,7 @@
 (require 'init-helm)
 (require 'init-yasnippet)         ;模版补全模式
 (require 'init-auto-complete)     ;代码补全
+(require 'init-go-mode)                 ;Go语言
 (require 'init-erc)               ;IRC 聊天
 ;; (require 'init-gnus)              ;Gnus
 ;;(require 'init-shell)             ;Shell

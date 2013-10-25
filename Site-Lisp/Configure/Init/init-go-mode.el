@@ -1,3 +1,10 @@
+(require 'go-mode-load)                 ;Go language
+(require 'go-eldoc)
+(add-hook 'go-mode-hook 'go-eldoc-setup)
+(require 'go-flymake)
+(require 'go-errcheck)
+
+
 (add-hook 'go-mode-hook (lambda ()
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)))
 (add-hook 'go-mode-hook (lambda ()

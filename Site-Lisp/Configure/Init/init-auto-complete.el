@@ -1,4 +1,5 @@
 ;; autocomplete
+(require 'go-autocomplete)
 (require 'auto-complete-config)
 
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/HualetEmacs/Site-Lisp/Packages/auto-complete/ac-dict")

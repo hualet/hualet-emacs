@@ -1,4 +1,4 @@
-;;; helm-firefox.el --- Firefox bookmarks
+;;; helm-firefox.el --- Firefox bookmarks -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
@@ -16,7 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-adaptative)
@@ -30,12 +30,22 @@
 ;; user_pref("browser.bookmarks.autoExportHTML", true);
 ;; NOTE: This is also working in the same way for mozilla aka seamonkey.
 
+
+(defgroup helm-firefox nil
+  "Helm libraries and applications for Firefox navigator."
+  :group 'helm)
+
+(defcustom helm-firefox-default-directory "/.mozilla/firefox/"
+  "The root directory containing firefox config."
+  :group 'helm-firefox
+  :type 'string)
+
 (defvar helm-firefox-bookmark-url-regexp "\\(https\\|http\\|ftp\\|about\\|file\\)://[^ \"]*")
 (defvar helm-firefox-bookmarks-regexp ">\\([^><]+.[^</a>]\\)")
 
 (defun helm-get-firefox-user-init-dir ()
   "Guess the default Firefox user directory name."
-  (let* ((moz-dir (concat (getenv "HOME") "/.mozilla/firefox/"))
+  (let* ((moz-dir (concat (getenv "HOME") helm-firefox-default-directory))
          (moz-user-dir
           (with-current-buffer (find-file-noselect (concat moz-dir "profiles.ini"))
             (goto-char (point-min))
@@ -68,17 +78,20 @@
                     (helm-browse-url
                      (helm-firefox-bookmarks-get-value candidate))))
                ("Copy Url"
-                . (lambda (elm)
-                    (kill-new (helm-w3m-bookmarks-get-value elm))))))))
+                . (lambda (candidate)
+                    (let ((url (helm-firefox-bookmarks-get-value
+                                candidate))) 
+                      (kill-new url)
+                      (message "`%s' copied to kill-ring" url))))))))
 
 (defun helm-firefox-bookmarks-get-value (elm)
   (assoc-default elm helm-firefox-bookmarks-alist))
 
-(defun helm-highlight-firefox-bookmarks (bookmarks source)
-  (loop for i in bookmarks
-        collect (propertize
-                 i 'face '((:foreground "YellowGreen"))
-                 'help-echo (helm-firefox-bookmarks-get-value i))))
+(defun helm-highlight-firefox-bookmarks (bookmarks _source)
+  (cl-loop for i in bookmarks
+           collect (propertize
+                    i 'face '((:foreground "YellowGreen"))
+                    'help-echo (helm-firefox-bookmarks-get-value i))))
 
 ;;;###autoload
 (defun helm-firefox-bookmarks ()

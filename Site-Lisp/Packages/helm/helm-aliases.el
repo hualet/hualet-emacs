@@ -1,4 +1,4 @@
-;;; helm-aliases.el --- Helm aliases for helm obsoletes functions.
+;;; helm-aliases.el --- Helm aliases for helm obsoletes functions. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 
 
 ;;; Helper functions to create aliases with old helm definitions
@@ -31,33 +31,33 @@
         (t nil)))
 
 (defun helm-check-conflicting-prefixes ()
-  (loop for s in (all-completions "helm-c-" obarray)
-        for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
-        when (or (and (not (helm-alias-p (intern s))) (fboundp (intern rep)))
-                 (and (not (helm-alias-p (intern s))) (boundp (intern rep))))
-        collect rep))
+  (cl-loop for s in (all-completions "helm-c-" obarray)
+           for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
+           when (or (and (not (helm-alias-p (intern s))) (fboundp (intern rep)))
+                    (and (not (helm-alias-p (intern s))) (boundp (intern rep))))
+           collect rep))
 
 (defun helm-collect-functions-with-bad-prefix ()
-  (loop for s in (all-completions "helm-c-" obarray)
-        for sym = (intern s)
-        when (and (not (helm-alias-p sym)) (fboundp sym))
-        collect s))
+  (cl-loop for s in (all-completions "helm-c-" obarray)
+           for sym = (intern s)
+           when (and (not (helm-alias-p sym)) (fboundp sym))
+           collect s))
 
 (defun helm-collect-vars-with-bad-prefix ()
-  (loop for s in (all-completions "helm-c-" obarray)
-        for sym = (intern s)
-        when (and (not (helm-alias-p sym)) (boundp sym))
-        collect s))
+  (cl-loop for s in (all-completions "helm-c-" obarray)
+           for sym = (intern s)
+           when (and (not (helm-alias-p sym)) (boundp sym))
+           collect s))
 
 (defun helm-insert-fn-aliases ()
-  (loop for s in (helm-collect-functions-with-bad-prefix)
-        for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
-        do (insert (format "(defalias '%s '%s)\n(make-obsolete '%s '%s \"1.5.1\")\n" s rep s rep))))
+  (cl-loop for s in (helm-collect-functions-with-bad-prefix)
+           for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
+           do (insert (format "(defalias '%s '%s)\n(make-obsolete '%s '%s \"1.5.1\")\n" s rep s rep))))
 
 (defun helm-insert-var-aliases ()
-  (loop for s in (helm-collect-vars-with-bad-prefix)
-        for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
-        do (insert (format "(defvaralias '%s '%s)\n(make-obsolete-variable '%s '%s \"1.5.1\")\n" s rep s rep))))
+  (cl-loop for s in (helm-collect-vars-with-bad-prefix)
+           for rep = (replace-regexp-in-string "helm-c-" "helm-" s)
+           do (insert (format "(defvaralias '%s '%s)\n(make-obsolete-variable '%s '%s \"1.5.1\")\n" s rep s rep))))
 
 
 ;;; Alias old functions prefixed with "helm-c-"
@@ -67,8 +67,6 @@
 (make-obsolete 'helm-c-etags-default-action 'helm-etags-default-action "1.5.1")
 (defalias 'helm-c-simple-call-tree-candidates 'helm-simple-call-tree-candidates)
 (make-obsolete 'helm-c-simple-call-tree-candidates 'helm-simple-call-tree-candidates "1.5.1")
-(defalias 'helm-c-browse-code-get-line 'helm-browse-code-get-line)
-(make-obsolete 'helm-c-browse-code-get-line 'helm-browse-code-get-line "1.5.1")
 (defalias 'helm-c-show-info-in-mode-line 'helm-show-info-in-mode-line)
 (make-obsolete 'helm-c-show-info-in-mode-line 'helm-show-info-in-mode-line "1.5.1")
 (defalias 'helm-c-gentoo-eshell-action 'helm-gentoo-eshell-action)
@@ -149,8 +147,6 @@
 (make-obsolete 'helm-c-arrange-type-attribute 'helm-arrange-type-attribute "1.5.1")
 (defalias 'helm-c-bookmark-w3m-setup-alist 'helm-bookmark-w3m-setup-alist)
 (make-obsolete 'helm-c-bookmark-w3m-setup-alist 'helm-bookmark-w3m-setup-alist "1.5.1")
-(defalias 'helm-c-match-on-directory-name 'helm-match-on-directory-name)
-(make-obsolete 'helm-c-match-on-directory-name 'helm-match-on-directory-name "1.5.1")
 (defalias 'helm-c-yahoo-suggest-action 'helm-yahoo-suggest-action)
 (make-obsolete 'helm-c-yahoo-suggest-action 'helm-yahoo-suggest-action "1.5.1")
 (defalias 'helm-c-buffer-query-replace-1 'helm-buffer-query-replace-1)
@@ -191,8 +187,6 @@
 (make-obsolete 'helm-c-goto-next-or-prec-file 'helm-goto-next-or-prec-file "1.5.1")
 (defalias 'helm-c-simple-call-tree-functions-callers-init 'helm-simple-call-tree-functions-callers-init)
 (make-obsolete 'helm-c-simple-call-tree-functions-callers-init 'helm-simple-call-tree-functions-callers-init "1.5.1")
-(defalias 'helm-c-match-on-file-name 'helm-match-on-file-name)
-(make-obsolete 'helm-c-match-on-file-name 'helm-match-on-file-name "1.5.1")
 (defalias 'helm-c-insert-file-name-completion-at-point 'helm-insert-file-name-completion-at-point)
 (make-obsolete 'helm-c-insert-file-name-completion-at-point 'helm-insert-file-name-completion-at-point "1.5.1")
 (defalias 'helm-c-point-file-in-dired 'helm-point-file-in-dired)
@@ -205,8 +199,6 @@
 (make-obsolete 'helm-c-apt-install 'helm-apt-install "1.5.1")
 (defalias 'helm-c-skip-boring-buffers 'helm-skip-boring-buffers)
 (make-obsolete 'helm-c-skip-boring-buffers 'helm-skip-boring-buffers "1.5.1")
-(defalias 'helm-c-shorten-home-path 'helm-shorten-home-path)
-(make-obsolete 'helm-c-shorten-home-path 'helm-shorten-home-path "1.5.1")
 (defalias 'helm-c-register-candidates 'helm-register-candidates)
 (make-obsolete 'helm-c-register-candidates 'helm-register-candidates "1.5.1")
 (defalias 'helm-c-find-function 'helm-find-function)
@@ -349,8 +341,6 @@
 (make-obsolete 'helm-c-elisp-library-scan-init 'helm-elisp-library-scan-init "1.5.1")
 (defalias 'helm-c-apt-refresh 'helm-apt-refresh)
 (make-obsolete 'helm-c-apt-refresh 'helm-apt-refresh "1.5.1")
-(defalias 'helm-c-string-match 'helm-string-match)
-(make-obsolete 'helm-c-string-match 'helm-string-match "1.5.1")
 (defalias 'helm-c-grep-cand-transformer 'helm-grep-cand-transformer)
 (make-obsolete 'helm-c-grep-cand-transformer 'helm-grep-cand-transformer "1.5.1")
 (defalias 'helm-c-kill-regexp 'helm-kill-regexp)
@@ -559,6 +549,8 @@
 (make-obsolete 'helm-c-adaptive-save-history 'helm-adaptive-save-history "1.5.1")
 (defalias 'helm-c-get-first-line-documentation 'helm-get-first-line-documentation)
 (make-obsolete 'helm-c-get-first-line-documentation 'helm-get-first-line-documentation "1.5.1")
+(defalias 'helm-approximate-candidate-number 'helm-get-candidate-number)
+(make-obsolete 'helm-approximate-candidate-number 'helm-get-candidate-number "1.5.5")
 
 
 ;;; variables
@@ -596,8 +588,6 @@
 (make-obsolete-variable 'helm-c-source-session 'helm-source-session "1.5.1")
 (defvaralias 'helm-c-source-org-headline 'helm-source-org-headline)
 (make-obsolete-variable 'helm-c-source-org-headline 'helm-source-org-headline "1.5.1")
-(defvaralias 'helm-c-browse-code-regexp-alist 'helm-browse-code-regexp-alist)
-(make-obsolete-variable 'helm-c-browse-code-regexp-alist 'helm-browse-code-regexp-alist "1.5.1")
 (defvaralias 'helm-c-source-minibuffer-history 'helm-source-minibuffer-history)
 (make-obsolete-variable 'helm-c-source-minibuffer-history 'helm-source-minibuffer-history "1.5.1")
 (defvaralias 'helm-c-source-files-in-current-dir 'helm-source-files-in-current-dir)
@@ -778,8 +768,6 @@
 (make-obsolete-variable 'helm-c-etags-tag-file-name 'helm-etags-tag-file-name "1.5.1")
 (defvaralias 'helm-c-source-bookmarks-su 'helm-source-bookmarks-su)
 (make-obsolete-variable 'helm-c-source-bookmarks-su 'helm-source-bookmarks-su "1.5.1")
-(defvaralias 'helm-c-browse-code-regexp-python 'helm-browse-code-regexp-python)
-(make-obsolete-variable 'helm-c-browse-code-regexp-python 'helm-browse-code-regexp-python "1.5.1")
 (defvaralias 'helm-c-source-emms-streams 'helm-source-emms-streams)
 (make-obsolete-variable 'helm-c-source-emms-streams 'helm-source-emms-streams "1.5.1")
 (defvaralias 'helm-c-buffer-map 'helm-buffer-map)
@@ -790,8 +778,6 @@
 (make-obsolete-variable 'helm-c-source-eshell-history 'helm-source-eshell-history "1.5.1")
 (defvaralias 'helm-c-source-absolute-time-timers 'helm-source-absolute-time-timers)
 (make-obsolete-variable 'helm-c-source-absolute-time-timers 'helm-source-absolute-time-timers "1.5.1")
-(defvaralias 'helm-c-source-browse-code 'helm-source-browse-code)
-(make-obsolete-variable 'helm-c-source-browse-code 'helm-source-browse-code "1.5.1")
 (defvaralias 'helm-c-source-findutils 'helm-source-findutils)
 (make-obsolete-variable 'helm-c-source-findutils 'helm-source-findutils "1.5.1")
 (defvaralias 'helm-c-ucs-help-message 'helm-ucs-help-message)
@@ -802,8 +788,6 @@
 (make-obsolete-variable 'helm-c-source-recentf 'helm-source-recentf "1.5.1")
 (defvaralias 'helm-c-cache-world 'helm-cache-world)
 (make-obsolete-variable 'helm-c-cache-world 'helm-cache-world "1.5.1")
-(defvaralias 'helm-c-browse-code-regexp-lisp 'helm-browse-code-regexp-lisp)
-(make-obsolete-variable 'helm-c-browse-code-regexp-lisp 'helm-browse-code-regexp-lisp "1.5.1")
 (defvaralias 'helm-c-source-picklist 'helm-source-picklist)
 (make-obsolete-variable 'helm-c-source-picklist 'helm-source-picklist "1.5.1")
 (defvaralias 'helm-c-source-buffer-not-found 'helm-source-buffer-not-found)

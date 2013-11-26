@@ -1,4 +1,4 @@
-;;; helm-buffers.el --- helm support for buffers.
+;;; helm-buffers.el --- helm support for buffers. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 ~ 2013 Thierry Volpiatto <thierry.volpiatto@gmail.com>
 
@@ -16,8 +16,8 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
-
-(require 'cl)
+
+(require 'cl-lib)
 (require 'helm)
 (require 'helm-utils)
 (require 'helm-elscreen)
@@ -25,7 +25,7 @@
 (require 'helm-regexp)
 
 (declare-function ido-make-buffer-list "ido" (default))
-
+
 (defgroup helm-buffers nil
   "Buffers related Applications and libraries for Helm."
   :group 'helm)
@@ -48,9 +48,17 @@ filtered from the list of candidates if the
   :group 'helm-buffers)
 
 (defcustom helm-buffer-max-length 20
-  "Max length of buffer names before truncate."
+  "Max length of buffer names before truncate.
+When disabled (nil) use the longest buffer-name length found."
   :group 'helm-buffers
-  :type  'integer)
+  :type  '(choice (const :tag "Disabled" nil)
+           (integer :tag "Length before truncate")))
+
+(defcustom helm-buffer-details-flag t
+  "Always show details in buffer list when non--nil."
+  :group 'helm-buffers
+  :type 'boolean)
+
 
 ;;; Faces
 ;;
@@ -66,8 +74,8 @@ filtered from the list of candidates if the
   :group 'helm-buffers)
 
 (defface helm-buffer-size
-  '((((background dark)) :foreground "RosyBrown")
-    (((background light)) :foreground "SlateGray"))
+    '((((background dark)) :foreground "RosyBrown")
+      (((background light)) :foreground "SlateGray"))
   "Face used for buffer size."
   :group 'helm-buffers)
 
@@ -100,9 +108,9 @@ filtered from the list of candidates if the
     (define-key map (kbd "M-%")       'helm-buffer-run-query-replace)
     (define-key map (kbd "M-m")       'helm-toggle-all-marks)
     (define-key map (kbd "M-a")       'helm-mark-all)
-    (when (locate-library "elscreen")
-      (define-key map (kbd "<C-tab>") 'helm-buffer-switch-to-elscreen))
-    (delq nil map))
+    (define-key map (kbd "C-]")       'helm-toggle-buffers-details)
+    (define-key map (kbd "C-c a")     'helm-buffers-toggle-show-hidden-buffers)
+    map)
   "Keymap for buffer sources in helm.")
 
 (defvar helm-buffers-ido-virtual-map
@@ -117,12 +125,26 @@ filtered from the list of candidates if the
     (define-key map (kbd "C-c C-x") 'helm-ff-run-open-file-externally)
     map))
 
+
 (defvar helm-buffers-list-cache nil)
+(defvar helm-buffer-max-len-mode nil)
 (defvar helm-source-buffers-list
   `((name . "Buffers")
     (init . (lambda ()
               ;; Issue #51 Create the list before `helm-buffer' creation.
-              (setq helm-buffers-list-cache (helm-buffer-list))))
+              (setq helm-buffers-list-cache (helm-buffer-list))
+              (let ((result (cl-loop for b in helm-buffers-list-cache
+                                     maximize (length b) into len-buf
+                                     maximize (length (with-current-buffer b
+                                                        (symbol-name major-mode)))
+                                     into len-mode
+                                     finally return (cons len-buf len-mode))))
+                (unless helm-buffer-max-length
+                  (setq helm-buffer-max-length (car result)))
+                (unless helm-buffer-max-len-mode
+                  ;; If a new buffer is longer that this value
+                  ;; this value will be updated
+                  (setq helm-buffer-max-len-mode (cdr result))))))
     (candidates . helm-buffers-list-cache)
     (type . buffer)
     (match helm-buffer-match-major-mode)
@@ -149,15 +171,19 @@ filtered from the list of candidates if the
                       (set-buffer-major-mode buffer))
                   (helm-switch-to-buffer buffer))))))
 
+(defvar ido-temp-list)
+(defvar ido-ignored-list)
+(defvar ido-process-ignore-lists)
+
 (defvar helm-source-ido-virtual-buffers
   `((name . "Ido virtual buffers")
     (candidates . (lambda ()
                     (let (ido-temp-list
                           ido-ignored-list
                           (ido-process-ignore-lists t))
-                    (when ido-use-virtual-buffers
-                      (ido-add-virtual-buffers-to-list)
-                      ido-virtual-buffers))))
+                      (when ido-use-virtual-buffers
+                        (ido-add-virtual-buffers-to-list)
+                        ido-virtual-buffers))))
     (keymap . ,helm-buffers-ido-virtual-map)
     (mode-line . helm-buffers-ido-virtual-mode-line-string)
     (action . (("Find file" . helm-find-many-files)
@@ -171,6 +197,8 @@ filtered from the list of candidates if the
                ("Open file externally (C-u to choose)"
                 . helm-open-file-externally)))))
 
+
+(defvar ido-use-virtual-buffers)
 (defun helm-buffer-list ()
   "Return the current list of buffers.
 Currently visible buffers are put at the end of the list.
@@ -190,97 +218,110 @@ See `ido-make-buffer-list' for more infos."
        (- (position-bytes (point-max))
           (position-bytes (point-min)))))))
 
-(defun helm-highlight-buffers (buffers sources)
+(defun helm-buffer-details (buffer &optional details)
+  (let* ((mode (with-current-buffer buffer (symbol-name major-mode)))
+         (buf (get-buffer buffer))
+         (size (propertize (helm-buffer-size buf)
+                           'face 'helm-buffer-size))
+         (proc (get-buffer-process buf))
+         (dir (with-current-buffer buffer (abbreviate-file-name default-directory)))
+         (file-name (helm-aif (buffer-file-name buf) (abbreviate-file-name it)))
+         (name (buffer-name buf))
+         (name-prefix (when (file-remote-p dir)
+                        (propertize "@ " 'face 'helm-ff-prefix))))
+    (cond
+      ( ;; A dired buffer.
+       (rassoc buf dired-buffers)
+       (list
+        (concat name-prefix
+                (propertize name 'face 'helm-ff-directory
+                            'help-echo dir))
+        size mode
+        (and details (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process))))
+      ;; A buffer file modified somewhere outside of emacs.=>red
+      ((and file-name (file-exists-p file-name)
+            (not (verify-visited-file-modtime buf)))
+       (list
+        (concat name-prefix
+                (propertize name 'face 'helm-buffer-saved-out
+                            'help-echo file-name))
+        size mode
+        (and details (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process))))
+      ;; A new buffer file not already saved on disk.=>indianred2
+      ((and file-name (not (verify-visited-file-modtime buf)))
+       (list
+        (concat name-prefix
+                (propertize name 'face 'helm-buffer-not-saved
+                            'help-echo file-name))
+        size mode
+        (and details (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process))))
+      ;; A buffer file modified and not saved on disk.=>orange
+      ((and file-name (buffer-modified-p buf))
+       (list
+        (concat name-prefix
+                (propertize name 'face 'helm-ff-symlink
+                            'help-echo file-name))
+        size mode
+        (and details (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process))))
+      ;; A buffer file not modified and saved on disk.=>green
+      (file-name
+       (list
+        (concat name-prefix
+                (propertize name 'face 'font-lock-type-face
+                            'help-echo file-name))
+        size mode
+        (and details (propertize (format "(in `%s')" dir) 'face 'helm-buffer-process))))
+      ;; Any non--file buffer.=>grey italic
+      (t (list
+          (concat (when proc name-prefix)
+                  (propertize name 'face 'italic
+                              'help-echo buffer))
+          size mode
+          (and details
+               (propertize
+                (if proc
+                    (format "(%s %s in `%s')"
+                            (process-name proc)
+                            (process-status proc) dir)
+                    (format "(in `%s')" dir))
+                'face 'helm-buffer-process)))))))
+
+(defun helm-highlight-buffers (buffers _source)
   "Transformer function to highlight BUFFERS list.
 Should be called after others transformers i.e (boring buffers)."
-  (loop ;; length of last buffer size string.
-        ;; Start at ten, such a length should never be reach.
-        ;; e.g 9999K, so the max should be 5 + a space = 6.
-        with old-len-size = 10
-        for i in buffers
-        for buf = (get-buffer i)
-        for proc = (get-buffer-process buf)
-        for size = (propertize (helm-buffer-size buf)
-                               'face 'helm-buffer-size)
-        for len-size = (length size)
-        for str-before-size = (helm-aif (and (> old-len-size len-size)
-                                             (- old-len-size len-size))
-                                  (make-string it ? ) "")
-        do (setq old-len-size (+ len-size (length str-before-size)))
-        for truncbuf = (if (> (string-width i) helm-buffer-max-length)
-                           ;; Issue #170, FIXME, this works only with
-                           ;; some fonts.
-                           (helm-substring-by-width i helm-buffer-max-length)
-                           (concat i (make-string
-                                      (- (+ helm-buffer-max-length 3)
-                                         (string-width i)) ? )))
-        for bfname = (buffer-file-name buf)
-        for mode = (with-current-buffer i (symbol-name major-mode))
-        collect
-        (cond (;; A dired buffer.
-               (rassoc buf dired-buffers)
-               (cons (concat (propertize
-                              truncbuf 'face 'helm-ff-directory
-                              'help-echo (car (rassoc buf dired-buffers)))
-                             " " str-before-size size "  " mode)
-                     i))
-              ;; A buffer file modified somewhere outside of emacs.=>red
-              ((and bfname (not (file-remote-p bfname))
-                    (file-exists-p bfname)
-                    (not (verify-visited-file-modtime buf)))
-               (cons (concat (propertize truncbuf 'face 'helm-buffer-saved-out
-                                         'help-echo bfname)
-                             " " str-before-size size "  " mode)
-                     i))
-              ;; A new buffer file not already saved on disk.=>indianred2
-              ((and bfname (not (file-remote-p bfname))
-                    (not (verify-visited-file-modtime buf)))
-               (cons (concat (propertize truncbuf 'face 'helm-buffer-not-saved
-                                         'help-echo bfname)
-                             " " str-before-size size "  " mode)
-                     i))
-              ;; A Remote buffer file modified and not saved on disk.=>@orange
-              ((and bfname (file-remote-p bfname) (buffer-modified-p buf))
-               (let ((prefix (propertize
-                              " " 'display
-                              (propertize "@ " 'face 'helm-ff-prefix))))
-                 (cons (concat prefix (propertize truncbuf 'face 'helm-ff-symlink
-                                                  'help-echo bfname)
-                               " " str-before-size size "  " mode)
-                       i)))
-              ;; A buffer file modified and not saved on disk.=>orange
-              ((and bfname (buffer-modified-p buf))
-               (cons (concat (propertize truncbuf 'face 'helm-ff-symlink
-                                         'help-echo bfname)
-                             " " str-before-size size "  " mode)
-                     i))
-              ;; A remote buffer file not modified and saved on disk.=>@green
-              ((and bfname (file-remote-p bfname))
-               (let ((prefix (propertize
-                              " " 'display
-                              (propertize "@ " 'face 'helm-ff-prefix))))
-                 (cons (concat prefix (propertize truncbuf
-                                                  'face 'font-lock-type-face
-                                                  'help-echo bfname)
-                               " " str-before-size size "  " mode)
-                       i)))
-              ;; A buffer file not modified and saved on disk.=>green
-              (bfname
-               (cons (concat (propertize truncbuf 'face 'font-lock-type-face
-                                         'help-echo bfname)
-                             " " str-before-size size "  " mode)
-                     i))
-              ;; Any non--file buffer.=>grey italic
-              (t (cons (concat (propertize truncbuf 'face 'italic
-                                           'help-echo i)
-                               " " str-before-size size "  " mode
-                               (and proc
-                                    (propertize
-                                     (format " (%s %s)"
-                                             proc (process-status proc))
-                                     'face 'helm-buffer-process)))
-                       i)))))
+  (cl-loop for i in buffers
+           for (name size mode meta) = (if helm-buffer-details-flag
+                                           (helm-buffer-details i 'details)
+                                           (helm-buffer-details i))
+           for truncbuf = (if (> (string-width name) helm-buffer-max-length)
+                              (helm-substring-by-width name helm-buffer-max-length)
+                              (concat name (make-string
+                                            (- (+ helm-buffer-max-length 3)
+                                               (string-width name)) ? )))
+           for len = (length mode)
+           when (> len helm-buffer-max-len-mode) do (setq helm-buffer-max-len-mode len)
+           for fmode = (concat (make-string (- (max helm-buffer-max-len-mode len) len) ? )
+                               mode)
+           ;; The max length of a number should be 1023.9X where X is the
+           ;; units, this is 7 characters.
+           for formatted-size = (format "%7s" size)
+           collect (cons (concat truncbuf "\t" formatted-size "  " fmode "  " meta)
+                         i)))
 
+(defun helm-toggle-buffers-details ()
+  (interactive)
+  (when helm-alive-p
+    (setq helm-buffer-details-flag (not helm-buffer-details-flag))
+    (helm-force-update (car (split-string (helm-get-selection nil t))))))
+
+(defun helm-buffers-sort-transformer (candidates _source)
+  (if (string= helm-pattern "")
+      candidates
+      (sort candidates
+            #'(lambda (s1 s2)
+                (< (string-width s1) (string-width s2))))))
+
+
 (defun helm-buffer-match-major-mode (candidate)
   "Match maybe buffer by major-mode.
 If you give a major-mode or partial major-mode,
@@ -292,7 +333,11 @@ before space matching pattern after space.
 If you give a pattern which doesn't match a major-mode, it will search buffer
 with name matching pattern."
   (let* ((cand (replace-regexp-in-string "^\\s-\\{1\\}" "" candidate))
-         (buf  (get-buffer cand)))
+         (buf  (get-buffer cand))
+         (match-mjm (lambda (str mjm)
+                      ;; Avoid matching all modes when entering only "mode".
+                      (and (not (string= str "mode"))
+                           (string-match str mjm)))))
     (when buf
       (with-current-buffer buf
         (let ((mjm   (symbol-name major-mode))
@@ -301,53 +346,55 @@ with name matching pattern."
                  (or (helm-buffers-match-inside cand split)
                      (string-match helm-pattern cand)))
                 ((string-match "\\s-$" helm-pattern)
-                 (string-match (car split) mjm))
+                 (funcall match-mjm (car split) mjm))
                 ((string-match "\\s-[@]" helm-pattern)
-                 (and (string-match (car split) mjm)
+                 (and (or (funcall match-mjm (car split) mjm)
+                          (string-match (car split) cand))
                       (helm-buffers-match-inside cand (cdr split))))
                 ((string-match "\\s-" helm-pattern)
-                 (and (string-match (car split) mjm)
-                      (loop for i in (cdr split) always (string-match i cand))))
-                (t (or (string-match helm-pattern mjm)
+                 (and (funcall match-mjm (car split) mjm)
+                      (cl-loop for i in (cdr split) always (string-match i cand))))
+                (t (or (funcall match-mjm helm-pattern mjm)
                        (string-match helm-pattern cand)))))))))
 
 (defun helm-buffers-match-inside (candidate lst)
-  (loop for i in lst
-        always
-        (cond ((string-match "\\`[\\]@" i)
-               (string-match i candidate))
-              ((string-match "\\`@\\(.*\\)" i)
-               (save-excursion
-                 (let ((str (match-string 1 i)))
-                   (goto-char (point-min))
-                   (re-search-forward str nil t))))
-              (t (string-match i candidate)))))
+  (cl-loop for i in lst
+           always
+           (cond ((string-match "\\`[\\]@" i)
+                  (string-match i candidate))
+                 ((string-match "\\`@\\(.*\\)" i)
+                  (save-excursion
+                    (let ((str (match-string 1 i)))
+                      (goto-char (point-min))
+                      (re-search-forward str nil t))))
+                 (t (string-match i candidate)))))
 
+
 (defun helm-buffer-query-replace-1 (&optional regexp-flag)
   "Query replace in marked buffers.
 If REGEXP-FLAG is given use `query-replace-regexp'."
   (let ((fn     (if regexp-flag 'query-replace-regexp 'query-replace))
         (prompt (if regexp-flag "Query replace regexp" "Query replace"))
         (bufs   (helm-marked-candidates)))
-    (loop with replace = (query-replace-read-from prompt regexp-flag)
-          with tostring = (unless (consp replace)
-                            (query-replace-read-to
-                             replace prompt regexp-flag))
-          for buf in bufs
-          do
-          (save-window-excursion
-            (helm-switch-to-buffer buf)
-            (save-excursion
-              (let ((case-fold-search t))
-                (goto-char (point-min))
-                (if (consp replace)
-                    (apply fn (list (car replace) (cdr replace)))
-                    (apply fn (list replace tostring)))))))))
+    (cl-loop with replace = (query-replace-read-from prompt regexp-flag)
+             with tostring = (unless (consp replace)
+                               (query-replace-read-to
+                                replace prompt regexp-flag))
+             for buf in bufs
+             do
+             (save-window-excursion
+               (helm-switch-to-buffer buf)
+               (save-excursion
+                 (let ((case-fold-search t))
+                   (goto-char (point-min))
+                   (if (consp replace)
+                       (apply fn (list (car replace) (cdr replace)))
+                       (apply fn (list replace tostring)))))))))
 
-(defun helm-buffer-query-replace-regexp (candidate)
+(defun helm-buffer-query-replace-regexp (_candidate)
   (helm-buffer-query-replace-1 'regexp))
 
-(defun helm-buffer-query-replace (candidate)
+(defun helm-buffer-query-replace (_candidate)
   (helm-buffer-query-replace-1))
 
 (defun helm-buffer-toggle-diff (candidate)
@@ -365,9 +412,16 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (helm-attrset 'diff-action 'helm-buffer-toggle-diff)
   (helm-execute-persistent-action 'diff-action))
 
+(defun helm-revert-buffer (candidate)
+  (with-current-buffer candidate
+    (when (buffer-file-name) (revert-buffer t t))))
+
+(defun helm-revert-marked-buffers (_ignore)
+  (mapc 'helm-revert-buffer (helm-marked-candidates)))
+
 (defun helm-buffer-revert-and-update (candidate)
   (let ((marked (helm-marked-candidates)))
-    (loop for buf in marked do (helm-revert-buffer buf))
+    (cl-loop for buf in marked do (helm-revert-buffer buf))
     (when (> (length marked) 1) (helm-unmark-all))
     (helm-force-update candidate)))
 
@@ -381,9 +435,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
 (defun helm-buffer-save-and-update (candidate)
   (let ((marked (helm-marked-candidates))
         (enable-recursive-minibuffers t))
-    (loop for buf in marked do
-          (with-current-buffer (get-buffer buf)
-            (save-buffer)))
+    (cl-loop for buf in marked do
+             (with-current-buffer (get-buffer buf)
+               (when (buffer-file-name) (save-buffer))))
     (when (> (length marked) 1) (helm-unmark-all))
     (helm-force-update candidate)))
 
@@ -393,6 +447,9 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
   (interactive)
   (helm-attrset 'save-action '(helm-buffer-save-and-update . never-split))
   (helm-execute-persistent-action 'save-action))
+
+(defun helm-kill-marked-buffers (_ignore)
+  (mapc 'kill-buffer (helm-marked-candidates)))
 
 ;;;###autoload
 (defun helm-buffer-run-kill-buffers ()
@@ -463,29 +520,29 @@ If REGEXP-FLAG is given use `query-replace-regexp'."
           (kill-buffer buffer))
         (kill-buffer buffer)))
   (helm-delete-current-selection)
-  (when (helm-empty-source-p)
-    (helm-force-update)
-    (helm-next-source)))
+  (when (helm-empty-source-p) (helm-next-source))
+  (with-helm-temp-hook 'helm-after-persistent-action-hook
+    (helm-force-update)))
 
 (defun helm-buffers-list-persistent-action (candidate)
   (if current-prefix-arg
       (helm-buffers-persistent-kill candidate)
       (helm-switch-to-buffer candidate)))
 
-(defun helm-ediff-marked-buffers (candidate &optional merge)
+(defun helm-ediff-marked-buffers (_candidate &optional merge)
   "Ediff 2 marked buffers or CANDIDATE and `helm-current-buffer'.
 With optional arg MERGE call `ediff-merge-buffers'."
   (let ((lg-lst (length (helm-marked-candidates)))
         buf1 buf2)
-    (case lg-lst
+    (cl-case lg-lst
       (0
        (error "Error:You have to mark at least 1 buffer"))
       (1
        (setq buf1 helm-current-buffer
-             buf2 (first (helm-marked-candidates))))
+             buf2 (cl-first (helm-marked-candidates))))
       (2
-       (setq buf1 (first (helm-marked-candidates))
-             buf2 (second (helm-marked-candidates))))
+       (setq buf1 (cl-first (helm-marked-candidates))
+             buf2 (cl-second (helm-marked-candidates))))
       (t
        (error "Error:To much buffers marked!")))
     (if merge
@@ -505,9 +562,9 @@ Can be used by any source that list buffers."
              (not helm-moccur-always-search-in-current)
              helm-moccur-always-search-in-current))
         (buffers (helm-marked-candidates))
-        (input (loop for i in (split-string helm-pattern " " t)
-                     thereis (and (string-match "\\`@\\(.*\\)" i)
-                                  (match-string 1 i)))))
+        (input (cl-loop for i in (split-string helm-pattern " " t)
+                        thereis (and (string-match "\\`@\\(.*\\)" i)
+                                     (match-string 1 i)))))
     (helm-multi-occur-1 buffers input)))
 
 ;;;###autoload
@@ -516,30 +573,36 @@ Can be used by any source that list buffers."
   (interactive)
   (helm-quit-and-execute-action 'helm-multi-occur-as-action))
 
+(defun helm-buffers-toggle-show-hidden-buffers ()
+  (interactive)
+  (let ((filter-attrs (helm-attr 'filtered-candidate-transformer
+                                 helm-source-buffers-list)))
+    (if (memq 'helm-shadow-boring-buffers filter-attrs)
+        (helm-attrset 'filtered-candidate-transformer
+                      (cons 'helm-skip-boring-buffers
+                            (remove 'helm-shadow-boring-buffers
+                                    filter-attrs))
+                      helm-source-buffers-list t)
+        (helm-attrset 'filtered-candidate-transformer
+                      (cons 'helm-shadow-boring-buffers
+                            (remove 'helm-skip-boring-buffers
+                                    filter-attrs))
+                      helm-source-buffers-list t))
+    (helm-force-update)))
+
+
 ;;; Candidate Transformers
 ;;
 ;;
-(defun helm-skip-boring-buffers (buffers sources)
+(defun helm-skip-boring-buffers (buffers _source)
   (helm-skip-entries buffers helm-boring-buffer-regexp-list))
 
-(defun helm-shadow-boring-buffers (buffers)
+(defun helm-shadow-boring-buffers (buffers _source)
   "Buffers matching `helm-boring-buffer-regexp' will be
 displayed with the `file-name-shadow' face if available."
   (helm-shadow-entries buffers helm-boring-buffer-regexp-list))
 
-(defun helm-revert-buffer (candidate)
-  (with-current-buffer candidate
-    (when (or (buffer-modified-p)
-              (not (verify-visited-file-modtime
-                    (get-buffer candidate))))
-      (revert-buffer t t))))
-
-(defun helm-revert-marked-buffers (ignore)
-  (mapc 'helm-revert-buffer (helm-marked-candidates)))
-
-(defun helm-kill-marked-buffers (ignore)
-  (mapc 'kill-buffer (helm-marked-candidates)))
-
+
 (define-helm-type-attribute 'buffer
     `((action
        ("Switch to buffer" . helm-switch-to-buffer)
@@ -562,18 +625,20 @@ displayed with the `file-name-shadow' face if available."
                                          (helm-ediff-marked-buffers candidate t))))
       (persistent-help . "Show this buffer")
       (filtered-candidate-transformer helm-skip-boring-buffers
+                                      helm-buffers-sort-transformer
                                       helm-highlight-buffers))
   "Buffer or buffer name.")
-
+
 ;;;###autoload
 (defun helm-buffers-list ()
-  "Preconfigured `helm' to list buffers.
-It is an enhanced version of `helm-for-buffers'."
+  "Preconfigured `helm' to list buffers."
   (interactive)
   (helm :sources '(helm-source-buffers-list
                    helm-source-ido-virtual-buffers
                    helm-source-buffer-not-found)
-        :buffer "*helm buffers*" :keymap helm-buffer-map))
+        :buffer "*helm buffers*"
+        :keymap helm-buffer-map
+        :truncate-lines t))
 
 (provide 'helm-buffers)
 

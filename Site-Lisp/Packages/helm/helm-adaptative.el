@@ -1,4 +1,4 @@
-;;; helm-adaptative.el --- Adaptive Sorting of Candidates.
+;;; helm-adaptative.el --- Adaptive Sorting of Candidates. -*- lexical-binding: t -*-
 
 ;; Original Author: Tamas Patrovics
 
@@ -20,7 +20,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 (require 'helm)
 
 
@@ -59,12 +59,18 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
   :global t
   (if helm-adaptative-mode
       (progn
+        (unless helm-adaptive-history
+          (helm-adaptative-maybe-load-history))
+        (add-hook 'kill-emacs-hook 'helm-adaptive-save-history)
         ;; Should run at beginning of `helm-initial-setup'.
         (add-hook 'helm-before-initialize-hook 'helm-adaptative-done-reset)
         ;; Should run at beginning of `helm-exit-minibuffer'.
         (add-hook 'helm-before-action-hook 'helm-adaptive-store-selection)
         ;; Should run at beginning of `helm-select-action'.
         (add-hook 'helm-select-action-hook 'helm-adaptive-store-selection))
+      (helm-adaptive-save-history)
+      (setq helm-adaptive-history nil)
+      (remove-hook 'kill-emacs-hook 'helm-adaptive-save-history)
       (remove-hook 'helm-before-initialize-hook 'helm-adaptative-done-reset)
       (remove-hook 'helm-before-action-hook 'helm-adaptive-store-selection)
       (remove-hook 'helm-select-action-hook 'helm-adaptive-store-selection)))
@@ -138,35 +144,31 @@ Format: ((SOURCE-NAME (SELECTED-CANDIDATE (PATTERN . NUMBER-OF-USE) ...) ...) ..
           ;; truncate history if needed
           (if (> (length (cdr selection-info)) helm-adaptive-history-length)
               (setcdr selection-info
-                      (subseq (cdr selection-info) 0 helm-adaptive-history-length))))))))
+                      (cl-subseq (cdr selection-info) 0 helm-adaptive-history-length))))))))
 
 (defun helm-adaptative-maybe-load-history ()
-  (when (and helm-adaptative-mode
-             (file-readable-p helm-adaptive-history-file))
+  "Load `helm-adaptive-history-file' which contain `helm-adaptive-history'.
+Returns nil if `helm-adaptive-history-file' doesn't exist."
+  (when (file-readable-p helm-adaptive-history-file)
     (load-file helm-adaptive-history-file)))
-
-(add-hook 'emacs-startup-hook 'helm-adaptative-maybe-load-history)
-(add-hook 'kill-emacs-hook 'helm-adaptive-save-history)
 
 (defun helm-adaptive-save-history (&optional arg)
   "Save history information to file given by `helm-adaptive-history-file'."
   (interactive "p")
-  (when helm-adaptative-mode
-    (with-temp-buffer
-      (insert
-       ";; -*- mode: emacs-lisp -*-\n"
-       ";; History entries used for helm adaptive display.\n")
-      (prin1 `(setq helm-adaptive-history ',helm-adaptive-history)
-             (current-buffer))
-      (insert ?\n)
-      (write-region (point-min) (point-max) helm-adaptive-history-file nil
-                    (unless arg 'quiet)))))
+  (with-temp-buffer
+    (insert
+     ";; -*- mode: emacs-lisp -*-\n"
+     ";; History entries used for helm adaptive display.\n")
+    (prin1 `(setq helm-adaptive-history ',helm-adaptive-history)
+           (current-buffer))
+    (insert ?\n)
+    (write-region (point-min) (point-max) helm-adaptive-history-file nil
+                  (unless arg 'quiet))))
 
 (defun helm-adaptive-sort (candidates source)
   "Sort the CANDIDATES for SOURCE by usage frequency.
-This is a filtered candidate transformer you can use for the
-attribute `filtered-candidate-transformer' of a source in
-`helm-sources' or a type in `helm-type-attributes'."
+This is a filtered candidate transformer you can use with the
+`filtered-candidate-transformer' attribute."
   (let* ((source-name (or (assoc-default 'type source)
                           (assoc-default 'name source)))
          (source-info (assoc source-name helm-adaptive-history)))
@@ -176,10 +178,10 @@ attribute `filtered-candidate-transformer' of a source in
                ;; pairs
                (mapcar (lambda (candidate-info)
                          (let ((count 0))
-                           (dolist (pattern-info (cdr candidate-info))
+                           (cl-dolist (pattern-info (cdr candidate-info))
                              (if (not (equal (car pattern-info)
                                              helm-pattern))
-                                 (incf count (cdr pattern-info))
+                                 (cl-incf count (cdr pattern-info))
 
                                  ;; if current pattern is equal to the previously
                                  ;; used one then this candidate has priority
@@ -187,7 +189,7 @@ attribute `filtered-candidate-transformer' of a source in
                                  ;; it only has to compete with other candidates
                                  ;; which were also selected with the same pattern
                                  (setq count (+ 10000 (cdr pattern-info)))
-                                 (return)))
+                                 (cl-return)))
                            (cons (car candidate-info) count)))
                        (cdr source-info)))
               sorted)
@@ -199,12 +201,12 @@ attribute `filtered-candidate-transformer' of a source in
                                           (> (cdr first) (cdr second)))))
 
                 ;; put those candidates first which have the highest usage count
-                (dolist (info usage)
-                  (when (member* (car info) candidates
-                                 :test 'helm-adaptive-compare)
+                (cl-dolist (info usage)
+                  (when (cl-member (car info) candidates
+                                   :test 'helm-adaptive-compare)
                     (push (car info) sorted)
-                    (setq candidates (remove* (car info) candidates
-                                              :test 'helm-adaptive-compare))))
+                    (setq candidates (cl-remove (car info) candidates
+                                                :test 'helm-adaptive-compare))))
 
                 ;; and append the rest
                 (append (reverse sorted) candidates nil))

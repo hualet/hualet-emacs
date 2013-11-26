@@ -377,6 +377,7 @@
         (("s" . "CSS") . (lambda () (interactive) (cycle-buffer-in-special-mode 'css-mode)))
         (("h" . "html") . (lambda () (interactive) (cycle-buffer-in-special-mode 'html-helper-mode)))
         (("m" . "OCaml") . (lambda () (interactive) (cycle-buffer-in-special-mode 'tuareg-mode)))
+        (("q" . "QML") . (lambda () (interactive) (cycle-buffer-in-special-mode 'qml-mode)))
         ))
 
 (defun one-key-menu-cycle-buffer ()

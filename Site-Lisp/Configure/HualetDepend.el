@@ -336,5 +336,6 @@
 (require 'gtk-look)                     ;devhelp 式的文档阅读
 (require 'wgrep)                        ;可写的grep模式
 (require 'rainbow-mode)
+(require 'browse-kill-ring)
 
 (provide 'HualetDepend)

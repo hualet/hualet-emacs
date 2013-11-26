@@ -1,1 +1,1 @@
-fmt.Println("${1:message}")
+fmt.Println(${1:infomation})

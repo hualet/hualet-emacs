@@ -698,4 +698,7 @@ ac-complete-mode-map
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Org-mode ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "C-c c") 'org-capture)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Browser Kill Ring ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "M-y") 'browse-kill-ring)
+
 (provide 'HualetKeySet)

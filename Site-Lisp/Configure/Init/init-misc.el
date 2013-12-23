@@ -88,6 +88,7 @@
                'emms-tag-editor-mode-hook
                'sh-mode-hook
                'haskell-cabal-mode-hook
+               'qml-mode-hook
                ))
   (add-hook hook '(lambda () (setq indent-tabs-mode nil))))
 

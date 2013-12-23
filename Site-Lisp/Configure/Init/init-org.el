@@ -11,18 +11,23 @@
  'org-babel-load-languages
  '((python . t)))
 
-(custom-set-variables 
+(custom-set-variables
  '(org-tags-column 80)                 ;设置tag的对齐位置
- '(org-todo-keywords '((sequence "TODO" "DOING" "HANGUP" "|" "DONE" "CANCEL"))) ;设置TODO的详细完成阶段
- '(org-default-notes-file (concat my-notes-directory "hualet.org"))
+ ;; '(org-todo-keywords '((sequence "TODO" "DOING" "HANGUP" "|" "DONE" "CANCEL"))) ;设置TODO的详细完成阶段
+ '(org-default-notes-file (concat my-notes-directory "WeeklyReviews.org"))
  )
 
-;; Setting Colours (faces) for todo states to give clearer view of work 
-(setq org-todo-keyword-faces
-      '(("TODO" . org-warning)
-        ("DOING" . "pink")
-        ("HANGUP" . "blue")
-        ("DONE" . "green")
-        ("CANCEL" . "black")))
+;; Setting Colours (faces) for todo states to give clearer view of work
+;; (setq org-todo-keyword-faces
+      ;; '(("TODO" . org-warning)
+        ;; ("DOING" . "pink")
+        ;; ("HANGUP" . "blue")
+        ;; ("DONE" . "green")
+        ;; ("CANCEL" . "black")))
+
+;; Org Capture 设置
+(setq org-capture-templates
+      '(("w" "Task" entry (file+datetree "~/Notes/WeeklyReviews.org")
+         "* TODO %?\n")))
 
 (provide 'init-org)

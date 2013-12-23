@@ -338,6 +338,14 @@ ac-complete-mode-map
    ("M-=" . text-scale-default-global)  ;恢复字体大小, 全局
    ))
 
+;;; ### Color-moccur ###
+;;; --- 增强的moccur
+(lazy-set-key
+ '(
+   ("s-x v" . moccur-grep)              ;搜索当前目录下的文件
+   ("s-x g" . moccur-grep-find-pwd)     ;递归搜索当前目录下的文件
+   ))
+
 ;;; ### Buffer Edit ###
 ;;; --- 缓存编辑
 (lazy-set-key

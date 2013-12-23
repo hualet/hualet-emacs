@@ -1,10 +1,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 字体设置 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar emacs-font-name "MONACO"
-	"The default font name")
-(defvar emacs-font-size 13
-  "The default font size.")
-(if (display-grayscale-p)
-    (progn
-      (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))))
+
+;;; Setting English font
+(set-face-attribute
+ 'default nil :font "MONACO 13")
+
+;;; Chinese Font
+(dolist (charset '(kana han symbol cjk-misc bopomofo))
+  (set-fontset-font (frame-parameter nil 'font)
+                    charset
+                    (font-spec :family "文泉驿等宽微米黑" :size 16)))
 
 (provide 'HualetFont)

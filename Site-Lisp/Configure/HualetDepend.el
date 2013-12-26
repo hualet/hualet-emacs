@@ -234,7 +234,7 @@
 ;(require 'compilation-recenter-end)     ;±‡“Î∫Ûª÷∏¥
 ;(require 'darcsum)                      ;darcs mode
 ;;; (require 'mumamo)
-;(require 'js2-mode)                     ;javascript mode
+(require 'js2-mode)                     ;javascript mode
 (require 'pretty-lambdada)              ;pretty lambda
 (require 'html-helper-mode)             ;html helper mode
 (require 'emmet-mode)                   ;upgraded zencoding mode

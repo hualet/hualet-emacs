@@ -190,6 +190,7 @@
                    ("\\.mll\\'" . tuareg-mode)
                    ("\\.mlp\\'" . tuareg-mode)
                    ("\\.qml\\'" . qml-mode)
+                   ("\\.js\\'" . js2-mode)
                    ))
  (add-to-alist 'auto-mode-alist elt-cons))
 

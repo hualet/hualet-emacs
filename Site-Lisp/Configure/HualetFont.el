@@ -8,6 +8,6 @@
 (dolist (charset '(kana han symbol cjk-misc bopomofo))
   (set-fontset-font (frame-parameter nil 'font)
                     charset
-                    (font-spec :family "文泉驿等宽微米黑" :size 16)))
+                    (font-spec :family "文泉驿等宽微米黑" :size 18)))
 
 (provide 'HualetFont)

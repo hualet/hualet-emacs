@@ -7,7 +7,6 @@
 ;(require 'flymake-shell)           ;对shell模式的实时语法检查
 (require 'flymake-cursor)          ;把flymake的错误信息显示在minibuf
 ;(require 'flymake-jslint)               ;flymake for javascript
-(require 'flymake-extension)            ;flymake 的一些扩展
 ;(require 'kill-ring-search)        ;Kill ring 搜索
 (require 'highlight-parentheses)   ;智能括号
 (require 'top-mode)                ;top

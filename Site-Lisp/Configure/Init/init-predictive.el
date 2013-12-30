@@ -14,7 +14,7 @@
  )
 
 (dolist (hook (list
-               'erc-mode-hook
+               ;; 'erc-mode-hook
                ;; 'rcirc-mode-hook
                ;; 'message-mode-hook
                ;; 'yaoddmuse-mode-hook

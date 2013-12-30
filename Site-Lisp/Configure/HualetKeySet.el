@@ -2,30 +2,13 @@
 ;;; --- 功能函数
 (lazy-set-key
  '(
-   ;; ("<f1>" . sh-show-help)                       ;elisp help
-   ;; ("<f2>" . refresh-file)                       ;自动刷新文件
-   ;; ("<f3>" . visit-tags-table)                   ;查找TAGS文件 (更新TAGS表)
-   ;; ("<f4>" . generate-gtags-files)               ;生成gtags引用文件
-   ;;("<f5>" . emacs-exit)                         ;退出emacs
    ("<f6>" . lock-screen)                        ;锁屏
-   ;; ("<f7>" . one-key-menu-ui)                    ;用户界面菜单
    ("<f8>" . dired-jump)                         ;文件管理起
-   ;; ("<f9>" . list-load-path-shadows)             ;显示重复加载的库
-   ;; ("<f10>" . open-current-log-keyboard-command) ;打开命令日志
    ("<f11>" . fullscreen-toggle)                 ;全屏切换
-   ;; ("<f12>" . hibernate-disk)                    ;休眠
    ;; ("M-1" . strip-blank-lines)                   ;删除选中区域的所有空行
    ("M-2" . indent-buffer)                       ;自动格式化当前Buffer
    ("M-3" . flymake-goto-prev-error)    ;上一个错误
    ("M-4" . flymake-goto-next-error)    ;下一个错误
-   ;; ("M-5" . insert-line-number+)                 ;自动在行首添加行号
-   ;; ("M-6" . strip-line-number)                   ;删除选中区域的行号
-   ;; ("C-4" . insert-changelog-date)               ;插入日志时间 (%Y/%m/%d)
-   ;; ("C-5" . insert-standard-date)                ;插入标准时间 (%Y-%m-%d %T)
-   ;; ("C-&" . switch-to-messages)                  ;跳转到 *Messages* buffer
-   ;; ("C-7" . jump-back)                           ;返回查找符号定义前的位置
-   ;; ("C-8" . find-function-or-variable-at-point)  ;查找符号的定义
-   ;; ("M-I" . backward-indent)                     ;向后移动4个字符
    ))
 
 ;;; ### Unset key ###
@@ -160,60 +143,6 @@ ac-complete-mode-map
 ;; (lazy-set-key '(
 ;;                 ("C-x C-r" . recentf-open-files)
 ;;                 ("C-S-t" . recentf-open-most-recent-file-cycle)))
-
-
-;;; ### Paredit ###
-;;; --- 结构化编程
-(lazy-unset-key
- '("M-J" "M-r" "M-s" "M-;" "C-M-f" "C-M-b")
- paredit-mode-map)                      ;卸载按键
-(lazy-set-key
- '(
-   ;; 符号插入
-   ("(" . paredit-open-parenthesis)             ;智能 (
-   (")" . paredit-close-parenthesis)            ;智能 )
-   ("[" . paredit-open-bracket)                 ;智能 [
-   ("]" . paredit-close-bracket)                ;智能 ]
-   ("{" . paredit-open-curly)                   ;智能 {
-   ("}" . paredit-close-curly)                  ;智能 }
-   ("C-s-," . paredit-open-angled)              ;智能 <
-   ("C-s-." . paredit-close-angled)             ;智能 >
-   ("\"" . paredit-doublequote)                 ;智能 "
-   ("\\" . paredit-backslash)                   ;智能 \
-   ;; 删除
-   ("M-o" . paredit-backward-delete)            ;向后删除
-   ("C-d" . paredit-forward-delete)             ;向前删除
-   ("C-k" . paredit-kill)                       ;删除
-   ("C-M-m" . paredit-forward-kill-word)        ;向前按词删除
-   ("C-M-n" . paredit-backward-kill-word)       ;向后按词删除
-   ;; 移动
-   ("C-M-S-m" . paredit-forward)                ;向前移动
-   ("C-M-S-n" . paredit-backward)               ;向后移动
-   ;; 包围
-   ("M-\"" . paredit-meta-doublequote)          ;用 " " 包围对象, 或跳出字符串
-   ("M-(" . paredit-wrap-sexp)                  ;用 ( ) 包围当前对象
-   ("M-[" . paredit-wrap-square)                ;用 [ ] 包围对象
-   ("M-{" . paredit-wrap-curly)                 ;用 { } 包围对象
-   ("C-(" . paredit-wrap-angled)                ;用 < > 包围对象
-   ("M-)" . paredit-splice-sexp+)               ;去除包围对象的括号, 并删除空行
-   ;; 跳出并换行缩进
-   ("M-:" . paredit-close-round-and-newline+)   ;跳出 ( ) 或 " " 并换行
-   ("M-?" . paredit-forward-sexp-and-newline)   ;移动到下一个表达式, 并换行
-   ("M-}" . paredit-close-curly-and-newline)    ;跳出 { } 并换行
-   ("M-]" . paredit-close-square-and-newline)   ;跳出 [ ] 并换行
-   ("C-)" . paredit-close-angled-and-newline)   ;跳出 < > 并换行
-   ;; 注释
-   ("C-M-:" . paredit-comment-list-and-newline) ;注释当前LIST并换行
-   ;; 其他
-   ("C-j" . paredit-newline)            ;智能换行并缩进
-   ("M-q" . paredit-reindent-defun)     ;重新格式化函数
-   ("M-s-r" . paredit-raise-sexp)       ;提取表达式, 并删除同一等级的其他表达式
-   ("M-s-b" . paredit-convolute-sexp)   ;嵌套表达式
-   ;; ("M-s-'" . one-key-menu-paredit)     ;Paredit 菜单
-   )
- paredit-mode-map
- )
-
 
 ;;; ### Window Operation ###
 ;;; --- 窗口操作

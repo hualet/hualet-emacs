@@ -127,7 +127,6 @@
 ;;; (require 'bbdb)                         ;数据库
 ;;; (require 'bbdb-autoloads)               ;bbdb 自动加载
 ;(require 'shell-history)               ;Shell历史
-(require 'paredit)                     ;括号编辑模式
 ;;; (require 'mwe-log-commands)       ;命令日志
 ;(require 'contentswitch)               ;按内容切换缓存或文件
 ;;; (require 'etest)                  ;测试工具
@@ -308,7 +307,7 @@
 (require 'one-key)                      ;one-key
 (require 'one-key-config)               ;one-key 扩展
 (require 'lazy-search)                  ;懒惰搜索
-(require 'lazy-search-extension)        ;lazy-seach 扩展
+;(require 'lazy-search-extension)        ;lazy-seach 扩展
 ;(require 'gnus-extension)               ;gnus扩展
 ;(require 'ispell-extension)             ;ispell扩展
 ;(require 'yaoddmuse)                    ;另一种 oddmuse 模式
@@ -326,7 +325,7 @@
 ;; (require 'pymacs)
 (require 'qml-mode)                     ;QML mode
 (require 'multiple-cursors)             ;Emacs的multi-cursor
-(require 'paredit-extension)
+;; (require 'paredit-extension)
 (require 'cowsay)                       
 (require 'direx)                        ;目录结构展示
 (require 'direx-project)                ;工程目录结构

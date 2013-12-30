@@ -18,7 +18,7 @@
 (require 'init-dired)             ;文件管理器
 (require 'init-org)               ;笔记管理和组织
 (require 'init-wget)              ;下载管理器
-(require 'init-paredit)           ;括号编辑模式
+(require 'init-smartparens)           ;括号编辑模式
 (require 'init-flymake)           ;实时语法检查
 (require 'init-emmet)
 ;;(require 'init-etags)             ;Etags 用于建立代码并提供补全数据

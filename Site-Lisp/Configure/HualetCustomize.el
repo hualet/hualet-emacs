@@ -56,11 +56,7 @@
  ;; ERC
  '(erc-server "irc.freenode.net")       ;设置服务器
  '(erc-port 6667)                       ;设置端口
- `(erc-ignore-list '("ams", "trick"))   ;设置白痴列表, 这样就看不到它们的信息
- ;; Google Desktop Search
- '(google-desktop-search-url "http://127.0.0.1:38923/?hl=zh_CN&s=vhITkQ_HHma9o9JG6cj-xJjhra0") ;Google桌面搜索的唯一URL, 从你的外部浏览器的地址栏复制
- ;; Gmail
- '(w3m-gmail-login-string "http://mail.google.com/mail/h/h4339zs3i3b6/?zy=n&f=1") ;gmail 登录字符串
+ '(erc-ignore-list '("ams", "trick"))   ;设置白痴列表, 这样就看不到它们的信息
  )
 
 (provide 'HualetCustomize)

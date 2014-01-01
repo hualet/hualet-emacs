@@ -82,7 +82,7 @@
 (setq dired-recursive-copies 'always)                  ;拷贝东西时不提示
 ;(toggle-dired-find-file-reuse-dir 1)                   ;使用单一模式浏览Dired
 (setq dired-details-hidden-string "[ ... ] ")          ;设置隐藏dired里面详细信息的字符串
-(setq dired-listing-switches "-aluh")                  ;传给 ls 的参数
+(setq dired-listing-switches "-aluhX")                  ;传给 ls 的参数
 (setq directory-free-space-args "-Pkh")                ;目录空间选项
 (setq dired-omit-size-limit nil)                       ;dired忽略的上限
 (setq dired-dwim-target t)                             ;Dired试着猜处默认的目标目录

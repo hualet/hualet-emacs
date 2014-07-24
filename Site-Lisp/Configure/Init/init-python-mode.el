@@ -1,8 +1,3 @@
-(setq py-install-directory "~/.emacs.d/HualetEmacs/Site-Lisp/Packages/python-mode.el-6.1.1/")
-
-(require 'python-mode)
-(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-;; FIXME this can solve the problem that emacs will take over 99% cpu while opening big python file.
 (add-hook 'python-mode-hook 
           (lambda ()
             (setq which-function-mode nil)))
